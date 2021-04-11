@@ -1,0 +1,121 @@
+* {
+  margin: 0;
+  padding: 0;
+}
+#app {
+  font-family: "Avenir", Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-align: center;
+  color: #2c3e50;
+}
+
+.main-container {
+  display: flex;
+  .main-content {
+    flex: 1;
+    background: #66677c;
+    height: 100vh;
+    overflow: auto;
+  }
+  .slide-menu {
+    flex: 0 0 200px;
+    width: 200px;
+    .operations {
+      position: fixed;
+      right: 0;
+      width: 200px;
+      top: 0;
+      bottom: 0;
+      background-color: #333;
+      box-sizing: border-box;
+      padding: 20px;
+      .item {
+        margin-bottom: 20px;
+        .title {
+          padding-bottom: 10px;
+          text-align: left;
+          color: #fff;
+        }
+      }
+      .github {
+        position: absolute;
+        bottom: 20px;
+        left: 0;
+        right: 0;
+      }
+    }
+  }
+}
+.card {
+  background: #fff;
+  border-radius: 5px;
+  overflow: hidden;
+  cursor: pointer;
+  position: relative;
+  transition: 0.2s;
+  top: 0;
+  &:hover {
+    top: -3px;
+  }
+  .cover {
+    margin: 10px 10px 0 10px;
+    img {
+      display: block;
+      width: 100%;
+    }
+  }
+  .name {
+    background: #fff;
+    color: #666;
+    font-weight: 600;
+    padding: 10px 20px;
+    font-size: 14px;
+  }
+  .menus {
+    padding: 10px;
+    border-top: 1px solid #e7e7e7;
+    text-align: right;
+    p {
+      position: relative;
+      display: inline-block;
+      padding: 4px 10px;
+      text-decoration: none;
+      text-align: center;
+      cursor: pointer;
+      user-select: none;
+      color: white;
+      font-size: 12px;
+      margin-left: 10px;
+      &::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        right: 0;
+        background: linear-gradient(135deg, #6e8efb, #a777e3);
+        border-radius: 4px;
+        transition: box-shadow 0.5s ease, transform 0.2s ease;
+        will-change: transform;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        transform: translateY(var(--ty, 0)) rotateX(var(--rx, 0))
+          rotateY(var(--ry, 0)) translateZ(var(--tz, -12px));
+      }
+      &:hover::before {
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+      }
+      &::after {
+        position: relative;
+        display: inline-block;
+        content: attr(data-title);
+        transition: transform 0.2s ease;
+        font-weight: bold;
+        letter-spacing: 0.01em;
+        will-change: transform;
+        transform: translateY(var(--ty, 0)) rotateX(var(--rx, 0))
+          rotateY(var(--ry, 0));
+      }
+    }
+  }
+}
