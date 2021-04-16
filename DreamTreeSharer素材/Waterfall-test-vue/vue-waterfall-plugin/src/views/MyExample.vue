@@ -279,9 +279,7 @@ export default {
       : false;
 
     this.list = this.images.map((item, index) => {
-      return {
-        ...item,
-        blankColor: this.colors[index % this.colors.length]
+      return {...item, blankColor: this.colors[index % this.colors.length]
       };
     });
   },
@@ -294,10 +292,7 @@ export default {
     addNewList() {
       return new Promise((resolve) => {
         const list = this.images.map((item, index) => {
-          return {
-            ...item,
-            blankColor: this.colors[index % this.colors.length]
-          };
+          return {...item, blankColor: this.colors[index % this.colors.length]};
         });
         this.list.push(...list);
         setTimeout(() => {
@@ -310,21 +305,20 @@ export default {
       if (this.isSetInitStyle) {
         return {
           width: `${props.data.itemWidth - 20}px`,
-          height: `${((props.data.itemWidth - 20) / props.data.width) *
-            props.data.height}px`,
+          height: `${((props.data.itemWidth - 20) / props.data.width) * props.data.height}px`,
           backgroundColor: props.data.blankColor
         };
       }
     },
-    // 初始化开关
-    changeState(val) {
-      window.localStorage.setItem('isSetInitStyle', val);
-      if (val) {
-        this.$message.success('已开启高度设置，请刷新页面查看效果');
-      } else {
-        this.$message.warning('已关闭高度设置，请刷新页面查看效果');
-      }
-    },
+    // // 初始化开关
+    // changeState(val) {
+    //   window.localStorage.setItem('isSetInitStyle', val);
+    //   if (val) {
+    //     this.$message.success('已开启高度设置，请刷新页面查看效果');
+    //   } else {
+    //     this.$message.warning('已关闭高度设置，请刷新页面查看效果');
+    //   }
+    // },
     /**
      * 图片点击
      */

@@ -17,6 +17,18 @@ proxyObj['/'] = {
         '^/': '/'
     }
 }
+proxyObj['/upload-api'] = {
+    // websocket
+    ws: false,
+    // 目标地址
+    target: 'http://upload-z2.qiniup.com',
+    // 发送请求头 host 会被设置 target
+    changeOrigin: true,
+    // 重写请求地址
+    pathRewrite: {
+        '^/upload-api': ''
+    }
+}
 
 // 请求到 8080，但是会转发到 8081 端口
 module.exports = {

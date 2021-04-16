@@ -18,8 +18,8 @@ axios.interceptors.request.use(config => {
  * 响应拦截器-拦截后台返回的数据
  */
 axios.interceptors.response.use(success => {
-    if (success.status && success.status == 200) {
-        if (success.data.statusCode == 500 || success.data.statusCode == 401 || success.data.statusCode == 403) {
+    if (success.status && success.status === 200) {
+        if (success.data.statusCode === 500 || success.data.statusCode === 401 || success.data.statusCode === 403) {
             Message.error({message: success.data.message})
             return
         }
@@ -30,11 +30,11 @@ axios.interceptors.response.use(success => {
     // 返回数据给前端
     return success.data
 }, error => {
-    if (error.response.statusCode == 504 || error.response.statusCode == 404) {
+    if (error.response.statusCode === 504 || error.response.statusCode === 404) {
         Message.error({message:'服务器掉线啦！( ╯□╰ )'})
-    } else if (error.response.statusCode == 403) {
+    } else if (error.response.statusCode === 403) {
         Message.error({message:'权限不足，请联系管理员！'})
-    } else if (error.response.statusCode == 401) {
+    } else if (error.response.statusCode === 401) {
         Message.error({message:'尚未登录，请先登录！'})
         router.replace('/')
     } else {
@@ -44,12 +44,13 @@ axios.interceptors.response.use(success => {
             Message.error({message:'未知错误！'})
         }
     }
-    return
+
 })
 
 /**
  * 前缀 url
  */
+// const baseURL = '/api'
 const baseURL = ''
 /**
  * 发送一个 axios 异步 post 请求
