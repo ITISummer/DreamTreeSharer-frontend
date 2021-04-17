@@ -169,8 +169,11 @@ export default {
   }
 };
 </script>
-
-<style lang="scss" scoped>
+<!--
+1. 加上与不加 scoped 无影响
+2. 加 module 会让格式很乱
+-->
+<style lang="scss">
 .main-container {
   display: flex;
   .el-header {

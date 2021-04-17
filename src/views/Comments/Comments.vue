@@ -165,6 +165,10 @@ export default {
 }
 </script>
 
+<!--
+1. 加与不加 scoped 无影响
+2. 加 module 会有很大影响
+-->
 <style scoped lang="scss">
 
 @import "../../../public/scss/index";

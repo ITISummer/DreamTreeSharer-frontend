@@ -232,3 +232,163 @@ proxyObj['/upload-api'] = {
 <img src="C:\Users\LCX\AppData\Roaming\Typora\typora-user-images\image-20210416210112427.png" alt="image-20210416210112427" style="zoom:80%;" />
 
 在经过一番仔细研究后发现需要加 http 或者 https 协议头部，于是请求地址变为了 `http://qrne6et6u.hn-bkt.clouddn.com/test.jpg` 这样就可以正确访问了
+
+# 2021年4月17日 - 处理图片上传时向后台动态获取 token
+
+前端需要在校验完用户提交的图片格式（后缀，大小）后往后台提交图片名(key)以方便后端根据 key 来生成图片上传 token。期间遇到一个问题是前端使用 `:before-upload="beforeUpload"` 钩子函数来校验完图片格式后，按理想情况，这时候应该开始根据 key 来向后台通过 发送 ajax 请求获得后台生成的 token。但是由于是异步请求，前端在校验完图片格式后就直接提交到远程服务器，这时候后台动态生成的 token 的获得始终是要慢于前台向远程服务器（七牛云）提交。所以每次提交给远程服务器时，token总是为 "" 。在经过一番折腾（查询\<el-upload> 标签相关属性与钩子函数）无果后，我脑子里这时候总是浮现 async 与 await，我在前期跟着学习的时候，有见过这两个关键词的使用，但是一直没有很深的印象也没有很好的理解。所以在遇到以上提到的问题后，我一直没第一时间反应过来。在遇到以上问题的时候，我就在想，是不是有一种手段，能够让 \<el-uplaod> 进行图片格式验证完后先等待 getQiniuToken() 异步获取到后台生成的 token 后再拿着 key 与 token 向远程服务器进行提交！结合刚才的想法与脑子里浮现的 async 与 await，我尝试模仿前面学习的用法，给本项目中的相关方法给加上 async 与 await 后，然后就成功了！开心（o(*￣▽￣*)ブ）！！！ 
+
+具体代码如下：
+
+```js
+  methods: {
+    /**
+     * 创建前从后台获取访问七牛云的 token - (key(文件名) bucket, AccessKey, SecretKey)
+     */
+    getQiniuToken: async function(key) {
+      const _this = this;
+     await this.getRequest(`/qiniu/uploadToken/${key}`)
+          .then(function(res) {
+            if (res.statusCode === 200) {
+              _this.qiniuData.token = res.object;
+            } else {
+              _this.$message({message: res.message, duration: 2000, type: "warning"});
+            }
+          });
+    },
+    /**
+     * 图片上传前的格式校验
+     * @param file
+     * @returns {boolean}
+     */
+    beforeUpload: async function(file) {
+      this.qiniuData.key = file.name;
+      const isJPG = file.type === "image/jpeg";
+      const isPNG = file.type === "image/png";
+      const isLt2M = file.size / 1024 / 1024 < 2;
+      if (!isJPG && !isPNG) {
+        this.$message.error("图片只能是 JPG/PNG 格式!");
+        return false;
+      }
+      if (!isLt2M) {
+        this.$message.error("图片大小不能超过 2MB!");
+        return false;
+      }
+     await this.getQiniuToken(this.qiniuData.key)
+    },
+```
+
+## 关于 vue 组件中的 \<style scoped> 与 \<style module> 使用的理解
+
+出现的问题是，当我在 Upload.vue 定义 img{width: 350px; height: 350px }时，会影响 Comments.vue 中评论者头像大小的影响，加了 scoped 就没影响了，但是貌似加了 scoped 后 Upload.vue 中的样式又会有变化，我尝试给给所有 vue 组件的 style 标签中都加上 scoped 属性，但是本来没加 scoped，样式显示效果就很好了，加了后反而不好了，整个样式的控制感觉整体上很乱，我在搜寻后，发现加 module 属性可以达到与 scoped 同样的效果，且貌似比 scoped 更好一点，但是当我尝试把原来的 scoped 属性换成 module 属性时，每个组件的样式显示又千奇百怪了。哎！ 😔
+
+**参考文档**
+
+[掘金： Vue: scoped 样式与 CSS Module 对比](https://juejin.cn/post/6844903673517211655)
+
+[segment: vue的scoped和module的区别](https://segmentfault.com/a/1190000021084387)
+
+[简书：Vue中对比scoped css和css module的区别](https://www.jianshu.com/p/255a42397db5)
+
+### \<style scoped>
+
+**以下内容参考** [简书：Vue中对比scoped css和css module的区别](https://www.jianshu.com/p/255a42397db5)
+
+为类名添加一个hash标识属性。无法完全避开css权重和类名重复的问题。
+
+```html
+<style scoped>
+h1 {
+ color: #f00;
+}
+</style>
+```
+
+```html
+//编译结果如下
+h1[data-v-4c3b6c1c] {
+ color: #f00;
+}
+```
+
+缺点
+
+- 如果用户在别处定义了相同的类名，也许还是会影响到组件的样式。
+- 根据css样式优先级的特性，scoped这种处理会造成每个样式的权重加重,引用 使用了scoped的组件 作为子组件，修改子组件的样式变得很难，可能迫不得已只能用！important
+- **scoped会使 标签选择器 渲染变慢很多倍**，用标签选择器时scoped会严重降低性能，而使用class或id则不会
+
+**以下内容参考** [segment：vue的scoped和module的区别](https://segmentfault.com/a/1190000021084387)
+
+在scoped规定区域内的样式。渲染后给元素加上属性，并将选择器变成属性选择器 。这样就限定了范围。防止形成全局样式。
+
+2. 缺点
+
+无法修改子组件、第三方组件、 v-html 创建的 DOM 、的样式，
+
+3. 解决方案
+
+1),通过穿透scoped，使用深度选择器，例如'>>>'。
+2),另外用一个普通不含scoped的style标签。在里面书写样式。
+
+4. 总结
+
+上面不管是那种方式都是违背scoped的原则。都会形成全局样式。所以使用scoped的一般是中小型项目。
+
+
+
+### \<style module>
+
+以下内容参考 [掘金： Vue: scoped 样式与 CSS Module 对比](https://juejin.cn/post/6844903673517211655)
+
+为所有类名重新生成类名，生成方式为类似 `所在组件名_原类名_哈希值` 例如：
+
+```vue
+<style>
+  .BasePanel__d17eko1 {
+    /* some styles */
+  }
+  .ComponentName__pricing-panel__a81Kj {
+    width: 300px;
+    margin-bottom: 30px;
+  }
+</style>
+
+<div class="BasePanel__d17eko1 ComponentName__pricing-panel__a81Kj">
+  content
+</div>
+
+作者：西楼听雨
+链接：https://juejin.cn/post/6844903673517211655
+来源：掘金
+著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。
+```
+
+**以下内容参考** [segment：vue的scoped和module的区别](https://segmentfault.com/a/1190000021084387)
+
+将module的里面的样式都保存在$style对象中，渲染后选择器会加上该组件所在文件的文件名作为前缀；由于是个对象所以也同时能将样式导出供其他页面使用。
+
+```vue
+<template>
+  <div :class="$style.content">
+    <div :class="$style['title-wrap']">我是红色的</div>
+    <green-title></green-title>
+  </div>
+</template>
+ 
+<style lang="scss" module>
+.content {
+  .title-wrap {
+    font-size: 20px;
+    color: red;
+  }
+}
+</style>
+```
+
+![image.png](https://segmentfault.com/img/bVbAC4o)
+
+结论： 根据渲染前后变化其实也是就形成一个特殊的模块化的命名方式。来形成全局样式，只是由于加上选择器前缀比较显得跟私有化些，一般难以重名而已。
+
+### 总结
+
+css module前期进行不麻烦的配置，实现的效果比scoped css更优，这里推荐使用css module。
+

@@ -15,11 +15,12 @@ data	上传时附带的额外参数
     <el-upload
         class="upload-demo"
         drag
+        :auto-upload="auto_upload"
         :action="upload_qiniu_url"
         :show-file-list="false"
+        :before-upload="beforeUpload"
         :on-success="handleSuccess"
         :on-error="handleError"
-        :before-upload="beforeUpload"
         :data="qiniuData">
       <img v-if="imageUrl" :src="imageUrl" class="avatar">
       <div v-else class="el-default">
@@ -36,44 +37,36 @@ export default {
   data() {
     return {
       imageUrl: "",
-      qiniuData: {key: "", token: "7viju8jm47T3cIZFLPXPJpj28OUpjQzFPS5Fw80p:hVlr_ADbwZzdNjZIn05fKBzenow=:eyJzY29wZSI6Iml0aXN1bW1lci1odWFuYW4tYnVja2V0OnRlc3QuanBnIiwiZGVhZGxpbmUiOjE2MTg1ODA4ODh9"},
+      auto_upload: true,
+      qiniuData: {key: "", token: ""},
       // 七牛云上传储存区域的上传域名（华东、华北、华南、北美、东南亚）
       upload_qiniu_url: "http://upload-z2.qiniup.com",
-      // upload_qiniu_url: "qrne6et6u.hn-bkt.clouddn.com",
       // 七牛云返回储存图片的子域名
-      // upload_qiniu_addr: "http://abc.clouddn.com/",
       upload_qiniu_addr: "qrne6et6u.hn-bkt.clouddn.com/",
-      global: {dataUrl: 'localhost:8080'}
+      // global: {dataUrl: 'localhost:8080'}
     };
   },
-  /**
-   * 创建前从后台获取访问七牛云的 token - (bucket, AccessKey, SecretKey)
-   */
-  // created() {this.getQiniuToken();},
   methods: {
-    // getQiniuToken: function() {
-    //   const _this = this;
-    //   this.$axios
-    //       .post(this.global.dataUrl + "/qiniu/uploadToken")
-    //       .then(function(res) {
-    //         console.log(res);
-    //         if (res.data.success) {
-    //           _this.qiniuData.token = res.data.result;
-    //         } else {
-    //           _this.$message({
-    //             message: res.data.info,
-    //             duration: 2000,
-    //             type: "warning"
-    //           });
-    //         }
-    //       });
-    // },
+    /**
+     * 创建前从后台获取访问七牛云的 token - (key(文件名) bucket, AccessKey, SecretKey)
+     */
+    getQiniuToken: async function(key) {
+      const _this = this;
+     await this.getRequest(`/qiniu/uploadToken/${key}`)
+          .then(function(res) {
+            if (res.statusCode === 200) {
+              _this.qiniuData.token = res.object;
+            } else {
+              _this.$message({message: res.message, duration: 2000, type: "warning"});
+            }
+          });
+    },
     /**
      * 图片上传前的格式校验
      * @param file
      * @returns {boolean}
      */
-    beforeUpload: function(file) {
+    beforeUpload: async function(file) {
       this.qiniuData.key = file.name;
       const isJPG = file.type === "image/jpeg";
       const isPNG = file.type === "image/png";
@@ -86,6 +79,7 @@ export default {
         this.$message.error("图片大小不能超过 2MB!");
         return false;
       }
+     await this.getQiniuToken(this.qiniuData.key)
     },
     /**
      * 上传成功
@@ -94,26 +88,28 @@ export default {
      */
     handleSuccess: function(res, file) {
       this.imageUrl = "http://"+this.upload_qiniu_addr + res.key;
-      this.$message({message: `上传成功！图片地址为：${this.imageUrl}`})
+      this.$message({message: `上传成功！图片地址为：${this.imageUrl}`, type: "success"})
     },
     /**
      * 上传失败
      * @param res
      */
     handleError: function(res) {
-      this.$message({
-        message: "上传失败",
-        type: "warning"
-      });
+      this.$message({message: "上传失败", type: "error"});
     }
   }
 };
 </script>
-
-<style scoped lang="scss">
+<!--[译] Vue: scoped 样式与 CSS Module 对比](https://juejin.cn/post/6844903673517211655)-->
+<!--
+加 scoped 对自身样式会有很大影响
+不加 scoped 会对 Comments 组件有很大影响
+加 module 不会有很大影响，而且会去掉对 Comments 组件的影响
+-->
+<style module lang="scss">
 
 .title {
-  margin: 90px 0 40px 0;
+  margin: 120px 0 40px 0;
 }
 .el-default {
   .el-icon-upload {
@@ -121,12 +117,12 @@ export default {
   }
 }
 .el-upload-dragger {
-  width: 350px;
+  width: 240px;
   height: 350px;
 }
 .avatar {
-  width: 350px;
-  height: 350px;
+  width: 240px;
+  height: 550px;
   display: block;
 }
 

@@ -17,7 +17,7 @@
               <el-input type="password" placeholder="请输入密码" auto-complete="false" v-model="loginForm.password"></el-input>
           </el-form-item>
           <el-form-item prop="captcha">
-              <el-input type="text" placeholder="点击图片更换验证码" auto-complete="false" maxLength="4" v-model="loginForm.captcha" style="width: 250px; margin-right: 5px"></el-input>
+              <el-input type="text" placeholder="点击图片更换验证码" auto-complete="false" @keyup.enter="login" v-model="loginForm.captcha" style="width: 250px; margin-right: 5px"></el-input>
               <img :src="captchaUrl" alt="啊我~" style="cursor: pointer" @click="updateCaptcha">
           </el-form-item>
           <el-form-item>
@@ -27,7 +27,7 @@
           </el-form-item>
         </el-form>
 <!--      // 注册模块-->
-      <el-form :rules="rules" ref="form" :model="regForm" class="login-container" v-show="!on" @submit.prevent="register">
+      <el-form :rules="rules" ref="form" :model="regForm" class="login-container" v-show="!on">
         <h3 class="login-title">用户注册</h3>
         <el-form-item prop="username">
           <el-input type="text" auto-complete="false" v-model="regForm.username" placeholder="请输入用户名"></el-input>
@@ -42,17 +42,17 @@
           <el-input type="tel" auto-complete="false" maxLength="11" v-model="regForm.phone" placeholder="请输入注册手机号"></el-input>
         </el-form-item>
         <el-form-item prop="smsCode">
-          <el-input type="text" auto-complete="false" maxLength="6" v-model="regForm.smsCode" placeholder="请输入验证码..." style="width: 250px; margin-right: 5px"></el-input>
+          <el-input type="text" auto-complete="false" @keyup.enter="register" v-model="regForm.smsCode" placeholder="请输入验证码..." style="width: 250px; margin-right: 5px"></el-input>
         </el-form-item>
         <el-form-item>
         <el-button type="primary">获取验证码</el-button>
-        <el-button type="primary" style="width: 100%">注册</el-button>
+        <el-button type="primary" style="width: 100%" @click="register">注册</el-button>
         <el-button type="primary" @click="on=true">已有账号？请登录</el-button>
         </el-form-item>
       </el-form>
     </div>
 </template>
-// 脚本
+<!--// 脚本-->
 <script>
 
 export default {
@@ -87,16 +87,20 @@ export default {
         },
         rules: {
           // 这里的 username, password, code 是表单标签里面的，不是 vm 属性
-          username: [{required: true,message: '请输入用户名', trigger:'blur'},
+          username: [
+            {required: true,message: '请输入用户名', trigger:'blur'},
             {min: 6,max: 18,message: '用户名长度应该在6-18字符内', trigger: 'change'}],
-          password: [{required: true,message: '请输入密码', trigger:'blur'},
+          password: [
+            {required: true,message: '请输入密码', trigger:'blur'},
             {min: 6,max: 18,message: '密码长度应该在6-18字符内', trigger: 'change'}],
-          captcha: [{required: true,message: '请输入图形验证码', trigger:'blur'},
+          captcha: [
+            {required: true,message: '请输入图形验证码', trigger:'blur'},
             {len: 4, message: "图形验证码长度应该为4", trigger: 'change'}],
           rePassword: [{required: true,message: '请确认密码', trigger:'blur'}],
           phone: [{required: true,message: '请输入手机号', trigger:'blur'}],
-          smsCode: [{required: true,message: '请输入短信验证码', trigger:'blur'},
-          {len: 4, message: "短信验证码长度应该为6", trigger: 'change'}],
+          smsCode: [
+            {required: true,message: '请输入短信验证码', trigger:'blur'},
+            {len: 4, message: "短信验证码长度应该为6", trigger: 'change'}],
         },
         }
     },
@@ -131,42 +135,47 @@ export default {
     },
 
     /**
-     * 更新验证码
-     */
-    updateCaptcha() {
-      return this.captchaUrl = '/captcha?time='+new Date()
-    },
-    /**
      * 用户注册
      */
     register() {
 
     },
+    /**
+     * 更新验证码
+     */
+    updateCaptcha() {
+      return this.captchaUrl = '/captcha?time='+new Date()
+    },
   }
 }
 </script>
-// 样式添加处
-<style type="text/css">
-    .login-container{
-        border-radius: 15px;
-        background-clip: padding-box;
-        margin: 180px auto;
-        width: 350px;
-        padding: 15px 35px 15px 35px;
-        background: #fff;
-        border: 1px solid #eaeaea;
-        box-shadow: 0 0 25px #cac6c6;
-    }
-    .login-title{
-        margin: 0 auto 40px auto;
-        text-align: center;
-    }
-    .login-rememberMe{
-        text-align: left;
-        margin: 0 0 15px 0;
-    }
-    .el-form-item__content{
-      display: flex;
-      align-items: center;
-    }
+<!--// 样式添加处-->
+
+<!--
+1. 加上与不加 scoped 有很大影响
+2. 加 module 与加 scoped 一样，会让格式很乱
+-->
+<style lang="scss">
+.login-container {
+  border-radius: 15px;
+  background-clip: padding-box;
+  margin: 180px auto;
+  width: 350px;
+  padding: 15px 35px 15px 35px;
+  background: #fff;
+  border: 1px solid #eaeaea;
+  box-shadow: 0 0 25px #cac6c6;
+}
+.login-title {
+  margin: 0 auto 40px auto;
+  text-align: center;
+}
+.login-rememberMe {
+  text-align: left;
+  margin: 0 0 15px 0;
+}
+.el-form-item__content {
+  display: flex;
+  align-items: center;
+}
 </style>
