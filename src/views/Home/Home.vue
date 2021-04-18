@@ -1,39 +1,12 @@
 <!--[瀑布流学习地址](https://www.jianshu.com/p/97b89597ab5c)-->
 <template>
-  <el-container class="main-container" >
-    <!--    头部-->
-    <el-header>
-      <el-row align="middle" justify="center">
-        <el-col :span="2">
-          <img  width="36" height="36" src="../../assets/logo.png"/>
-<!--          <el-avatar size="large" src=""></el-avatar>-->
-        </el-col>
-        <el-col :span="2">
-          <div>
-            <el-button round>Home</el-button>
-          </div>
-        </el-col>
-        <el-col :span="15" :offset="1">
-          <el-input type="text" placeholder="Type something" prefix-icon="el-icon-search" v-model="search"></el-input>
-        </el-col>
-        <el-col :span="2" :offset="2">
-          <el-dropdown>
-            <div class="el-dropdown-link">
-              <el-avatar size="large" src="https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png"></el-avatar>
-            </div>
-            <el-dropdown-menu slot="dropdown">
-              <el-dropdown-item>Action 1</el-dropdown-item>
-              <el-dropdown-item>Action 2</el-dropdown-item>
-              <el-dropdown-item disabled>Action 3</el-dropdown-item>
-            </el-dropdown-menu>
-          </el-dropdown>
-        </el-col>
-      </el-row>
-    </el-header>
+  <el-container class="main-container">
+<!--    头部-->
+    <Header :search="search"></Header>
     <!--    主体-->
     <el-main  class="main-content">
-      <!-- 滚动加载 -->
-      <div v-infinite-scroll="load" infinite-scroll-disabled="disabled">
+      <!-- 滚动加载 下面 v-infinite-scroll 的放置位置与瀑布流是否能够加载有关 -->
+      <div v-infinite-scroll="load" infinite-scroll-disabled="disabled" style="margin-top: 40px">
         <Waterfall ref="waterfall" :list="list" :gutter="10" :width="240"
          :breakpoints="{
           //当屏幕宽度小于等于1200
@@ -77,10 +50,10 @@
 
 <script>
 import Waterfall from 'vue-waterfall-plugin';
+import Header from "../../components/Header/Header";
 // const baseURL = '../../assets/images/'
 export default {
-  components: {Waterfall},
-
+  components: {Waterfall,Header},
   data() {
     return {
       search: '',
@@ -116,7 +89,7 @@ export default {
         {label: 'fadeInDown', value: 'fadeInDown'},
         {label: 'zoomIn', value: 'zoomIn'}
       ],
-    };
+    }
   },
 
   computed: {
@@ -167,117 +140,98 @@ export default {
      */
     handleDelete() {this.$message.error('删除');},
   }
-};
+}
 </script>
 <!--
 1. 加上与不加 scoped 无影响
 2. 加 module 会让格式很乱
+
+flex 属性用于设置或检索弹性盒模型对象的子元素如何分配空间。
+flex 属性是 flex-grow、flex-shrink 和 flex-basis 属性的简写属性。
+注意：如果元素不是弹性盒模型对象的子元素，则 flex 属性不起作用。
 -->
 <style lang="scss">
-.main-container {
-  display: flex;
-  .el-header {
-    background: #66677c;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    z-index: 999;
-    border-radius: 20px;
-    padding: 10px 0 0 0;
-    .el-dropdown-link {
-      cursor: pointer;
-      color: #409EFF;
-    }
-    img {
-      cursor: pointer;
-      border-radius: 13px;
-    }
-  }
-  /**
-  主体样式
-   */
-  .main-content {
-    flex: 1;
-    background: #66677c;
-    height: 100vh;
-    overflow-y: auto;
-    padding: 60px 0 0 0;
-  }
-}
-
+//.main-container {
+//  display: flex;
+//}
 /**
-每一张卡片样式
+主体样式
  */
-.card {
-  background: #fff;
-  border-radius: 5px;
-  overflow: hidden;
-  cursor: pointer;
-  position: relative;
-  transition: 0.2s;
-  top: 0;
-  &:hover {
-    top: -3px;
-  }
-  .cover {
-    margin: 10px 10px 0 10px;
-    img {
-      display: block;
-      width: 100%;
-    }
-  }
-  // 卡片底部名字样式
-  .name {
+.main-content {
+  //flex: 1;
+  //background: #66677c;
+  background: #6e8efb;
+  height: 100vh;
+  overflow-y: auto;
+  //margin-top: 50px;
+  //padding: 100px 0 0 0;
+  .card { /** 每一张卡片样式 */
     background: #fff;
-    color: #666;
-    font-weight: 600;
-    padding: 10px 20px;
-    font-size: 14px;
-  }
-
-  // 卡片操作菜单栏
-  .menus {
-    padding: 10px;
-    border-top: 1px solid #e7e7e7;
-    text-align: right;
-    p {
-      position: relative;
-      display: inline-block;
-      padding: 4px 10px;
-      text-decoration: none;
-      text-align: center;
-      cursor: pointer;
-      user-select: none;
-      color: white;
-      font-size: 12px;
-      margin-left: 10px;
-      &::before {
-        content: "";
-        position: absolute;
-        top: 0;
-        left: 0;
-        bottom: 0;
-        right: 0;
-        background: linear-gradient(135deg, #6e8efb, #a777e3);
-        border-radius: 4px;
-        transition: box-shadow 0.5s ease, transform 0.2s ease;
-        will-change: transform;
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-        transform: translateY(var(--ty, 0)) rotateX(var(--rx, 0)) rotateY(var(--ry, 0)) translateZ(var(--tz, -12px));
+    border-radius: 5px;
+    overflow: hidden;
+    cursor: pointer;
+    position: relative;
+    transition: 0.2s;
+    top: 0;
+    &:hover {
+      top: -3px;
+    }
+    .cover {
+      margin: 10px 10px 0 10px;
+      img {
+        display: block;
+        width: 100%;
       }
-      &:hover::before {
-        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-      }
-      &::after {
+    }
+    .name { //卡片底部名字样式
+      background: #fff;
+      color: #666;
+      font-weight: 600;
+      padding: 10px 20px;
+      font-size: 14px;
+    }
+    .menus {// 卡片操作菜单栏
+      padding: 10px;
+      border-top: 1px solid #e7e7e7;
+      text-align: right;
+      p {
         position: relative;
         display: inline-block;
-        content: attr(data-title);
-        transition: transform 0.2s ease;
-        font-weight: bold;
-        letter-spacing: 0.01em;
-        will-change: transform;
-        transform: translateY(var(--ty, 0)) rotateX(var(--rx, 0)) rotateY(var(--ry, 0));
+        padding: 4px 10px;
+        text-decoration: none;
+        text-align: center;
+        cursor: pointer;
+        user-select: none;
+        color: white;
+        font-size: 12px;
+        margin-left: 10px;
+        &::before {
+          content: "";
+          position: absolute;
+          top: 0;
+          left: 0;
+          bottom: 0;
+          right: 0;
+          background: linear-gradient(135deg, #6e8efb, #a777e3);
+          border-radius: 4px;
+          transition: box-shadow 0.5s ease, transform 0.2s ease;
+          will-change: transform;
+          box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+          transform: translateY(var(--ty, 0)) rotateX(var(--rx, 0)) rotateY(var(--ry, 0)) translateZ(var(--tz, -12px));
+        }
+        &:hover::before {
+          box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+        &::after {
+          position: relative;
+          display: inline-block;
+          content: attr(data-title);
+          transition: transform 0.2s ease;
+          font-weight: bold;
+          letter-spacing: 0.01em;
+          will-change: transform;
+          transform: translateY(var(--ty, 0)) rotateX(var(--rx, 0)) rotateY(var(--ry, 0));
+        }
       }
     }
   }

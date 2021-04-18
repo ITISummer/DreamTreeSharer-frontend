@@ -86,7 +86,7 @@ export default {
           smsCode: ''
         },
         rules: {
-          // 这里的 username, password, code 是表单标签里面的，不是 vm 属性
+          // 这里的 username, password, code 是和表单标签里面对应的，不是 vm 属性
           username: [
             {required: true,message: '请输入用户名', trigger:'blur'},
             {min: 6,max: 18,message: '用户名长度应该在6-18字符内', trigger: 'change'}],
@@ -97,7 +97,9 @@ export default {
             {required: true,message: '请输入图形验证码', trigger:'blur'},
             {len: 4, message: "图形验证码长度应该为4", trigger: 'change'}],
           rePassword: [{required: true,message: '请确认密码', trigger:'blur'}],
-          phone: [{required: true,message: '请输入手机号', trigger:'blur'}],
+          phone: [
+            {required: true,message: '请输入手机号', trigger:'blur'},
+            {len: 11, message: '手机号长度应该为 11 位', trigger: 'change'}],
           smsCode: [
             {required: true,message: '请输入短信验证码', trigger:'blur'},
             {len: 4, message: "短信验证码长度应该为6", trigger: 'change'}],

@@ -392,3 +392,262 @@ h1[data-v-4c3b6c1c] {
 
 css module前期进行不麻烦的配置，实现的效果比scoped css更优，这里推荐使用css module。
 
+# 2021年4月18日-引入用户个人中心模块
+
+[Vue修改用户信息~不要错过哦](https://blog.csdn.net/weixin_46370867/article/details/113448645)
+
+参考以上文章，该文章使用的是 \<el-dialog>  不过为了适应本项目，我想改成 \<el-table> 吧，这样会更好看点！
+
+另外，今天遇到一些问题，得记录下！
+
+[npm run dev卡住 即 vue-cli-service serve卡住，不提示错误信息，进程也不关闭](https://blog.csdn.net/weixin_43711917/article/details/97970502)
+
+首先是在创建一个 vue 组件后，不要直接在 \<template> 下写一些文本内容吧，这样会导致 build 的时候编译时卡住不动，没报错，也没提示，就是编译时卡住了，详解可以参考以上链接！
+
+而在已经运行好的一个组件下，直接在 \<template> 中添加文本内容，则会报错：
+
+<img src="https://raw.githubusercontent.com/ITISummer/FigureBed/master/img/Snipaste_2021-04-18_21-43-11.png" style="zoom: 80%;" />
+
+<img src="https://raw.githubusercontent.com/ITISummer/FigureBed/master/img/Snipaste_2021-04-18_21-35-15.png" style="zoom:80%;" />
+
+另外，使用 vue 时，\<style> 里的样式真难捉摸，我觉得是不是 build 的一些 bug ，明明一样的样式控制代码，有时候去掉跟没去掉样式没啥差别，有时候把直接在标签里在 style 属性里写的样式照搬到 \<style> 中，居然又会有很大的差别！明明已经运行正常的样式，在持续运行一段时间后，居然又变了！哎，反正真心累吧！真的很不想弄样式！
+
+
+
+另外，记录下，刚本来想截图上传到 github 图床的，但是使用 picgo 一直上传不了，后来搜了下后，忽然记起，我改了我的 GitHub 用户名，所以一直上传不了！哎，我还以为 picgo 对 GitHub 这么不友好呢！[PicGo上传图片到GitHub总是失败的特殊解决办法](https://www.shopee6.com/web/web-tutorial/picgo-github-fail.html) 好了，几天就这样了吧！我左手臂酸疼，不想弄了！
+
+
+
+## vue 组件间通信的六种方式
+
+参考来源：[segment：vue组件间通信六种方式（完整版）](https://segmentfault.com/a/1190000019208626)
+
+![img](https://upload-images.jianshu.io/upload_images/3174701-7a15ec352b4e7d84?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+
+A 和 B、B 和 C、B 和 D 都是父子关系，C 和 D 是兄弟关系，A 和 C 是隔代关系（可能隔多代）
+
+### 方法一、`props`/`$emit`
+
+父组件A通过props的方式向子组件B传递，B to A 通过在 B 组件中 $emit, A 组件中 v-on 的方式实现。
+
+#### 1.父组件向子组件传值
+
+父组件向子组件传递 `users:["Henry","Bucky","Emily"]`
+
+```vue
+//App.vue父组件
+<template>
+  <div id="app">
+    <users v-bind:users="users"></users>//前者自定义名称便于子组件调用，后者要传递数据名
+  </div>
+</template>
+<script>
+import Users from "./components/Users"
+export default {
+  name: 'App',
+  data(){
+    return{
+      users:["Henry","Bucky","Emily"]
+    }
+  },
+  components:{
+    "users":Users
+  }
+}
+```
+
+```vue
+//users子组件
+<template>
+  <div class="hello">
+    <ul>
+      <li v-for="user in users">{{user}}</li>//遍历传递过来的值，然后呈现到页面
+    </ul>
+  </div>
+</template>
+<script>
+export default {
+  name: 'HelloWorld',
+  props:{
+    users:{           //这个就是父组件中子标签自定义名字
+      type:Array,
+      required:true
+    }
+  }
+}
+</script>
+```
+
+**总结：父组件通过props向下传递数据给子组件。注：组件中的数据共有三种形式：data、props、computed**
+
+#### 2.子组件向父组件传值（通过分发事件形式 (this.$emit()）
+
+![img](https://upload-images.jianshu.io/upload_images/3174701-8d31dfc061d39fad?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+
+```vue
+// 子组件
+<template>
+  <header>
+    <h1 @click="changeTitle">{{title}}</h1>//绑定一个点击事件
+  </header>
+</template>
+<script>
+export default {
+  name: 'app-header',
+  data() {
+    return {
+      title:"Vue.js Demo"
+    }
+  },
+  methods:{
+    changeTitle() {
+      this.$emit("titleChanged","子向父组件传值");//自定义事件  传递值“子向父组件传值”
+    }
+  }
+}
+</script>
+```
+
+```vue
+// 父组件
+<template>
+  <div id="app">
+    <app-header v-on:titleChanged="updateTitle" ></app-header>//与子组件titleChanged自定义事件保持一致
+   // updateTitle($event)接受传递过来的文字
+    <h2>{{title}}</h2>
+  </div>
+</template>
+<script>
+import Header from "./components/Header"
+export default {
+  name: 'App',
+  data(){
+    return{
+      title:"传递的是一个值"
+    }
+  },
+  methods:{
+    updateTitle(e){   //声明这个函数
+      this.title = e;
+    }
+  },
+  components:{
+   "app-header":Header,
+  }
+}
+</script>
+```
+
+**总结：子组件通过events给父组件发送消息，实际上就是子组件把自己的数据发送到父组件。**
+
+### 方法二、`$emit`/`$on`
+
+**这种方法通过一个空的Vue实例作为中央事件总线（事件中心），用它来触发事件和监听事件,巧妙而轻量地实现了任何组件间的通信，包括父子、兄弟、跨级**。当我们的项目比较大时，可以选择更好的状态管理解决方案vuex。
+
+```vue
+    var Event=new Vue();
+    Event.$emit(事件名,数据);
+    Event.$on(事件名,data => {});
+```
+
+
+
+### 方法三、vuex
+
+![img](https://upload-images.jianshu.io/upload_images/3174701-e62ba449a0c2e7ac?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+
+#### 1.简要介绍Vuex原理
+
+Vuex实现了一个**单向数据流**，**在全局拥有一个State存放数据**，当组件要更改State中的数据时，必须通过Mutation进行，Mutation同时提供了订阅者模式供外部插件调用获取State数据的更新。而当所有异步操作(常见于调用后端接口异步获取更新数据)或批量的同步操作需要走Action，但Action也是无法直接修改State的，还是需要通过Mutation来修改State的数据。最后，根据State的变化，渲染到视图上。
+
+#### 2.简要介绍各模块在流程中的功能：
+
+- Vue Components：Vue组件。HTML页面上，负责接收用户操作等交互行为，**执行dispatch方法触发对应action进行回应**。
+- dispatch：操作行为触发方法，是唯一能执行action的方法。
+- actions：**操作行为处理模块,由组件中的`$store.dispatch('action 名称', data1)`来触发。然后由commit()来触发mutation的调用 , 间接更新 state**。负责处理Vue Components接收到的所有交互行为。包含同步/异步操作，支持多个同名方法，按照注册的顺序依次触发。向后台API请求的操作就在这个模块中进行，包括触发其他action以及提交mutation的操作。该模块提供了Promise的封装，以支持action的链式触发。
+- commit：状态改变提交操作方法。对mutation进行提交，**是唯一能执行mutation的方法**。
+- mutations：**状态改变操作方法，由actions中的`commit('mutation 名称')`来触发**。**是Vuex修改state的唯一推荐方法**。该方法只能进行同步操作，且方法名只能全局唯一。操作之中会有一些hook暴露出来，以进行state的监控等。
+- state：页面状态管理容器对象。集中存储Vue components中data对象的零散数据，全局唯一，以进行统一的状态管理。**页面显示所需的数据从该对象中进行读取**，利用Vue的细粒度数据响应机制来进行高效的状态更新。
+- getters：state对象读取方法。图中没有单独列出该模块，应该被包含在了render中，Vue Components通过该方法读取全局state对象。
+
+#### 3.Vuex与localStorage
+
+vuex 是 vue 的状态管理器，存储的数据是响应式的。但是并不会保存起来，刷新之后就回到了初始状态，**具体做法应该在vuex里数据改变的时候把数据拷贝一份保存到localStorage里面，刷新之后，如果localStorage里有保存的数据，取出来再替换store里的state。**
+
+```vue
+<script>
+let defaultCity = "上海"
+try {   // 用户关闭了本地存储功能，此时在外层加个try...catch
+  if (!defaultCity){
+    defaultCity = JSON.parse(window.localStorage.getItem('defaultCity'))
+  }
+}catch(e){}
+export default new Vuex.Store({
+  state: {
+    city: defaultCity
+  },
+  mutations: {
+    changeCity(state, city) {
+      state.city = city
+      try {
+      window.localStorage.setItem('defaultCity', JSON.stringify(state.city));
+      // 数据改变的时候把数据拷贝一份保存到localStorage里面
+      } catch (e) {}
+    }
+  }
+})    
+</script>
+```
+
+这里需要注意的是：由于vuex里，我们保存的状态，都是数组，而localStorage只支持字符串，所以需要用JSON转换：
+
+```vue
+<script>
+JSON.stringify(state.subscribeList);   // array -> string
+JSON.parse(window.localStorage.getItem("subscribeList"));    // string -> array    
+</script>
+```
+
+### 方法四、`$attrs`/`$listeners`
+
+#### 1.简介
+
+多级组件嵌套需要传递数据时，通常使用的方法是通过vuex。但如果仅仅是传递数据，而不做中间处理，使用 vuex 处理，未免就有点大材小用。为此Vue2.4 版本提供了另一种方法----`$attrs`/`$listeners`
+
+- `$attrs`：包含了父作用域中不被 prop 所识别 (且获取) 的特性绑定 (class 和 style 除外)。当一个组件没有声明任何 prop 时，这里会包含所有父作用域的绑定 (class 和 style 除外)，并且可以通过 v-bind="$attrs" 传入内部组件。通常配合 interitAttrs 选项一起使用。
+- `$listeners`：包含了父作用域中的 (不含 .native 修饰器的) v-on 事件监听器。它可以通过 v-on="$listeners" 传入内部组件
+
+<img src="https://upload-images.jianshu.io/upload_images/3174701-db162929eb89cb7f?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="img" style="zoom:80%;" />
+
+如上图所示`$attrs`表示没有继承数据的对象，格式为{属性名：属性值}。Vue2.4提供了`$attrs` , `$listeners` 来传递数据与事件，跨级组件之间的通讯变得更简单。简单来说：`$attrs`与`$listeners` 是两个对象，`$attrs` 里存放的是父组件中绑定的非 Props 属性，`$listeners`里存放的是父组件中绑定的非原生事件。
+
+### 方法五、provide/inject
+
+#### 1.简介
+
+Vue2.2.0新增API,这对选项需要一起使用，**以允许一个祖先组件向其所有子孙后代注入一个依赖，不论组件层次有多深，并在起上下游关系成立的时间里始终生效**。一言而蔽之：祖先组件中通过provider来提供变量，然后在子孙组件中通过inject来注入变量。
+**provide / inject API 主要解决了跨级组件间的通信问题，不过它的使用场景，主要是子组件获取上级组件的状态，跨级组件间建立了一种主动提供与依赖注入的关系**。
+
+### 方法六、`$parent` / `$children`与 `ref`
+
+- `ref`：如果在普通的 DOM 元素上使用，引用指向的就是 DOM 元素；如果用在子组件上，引用就指向组件实例
+- `$parent` / `$children`：访问父 / 子实例
+
+需要注意的是：这两种都是直接得到组件实例，使用后可以直接调用组件的方法或访问数据。
+
+### 总结
+
+常见使用场景可以分为三类：
+
+- 父子通信：
+
+父向子传递数据是通过 props，子向父是通过 events（`$emit`）；通过父链 / 子链也可以通信（`$parent` / `$children`）；ref 也可以访问组件实例；provide / inject API；`$attrs/$listeners`
+
+- 兄弟通信：
+
+Bus；Vuex
+
+- 跨级通信：
+
+Bus；Vuex；provide / inject API、`$attrs/$listeners`
+

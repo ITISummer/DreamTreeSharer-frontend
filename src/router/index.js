@@ -4,8 +4,11 @@ import VueRouter from 'vue-router'
 import LoginAndRegister from "../views/LoginAndRegister/LoginAndRegister";
 import Home from "../views/Home/Home";
 import Comments from "../views/Comments/Comments";
-import CommentsTest from "../views/Comments/CommentsTest";
 import Upload from "../views/Upload/Upload";
+import PersonalCenter from "../views/PersonalCenter/PersonalCenter";
+import Logout from "../views/Logout/Logout";
+import PinBoards from "../views/PersonalCenter/PinBoards/PinBoards";
+import AccountSetting from "../views/PersonalCenter/AccountSetting/AccountSetting";
 // 相当于 controller 层，起转发请求的作用
 Vue.use(VueRouter)
 // 定义 routes 对象数组
@@ -35,6 +38,28 @@ const routes = [
         path: `${baseURL}/upload`,
         component: Upload,
     },
+    {
+        name: '个人中心',
+        path: `${baseURL}/personal-center`,
+        component: PersonalCenter,
+        children: [
+            {
+                name: '账户设置',
+                path: `${baseURL}/account-setting`,
+                component: AccountSetting,
+            },
+            {
+                name: '梦卡管理',
+                path: `${baseURL}/pin-boards`,
+                component: PinBoards,
+            }
+        ]
+    },
+    {
+        name: '注销',
+        path: `${baseURL}/logout`,
+        component: Logout,
+    }
 
 ]
 
