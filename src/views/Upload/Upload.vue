@@ -15,14 +15,15 @@ data	上传时附带的额外参数
     <el-upload
         class="upload-demo"
         drag
-        :auto-upload="auto_upload"
-        :action="upload_qiniu_url"
         :show-file-list="false"
+        :auto-upload="auto_upload"
+        :action="qiniu.uploadQiniuUrl"
+        :data="qiniu.qiniuData"
         :before-upload="beforeUpload"
         :on-success="handleSuccess"
         :on-error="handleError"
-        :data="qiniuData">
-      <img v-if="imageUrl" :src="imageUrl" class="avatar">
+        >
+      <el-image v-if="imageUrl" :src="imageUrl" class="avatar"></el-image>
       <div v-else class="el-default">
         <i class="el-icon-upload"></i>
         <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
@@ -38,36 +39,23 @@ export default {
     return {
       imageUrl: "",
       auto_upload: true,
-      qiniuData: {key: "", token: ""},
-      // 七牛云上传储存区域的上传域名（华东、华北、华南、北美、东南亚）
-      upload_qiniu_url: "http://upload-z2.qiniup.com",
-      // 七牛云返回储存图片的子域名
-      upload_qiniu_addr: "qrne6et6u.hn-bkt.clouddn.com/",
-      // global: {dataUrl: 'localhost:8080'}
+      qiniu: {
+        qiniuData: {key: "", token: ""},
+        // 七牛云上传储存区域的上传域名（华东、华北、华南、北美、东南亚）
+        uploadQiniuUrl: "http://upload-z2.qiniup.com",
+        // 七牛云返回储存图片的子域名
+        uploadQiniuAddr: "qrne6et6u.hn-bkt.clouddn.com/",
+      }
     };
   },
   methods: {
-    /**
-     * 创建前从后台获取访问七牛云的 token - (key(文件名) bucket, AccessKey, SecretKey)
-     */
-    getQiniuToken: async function(key) {
-      const _this = this;
-     await this.getRequest(`/qiniu/uploadToken/${key}`)
-          .then(function(res) {
-            if (res.statusCode === 200) {
-              _this.qiniuData.token = res.object;
-            } else {
-              _this.$message({message: res.message, duration: 2000, type: "warning"});
-            }
-          });
-    },
     /**
      * 图片上传前的格式校验
      * @param file
      * @returns {boolean}
      */
     beforeUpload: async function(file) {
-      this.qiniuData.key = file.name;
+      this.qiniu.qiniuData.key = file.name;
       const isJPG = file.type === "image/jpeg";
       const isPNG = file.type === "image/png";
       const isLt2M = file.size / 1024 / 1024 < 2;
@@ -79,15 +67,28 @@ export default {
         this.$message.error("图片大小不能超过 2MB!");
         return false;
       }
-     await this.getQiniuToken(this.qiniuData.key)
+      await this.getQiniuToken(this.qiniu.qiniuData.key)
+    },
+    /**
+     * 创建前从后台获取访问七牛云的 token - (key(文件名) bucket, AccessKey, SecretKey)
+     */
+    getQiniuToken: async function(key) {
+      const _this = this;
+      await this.getRequest(`/qiniu/uploadToken/${key}`)
+          .then(function(res) {
+            if (res.statusCode === 200) {
+              _this.qiniu.qiniuData.token = res.object;
+            } else {
+              _this.$message({message: res.message, duration: 2000, type: "warning"});
+            }
+          });
     },
     /**
      * 上传成功
      * @param res
-     * @param file
      */
-    handleSuccess: function(res, file) {
-      this.imageUrl = "http://"+this.upload_qiniu_addr + res.key;
+    handleSuccess: function(res) {
+      this.imageUrl = "http://"+this.qiniu.uploadQiniuAddr + res.key;
       this.$message({message: `上传成功！图片地址为：${this.imageUrl}`, type: "success"})
     },
     /**

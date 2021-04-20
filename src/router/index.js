@@ -9,6 +9,7 @@ import PersonalCenter from "../views/PersonalCenter/PersonalCenter";
 import Logout from "../views/Logout/Logout";
 import PinBoards from "../views/PersonalCenter/PinBoards/PinBoards";
 import AccountSetting from "../views/PersonalCenter/AccountSetting/AccountSetting";
+import Cropper from "../views/Cropper/Cropper"
 // 相当于 controller 层，起转发请求的作用
 Vue.use(VueRouter)
 // 定义 routes 对象数组
@@ -59,6 +60,11 @@ const routes = [
         name: '注销',
         path: `${baseURL}/logout`,
         component: Logout,
+    },
+    {
+        name: 'cropper',
+        path: `${baseURL}/cropper`,
+        component: Cropper,
     }
 
 ]

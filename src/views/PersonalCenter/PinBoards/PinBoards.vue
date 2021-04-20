@@ -1,5 +1,5 @@
 <template>
-<div style="height: 1000px; text-align: left; background-color: green">pinboards</div>
+<div style="height: 1000px; text-align: center; background-color: green">pinboards</div>
 </template>
 
 <script>

@@ -22,9 +22,9 @@ See [Configuration Reference](https://cli.vuejs.org/config/).
 
 DreamTreeSharer 前端
 
-本来是在看到 Pinterest.com 后想借鉴其页面布局的，然后当时自己心里想着可不可以改装下，弄一个“想法分享网站”。而“想法分享”这个想法也是在看到 v2ex 后，感觉 v2ex 上面的一些创意想法都还不错！所以此项目后来索性就是结合 pinterest 的网站页面+v2ex 的想法分享搭建的。
+本来是在看到 Pinterest.com 后想借鉴其页面布局的，然后当时自己心里想着可不可以改装下，弄一个“想法分享网站”。而“想法分享”这个想法也是在看到 v2ex 后，感觉 v2ex 上面的一些创意想法都还不错！所以此项目后来索性就是结合 pinterest 的网站页面+v2ex 的想法分享搭建的。不过我给它起了个中文名叫 - “许愿分享树”，英文名叫 "DreamTreeSharer"，意在想让人们大胆分享心中的想法和愿望！
 
-由于毕设论文需要，同时也是对自己搭建过程的一个记录，我后知后觉的才觉得应该弄一个搭建过程记录，记录如何引入模块，如何将网上的模块给整合到此项目中并加以改进以适合本项目。记录的话就按照时间线+简单概述来记录吧！
+由于毕设论文需要，同时也是对自己搭建过程的一个记录，我后知后觉的才觉得应该弄一个搭建过程记录，记录如何引入模块，如何将网上的模块给整合到此项目中并加以改进以适合本项目以及使用了哪些资料或者网络链接！。记录的话就按照时间线+简单概述来记录吧~
 
 # 参考学习网站
 
@@ -171,6 +171,8 @@ README.md: 项目说明
 [Element el-upload上传组件详解](https://segmentfault.com/a/1190000013796215)
 
 [ElementUI的Upload上传，配合七牛云储存图片](https://segmentfault.com/a/1190000016309473)
+
+[java调用qiniu七牛云空间](https://blog.csdn.net/visket2008/article/details/77164233)
 
 **根据以上教程，运行代码后报如下错**
 
@@ -414,7 +416,7 @@ css module前期进行不麻烦的配置，实现的效果比scoped css更优，
 
 
 
-另外，记录下，刚本来想截图上传到 github 图床的，但是使用 picgo 一直上传不了，后来搜了下后，忽然记起，我改了我的 GitHub 用户名，所以一直上传不了！哎，我还以为 picgo 对 GitHub 这么不友好呢！[PicGo上传图片到GitHub总是失败的特殊解决办法](https://www.shopee6.com/web/web-tutorial/picgo-github-fail.html) 好了，几天就这样了吧！我左手臂酸疼，不想弄了！
+另外，记录下，刚本来想截图上传到 github 图床的，但是使用 picgo 一直上传不了，后来搜了下后，忽然记起，我改了我的 GitHub 用户名，所以一直上传不了！哎，我还以为 picgo 对 GitHub 这么不友好呢！重新添加了 token，然后就可以了！[PicGo上传图片到GitHub总是失败的特殊解决办法](https://www.shopee6.com/web/web-tutorial/picgo-github-fail.html) 好了，今天就这样了吧！我左手臂酸疼，不想弄了！
 
 
 
@@ -651,3 +653,27 @@ Bus；Vuex
 
 Bus；Vuex；provide / inject API、`$attrs/$listeners`
 
+# 2021年4月20日 给个人中心添加用户头像上传
+
+[使用的组件](https://github.com/dream2023/vue-ele-upload-image)
+
+[vue-image-crop-upload裁剪工具使用踩坑](https://blog.csdn.net/liu19721018/article/details/114687092)
+
+昨天停电一天，手机关机没电，停电也没网，所以没有弄！
+
+在完善用户信息修改过程中我遇到了以下问题，目前还没有解决！
+
+就是，使用 vue 的 element-ui 库的 \<el-upload> 上传图片的问题！
+我现在有个需求是，希望弄一个用户上传头像的功能，能够给用户提供裁切头像的功能，但是原生的 \<el-uplaod> 没有这个功能，所以我就找了个别人二次封装 \<el-upload> 的一个组件 【https://github.com/dream2023/vue-ele-upload-image】使用这个组件的好处是能够比较简单的就可以上传图片了！但是这其中也有一个问题，就是我想在上传图片前获取图片文件名（key），然后根据 key，再 axios 异步传递给本地后台生成一个 token（七牛云对象存储需要）然后再上传，如果是使用原生 \<el-upload> 标签的话，就可以使用 before-upload 钩子函数通过 file.name 获取 key，然后 axios 异步传递给后台，后台根据 key 生成 token 后再以 json 方式返回给前端，前端再根据 key 和 token 传递给远程七牛云对象存储！但是使用这个组件后我感觉使用 before-upload 不起作用，根本调用不了这个钩子函数！
+
+然后我尝试的解决办法是，把这个组件给下载下来，然后提取其中的组件 vue-ele-upload-image-master\lib\EleUploadImage.vue 到我的 src/views/Cropper 目录下，然后改其中的对应的 \<el-upload> 的 before-upload 钩子函数里面给添加 axios 访问本地后台以获取 token，但是失败了，感觉也没有调用！
+
+于是我尝试的第二种方法是不直接在 EleUploadImage.vue 中调用，而是在其中使用 props 暴露 before-upload 出来，然后我在我的 vue 组件 PersonalCenter.vue 中通过传递方法给 props 来调用，但是也调用不了！
+
+ EleUploadImage.vue 中有封装 element-ui 的 \<el-uplaod>和 
+import Cropper from "vue-image-crop-upload";
+import EleGallery from "vue-ele-gallery";
+
+这两个组件，其中 vue-image-crop-upload 是做图片裁剪功能的，我想到的第三种方法是直接使用 vue-image-crop-upload 组件，但是我还没尝试，由于 EleUploadImage.vue 的简便性，我想继续尝试用这个组件！不知哥你有没有啥建议可以参考下？谢谢~
+
+对了，还有个情况是：当我直接把文件名（key）和生成好的 token 写定在请求的 data 数据域中时，是可以正常裁剪后上传头像的，所以问题就是怎么在使用 EleUploadImage.vue 的前提下，将 key 传递给本地后台生成 token 然后返回！

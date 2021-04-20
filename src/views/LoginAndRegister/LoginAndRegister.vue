@@ -64,6 +64,24 @@ export default {
    */
     name: 'LoginAndRegister',
     data() { //组件里 data 属性必须是一个函数
+      /**
+       * 验证输入的密码格式
+       * @param rule
+       * @param value
+       * @param callback
+       */
+      const checkPassword = (rule, value, callback) => {
+        // 密码至少包含大写字母，小写字母，数字，且不少于8位
+        const regOfPwd = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[^]{8,16}$/;
+        if (value === '') {
+          callback(new Error('请输入密码！'));
+        } else if (!regOfPwd.test(value)) {
+          callback(new Error('密码至少包含大写字母，小写字母，数字，且不少于8位！'))
+          // this.$refs.ruleForm.validateField('checkPass');
+        } else {
+          callback();
+        }
+      }
       return{
         // 设置是否有 loading 效果(element-ui) 点击登录按钮时则设置为 true
         loading: false,
@@ -73,14 +91,14 @@ export default {
         captchaUrl: '/captcha?time='+new Date(),
         loginForm: {
           username: 'summer',
-          password: 'summer',
+          password: 'WWW_dts123',
           captcha: '',
           checked: true
         },
         // 注册参数
         regForm: {
           username: 'summer',
-          password: 'summer',
+          password: 'WWW_dts123',
           rePassword: 'summer',
           phone: '15244812873',
           smsCode: ''
@@ -90,9 +108,7 @@ export default {
           username: [
             {required: true,message: '请输入用户名', trigger:'blur'},
             {min: 6,max: 18,message: '用户名长度应该在6-18字符内', trigger: 'change'}],
-          password: [
-            {required: true,message: '请输入密码', trigger:'blur'},
-            {min: 6,max: 18,message: '密码长度应该在6-18字符内', trigger: 'change'}],
+          password: [{ validator: checkPassword, trigger: 'blur' }],
           captcha: [
             {required: true,message: '请输入图形验证码', trigger:'blur'},
             {len: 4, message: "图形验证码长度应该为4", trigger: 'change'}],

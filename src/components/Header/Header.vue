@@ -3,7 +3,8 @@
   <el-header>
     <el-row align="middle" justify="center">
       <el-col :span="2">
-          <img  width="36" height="36" src="../../assets/logo.png">
+<!--          <img  width="36" height="36" src="">-->
+        <el-image style="width: 36px; height: 36px" :src="require('@/assets/logo.png')"></el-image>
         <!--          <el-avatar size="large" src=""></el-avatar>-->
       </el-col>
       <el-col :span="2">
@@ -20,19 +21,7 @@
             <el-avatar size="large" src="https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png"></el-avatar>
           </div>
           <el-dropdown-menu slot="dropdown">
-            <!-- 个人中心
-            包括：
-            账户设置：
-              用户头像更改
-              用户姓名更改(first name, last name)
-              用户名更改
-              用户邮箱更改
-              用户密码更改
-              用户性别更改
-            管理卡片：
-              卡片增删改查
-            此处需要 PersonalCenter.vue 里暴露 getUserInfo(id)
-            -->
+            <!-- 个人中心：此处需要 PersonalCenter.vue 里暴露 getUserInfo(id) -->
             <el-dropdown-item><router-link to="/personal-center">个人中心</router-link></el-dropdown-item>
             <el-dropdown-item><router-link to="/logout">登出</router-link></el-dropdown-item>
           </el-dropdown-menu>
@@ -64,7 +53,7 @@ export default {
     cursor: pointer;
     color: #409EFF;
   }
-  img {
+  .el-image {
     cursor: pointer;
     border-radius: 13px;
   }

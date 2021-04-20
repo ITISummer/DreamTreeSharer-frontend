@@ -13,31 +13,70 @@ rules	validation rules of form
 <!-- editDialogVisible 值 为 true 显示对话框 / false 隐藏对话框 -->
 <!-- editDialogClosed 监听对话框 -->
 <template>
-  <el-dialog title="用户个人信息修改" :visible.sync="editDialogVisible" width="50%" @close="editDialogClosed">
-    <el-form ref="updateFormRef" :model="updateForm" :rules="updateFormRules" label-width="70px">
-      <el-form-item label="用户名" prop="username">
-        <el-input v-model="updateForm.username" disabled></el-input>
-      </el-form-item>
-
-      <el-form-item label="邮箱" prop="email">
-        <el-input clearable type="email" v-model="updateForm.email"></el-input>
-      </el-form-item>
-
-      <el-form-item label="手机号" prop="mobile">
-        <el-input clearable type="tel" maxlength="11" v-model="updateForm.mobile"></el-input>
-      </el-form-item>
-    </el-form>
-<!--    对话框脚部-->
-    <span slot="footer" class="dialog-footer">
-      <el-button @click="editDialogVisible = false">取 消</el-button>
-       <el-button @click="editDialogClosed">重置</el-button>
-      <el-button type="primary" @click="updateUserInfo">确 定</el-button>
-    </span>
-  </el-dialog>
+  <el-form ref="updateForm" :model="updateForm" :rules="updateFormRules" label-width="70px">
+    <!--      用户名-->
+    <el-form-item label="用户名" prop="username">
+      <el-input v-model="updateForm.username" disabled></el-input>
+    </el-form-item>
+    <!--邮箱-->
+    <el-form-item label="邮箱" prop="email">
+      <el-input clearable type="email" v-model="updateForm.email"></el-input>
+    </el-form-item>
+    <!-- 手机号-->
+    <el-form-item label="手机号" prop="mobile">
+      <el-input clearable type="tel" maxlength="11" v-model="updateForm.mobile"></el-input>
+    </el-form-item>
+    <!--      重置密码-->
+    <el-form-item label="密码" prop="password">
+      <el-input type="password" v-model="updateForm.password" autocomplete="off"></el-input>
+    </el-form-item>
+    <!--      确认密码-->
+    <el-form-item label="确认密码" prop="checkPassword">
+      <el-input type="password" v-model="updateForm.checkPassword" autocomplete="off"></el-input>
+    </el-form-item>
+    <!--      生日-->
+    <el-form-item label="生日">
+      <el-col :span="11">
+        <el-form-item prop="date">
+          <el-date-picker type="date" placeholder="选择日期" v-model="updateForm.date"
+                          style="width: 100%;"></el-date-picker>
+        </el-form-item>
+      </el-col>
+    </el-form-item>
+    <!--      性别-->
+    <el-form-item label="性别" prop="sex">
+      <el-radio-group v-model="updateForm.sex">
+        <el-radio label="男"></el-radio>
+        <el-radio label="女"></el-radio>
+      </el-radio-group>
+    </el-form-item>
+    <!-- 头像上传(crop) -->
+    <el-form-item>
+      <ele-upload-image
+          crop
+          v-model="updateForm.avatarURL"
+          :fileSize="1"
+          :action="qiniu.uploadQiniuUrl"
+          :data="qiniu.qiniuData"
+          :responseFn="handleResponse"
+          :beforeUpload="beforeUpload"
+      ></ele-upload-image>
+    </el-form-item>
+    <!--      按钮 -->
+    <el-form-item>
+      <el-button type="primary" @click="updateUserInfo">Create</el-button>
+      <el-button @click="resetForm('updateForm')">Cancel</el-button>
+    </el-form-item>
+  </el-form>
 </template>
 
 <script>
+// 局部引入
+// import EleUploadImage from "../../Cropper/EleUploadImage";
+import EleUploadImage from "vue-ele-upload-image";
+
 export default {
+  components: {EleUploadImage},
   data() {
     /**
      * 验证邮箱格式
@@ -47,14 +86,16 @@ export default {
      * @returns {*}
      */
     const checkEmail = (rule, value, callback) => {
-      if (!value) {return callback(new Error('请输入邮箱！'));}
+      if (!value) {
+        return callback(new Error('请输入邮箱！'));
+      }
       // 验证邮箱的正则表达式
       const regOfEmail = /^[A-Za-zd]+([-_.][A-Za-zd]+)*@([A-Za-zd]+[-.])+[A-Za-zd]{2,5}$/
       setTimeout(() => {
         if (!regOfEmail.test(value)) {
           callback(new Error('邮箱格式不匹配！'));
         } else {
-            callback();
+          callback();
         }
       }, 500);
     };
@@ -66,29 +107,142 @@ export default {
      * @returns {*}
      */
     const checkMobile = (rule, value, callback) => {
-      if (!value) {return callback(new Error('请输入手机号！'));}
+      if (!value) {
+        return callback(new Error('请输入手机号！'));
+      }
       setTimeout(() => {
         const regOfMobile = /^1[3456789]\d{9}$/
         if (!regOfMobile.test(value)) {
           callback(new Error('手机号格式不正确！'));
         } else {
-            callback();
-          }
-      },500);
+          callback();
+        }
+      }, 500);
     };
+
+    /**
+     * 验证输入的密码格式
+     * @param rule
+     * @param value
+     * @param callback
+     */
+    const checkPassword = (rule, value, callback) => {
+      // 密码至少包含大写字母，小写字母，数字，且不少于8位
+      const regOfPwd = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[^]{8,16}$/;
+      if (value === '') {
+        callback(new Error('请输入密码！'));
+      } else if (!regOfPwd.test(value)) {
+        callback(new Error('密码至少包含大写字母，小写字母，数字，且不少于8位！'))
+        // this.$refs.ruleForm.validateField('checkPass');
+      } else {
+        callback();
+      }
+    }
+
+    /**
+     * 验证是否与以上密码相同
+     * @param rule
+     * @param value
+     * @param callback
+     * @returns {{updateFormRules: {mobile: [{validator: function(*, *=, *): *, trigger: string}], email: [{validator: function(*, *=, *): *, trigger: string}]}, updateForm: {}}}
+     */
+    const reCheckPassword = (rule, value, callback) => {
+      if (value === '') {
+        callback(new Error('请重新输入密码！'));
+      } else if (value !== this.updateForm.password) {
+        callback(new Error('输入的密码与以上密码不相同！'));
+      } else {
+        callback();
+      }
+    }
     return {
-       // 控制 修改用户对话框 的 显示与隐藏
-      editDialogVisible: true,
       // 查询到的用户信息对象
       updateForm: {},
+      qiniu: {
+        qiniuData: {key: "", token: ""},
+        // 七牛云上传储存区域的上传域名（华东、华北、华南、北美、东南亚）
+        uploadQiniuUrl: "http://upload-z2.qiniup.com",
+        // 七牛云返回储存图片的子域名
+        uploadQiniuAddr: "qrne6et6u.hn-bkt.clouddn.com/",
+      },
       // 修改表单的验证规则 blur: 文本失去焦点
       updateFormRules: {
-        email: [{ validator: checkEmail, trigger: 'blur' }],
-        mobile: [{ validator: checkMobile, trigger: 'blur' }],
+        email: [{validator: checkEmail, trigger: 'blur'}],
+        mobile: [{validator: checkMobile, trigger: 'blur'}],
+        password: [{validator: checkPassword, trigger: 'blur'}],
+        checkPassword: [{validator: reCheckPassword, trigger: 'blur'}],
       },
     }
   },
   methods: {
+    // 上传前校检格式和大小
+    async beforeUpload(file) {
+      let isImg = false;
+      if (this.fileType.length) {
+        let fileExtension = "";
+        if (file.name.lastIndexOf(".") > -1) {
+          fileExtension = file.name.slice(file.name.lastIndexOf(".") + 1);
+        }
+        isImg = this.fileType.some(type => {
+          if (file.type.indexOf(type) > -1) return true;
+          if (fileExtension && fileExtension.indexOf(type) > -1) return true;
+          return false;
+        });
+      } else {
+        isImg = file.type.indexOf("image") > -1;
+      }
+
+      if (!isImg) {
+        this.$message.error(
+            `文件格式不正确, 请上传${this.fileType.join("/")}图片格式文件!`
+        );
+        return false;
+      }
+
+      if (this.fileSize) {
+        const isLt = file.size / 1024 / 1024 < this.fileSize;
+        if (!isLt) {
+          this.$message.error(`上传头像图片大小不能超过 ${this.fileSize} MB!`);
+          return false;
+        }
+      }
+      // 七牛云所需参数
+      this.qiniu.qiniuData.key = file.name
+      console.log('--------------======1=======-----------')
+      if (await this.getQiniuToken(this.qiniu.qiniuData.key)) {
+        this.uploading = true;
+        console.log('--------------======2=======-----------')
+        return true;
+      }
+      // this.uploading = true;
+      // return true;
+    },
+    /**
+     * 创建前从后台获取访问七牛云的 token - (key(文件名) bucket, AccessKey, SecretKey)
+     */
+    getQiniuToken: async function (key) {
+      const _this = this;
+      await this.getRequest(`/qiniu/uploadToken/${key}`)
+          .then(function (res) {
+            if (res.statusCode === 200) {
+              _this.qiniuData.token = res.object;
+            } else {
+              _this.$message({message: res.message, duration: 2000, type: "warning"});
+            }
+          });
+    },
+    /**
+     * 上传图片成功后的处理！
+     * res -> 请求远程图床响应返回的数据
+     * file -> 上传的图片
+     * fileList -> 上传的图片集
+     */
+    handleResponse(res, file, fileList) {
+      console.log(res)
+      console.log(file)
+      // console.log(file.url)
+      return file.url
+    },
     /**
      * 展示编辑用户的对话框<br>
      * 展示时从后台异步获取对应 id 的用户信息
@@ -96,32 +250,30 @@ export default {
      * @returns {Promise<ElMessageComponent>}
      */
     async getUserInfo(id) {
-      // console.log(id)
-      // this.editDialogVisible = true
-      const { res } = await this.getRequest('getUserById/' + id)
+      const {res} = await this.getRequest('getUserById/' + id)
       if (res.meta.status !== 200) {
         return this.$message.error('查询用户失败')
       }
       // 把查询到的数据 保存到 updateForm
       this.updateForm = res.data
-      // 显示修改用户的对话框
-      this.editDialogVisible = true
     },
     /**
      * 修改用户信息并提交
      */
     updateUserInfo() {
       this.$refs.updateFormRef.validate(async (valid) => {
-        // console.log(valid)
         // 没通过验证
         if (!valid) return
         // 通过验证，发起修改用户信息的数据请求
         const {res} = await this.putRequest(`updateUserInfo/${this.updateForm.id}`, this.updateForm)
+        // console.log(res)
         // 判断请求是否成功
         // 请求失败
-        if (res.meta.status !== 200) {return this.$message.error('更新用户信息失败！')}
-        // 请求成功，关闭对话框
-        this.editDialogVisible = false
+        if (res.meta.status !== 200) {
+          return this.$message.error('更新用户信息失败！')
+        }
+        // // 请求成功，关闭对话框
+        // this.editDialogVisible = false
         // 刷新数据列表
         await this.getUserInfo(this.updateForm.id)
         // 提示修改成功
@@ -129,12 +281,10 @@ export default {
       })
     },
     /**
-     * 监听修改用户对话框的关闭事件<br>
-     * updateFormRef 修改用户表单的别名<br>
-     * 关闭表单<br>
+     * 重置表单
      */
-    editDialogClosed() {
-      this.$refs.updateFormRef.resetFields()
+    resetForm(formName) {
+      this.$refs[formName].resetFields();
     }
   },
 }
