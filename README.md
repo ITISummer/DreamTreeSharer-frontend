@@ -556,7 +556,7 @@ export default {
 
 ### 方法三、vuex
 
-![img](https://upload-images.jianshu.io/upload_images/3174701-e62ba449a0c2e7ac?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+![img](D:\CodingsAndWorkplaces\WebStormWorkplace\DreamTreeSharer-frontend\src\store\vuex 调用过程)
 
 #### 1.简要介绍Vuex原理
 
@@ -674,6 +674,64 @@ Bus；Vuex；provide / inject API、`$attrs/$listeners`
 import Cropper from "vue-image-crop-upload";
 import EleGallery from "vue-ele-gallery";
 
-这两个组件，其中 vue-image-crop-upload 是做图片裁剪功能的，我想到的第三种方法是直接使用 vue-image-crop-upload 组件，但是我还没尝试，由于 EleUploadImage.vue 的简便性，我想继续尝试用这个组件！不知哥你有没有啥建议可以参考下？谢谢~
+这两个组件，其中 vue-image-crop-upload 是做图片裁剪功能的，我想到的第三种方法是直接使用 vue-image-crop-upload 组件，但是我还没尝试，由于 EleUploadImage.vue 的简便性，我想继续尝试用这个组件！
 
 对了，还有个情况是：当我直接把文件名（key）和生成好的 token 写定在请求的 data 数据域中时，是可以正常裁剪后上传头像的，所以问题就是怎么在使用 EleUploadImage.vue 的前提下，将 key 传递给本地后台生成 token 然后返回！
+
+
+
+# 2021年4月21日 发现以上问题出现的问题点，不过今天又遇到了新的问题
+
+以上问题，其实是我没仔细地阅读源码而导致的！其实在【https://github.com/dream2023/vue-ele-upload-image】这个组件的源码中，有明确指定当使用不同属性（drag, crop）的时候，会调用里面封装的不同上传组件，里面使用了 v-if="crop" 和 v-if="!crop" 来判定是加载 \<el-upload> 还是 \<cropper>！这个问题是昨晚解决的，昨晚十一点多的时候，我朋友还远程帮我调试，后来在他调试过程中，我忽然看到了这个加载条件，然后我们一起验证了是否是因为 （drag, crop） 属性指定的原因，最后发现是这样的！
+
+不过今天我又遇到了新的问题！
+
+在指定 crop 属性，从而使用 \<cropper>  后，然后重写 cropper 中的 crop-success 钩子函数【记录一个小插曲：在将 crop-success 这个钩子函数给暴露给父组件（调用者），从而能够让父组件可以重写的目的，使用的是子组件中使用 props 暴露钩子函数，但是我这时候又想获取子组件中的 data 数据域，于是我查询了下，发现可以在子组件中使用 $emit() 分发事件的方式传递给父组件数据 [vue组件间通信六种方式（完整版）](https://segmentfault.com/a/1190000019208626)】就可以正常从本地后台获取 token 了，但是我发现它内部提交有一些问题：当我上传第一张图片时，提交给远程的 token 为空（但是我本地是生成了 token 并传递给了本地前台的），然后七牛云远程给报：`{"error":"token not specified"}` 然后我上传第二张不同图片后，它内部提交的 token 是第一张图片的 token，所以七牛云远程就报 `{"error":"key doesn't match with scope"}`于是我又上传第三张不同图片，得到的结果是和上传第二张得到的结果一样 `{"error":"key doesn't match with scope"}` 于是我陷入了思考，那是不是我两次上传同一张图片后就能成功呢？于是我测试了下，在连续上传同一张图片后，真的成功了！！！！！，我天！！！但是片刻喜悦过后，我要怎么解决这个问题呢？
+
+```js
+理想情况下的 key:token 对应关系
+主板.png
+7viju8jm47T3cIZFLPXPJpj28OUpjQzFPS5Fw80p:eEf8h-nntBdX9KsNRUm3PFeSodc=:eyJzY29wZSI6Iml0aXN1bW1lci1odWFuYW4tYnVja2V0OuS4u-advy5wbmciLCJkZWFkbGluZSI6MTYxODk3ODE3OX0=
+
+显卡.png
+7viju8jm47T3cIZFLPXPJpj28OUpjQzFPS5Fw80p:Q75N-YGg-U_8V0ApwOCbpBgMQdQ=:eyJzY29wZSI6Iml0aXN1bW1lci1odWFuYW4tYnVja2V0OuaYvuWNoS5wbmciLCJkZWFkbGluZSI6MTYxODk3ODE5NH0=
+
+缓存.png
+7viju8jm47T3cIZFLPXPJpj28OUpjQzFPS5Fw80p:MY_NrJ6b5qF1ouBIVlk38NTUFP8=:eyJzY29wZSI6Iml0aXN1bW1lci1odWFuYW4tYnVja2V0Oue8k-WtmC5wbmciLCJkZWFkbGluZSI6MTYxODk3ODIyNX0=
+
+-------------------------------------------------------------------------------------------------------------------
+现实情况下的 key:token 对应关系
+key: 主板.png
+token: 
+
+key: 显卡.png
+token: 7viju8jm47T3cIZFLPXPJpj28OUpjQzFPS5Fw80p:eEf8h-nntBdX9KsNRUm3PFeSodc=:eyJzY29wZSI6Iml0aXN1bW1lci1odWFuYW4tYnVja2V0OuS4u-advy5wbmciLCJkZWFkbGluZSI6MTYxODk3ODE3OX0=
+
+key: 缓存.png
+token: 7viju8jm47T3cIZFLPXPJpj28OUpjQzFPS5Fw80p:Q75N-YGg-U_8V0ApwOCbpBgMQdQ=:eyJzY29wZSI6Iml0aXN1bW1lci1odWFuYW4tYnVja2V0OuaYvuWNoS5wbmciLCJkZWFkbGluZSI6MTYxODk3ODE5NH0=
+```
+
+## 使用 vuex 做数据（状态）管理
+
+### 安装 vuex
+
+```bash
+npm install vuex -S
+```
+
+### 导入 vue 和 vuex
+
+新建 /src/store/index.js
+
+```js
+import Vue from "vue";
+import Vuex from 'vuex'
+Vue.use(vuex)
+```
+
+### 记录 el-loading 持续加载的问题
+
+由于我配置了全局拦截器用于拦截**请求与响应**，但是我在登录页面登录时，输入错误的验证码后，el-loading 就一直加载。我想是因为在我输入登录信息和错误验证码后，先设置了 el-loading 效果为 true，然后再去向本地后台发送 login 请求，本地后台处理 login 请求后将响应结果反馈到到前台，但是这时候响应拦截器拦截了本地后台返回的结果，因为检测到验证码匹配错误，所以就直接 return 了，那么在登录页面的 el-loading 就一直为 true 了，所以 el-loading 效果就一直在，于是我在想能不能在拦截器拦截到错误验证码反馈后，能够通知登录页面刷新或者是关闭 el-loading 效果，以方便用户再次输入，但是我转念一想，如果是刷新的话，那么用户输入的数据会没有，这样会不友好！但是通知登录页面将 el-loading 效果设置为 false，我又不会。所以我上网搜了下，发现可以在 请求与拦截 的配置里配置全局的 loading 效果，所以我决定尝试下！[vue axios封装和公共全局loading配置 合并loading请求效果 避免重复请求](https://blog.csdn.net/weixin_45115705/article/details/99672365)
+
+整个过程还算顺利，其中报了两个错，搜了下就修复了，但是没做记录，小遗憾吧！决定休息下洗洗睡了！遇到 bug 太累了啊~
+

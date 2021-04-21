@@ -4,10 +4,6 @@
     <div>
 <!--      // 登录模块-->
       <el-form ref="loginForm" class="login-container" :rules="rules" :model="loginForm"  v-show="on"
-       v-loading="loading"
-       element-loading-text="正在登录..."
-       element-loading-spinner="el-icon-loading"
-       element-loading-background="rgba(0, 0, 0, 0.8)"
       >
           <h3 class="login-title">用户登录</h3>
           <el-form-item prop="username">
@@ -27,7 +23,7 @@
           </el-form-item>
         </el-form>
 <!--      // 注册模块-->
-      <el-form :rules="rules" ref="form" :model="regForm" class="login-container" v-show="!on">
+      <el-form :rules="rules" ref="regForm" :model="regForm" class="login-container" v-show="!on">
         <h3 class="login-title">用户注册</h3>
         <el-form-item prop="username">
           <el-input type="text" auto-complete="false" v-model="regForm.username" placeholder="请输入用户名"></el-input>
@@ -55,6 +51,9 @@
 <!--// 脚本-->
 <script>
 
+import requests from "../../apis/requests";
+import * as LoginAndRegister from '../../apis/LoginAndRegister'
+
 export default {
   /**
    * 当一个 Vue 实例被创建时，它将 data 对象中的所有的
@@ -62,7 +61,6 @@ export default {
    * 当这些 property 的值发生改变时，
    * 视图将会产生“响应”，即匹配更新为新的值。
    */
-    name: 'LoginAndRegister',
     data() { //组件里 data 属性必须是一个函数
       /**
        * 验证输入的密码格式
@@ -77,18 +75,18 @@ export default {
           callback(new Error('请输入密码！'));
         } else if (!regOfPwd.test(value)) {
           callback(new Error('密码至少包含大写字母，小写字母，数字，且不少于8位！'))
-          // this.$refs.ruleForm.validateField('checkPass');
         } else {
           callback();
         }
       }
       return{
-        // 设置是否有 loading 效果(element-ui) 点击登录按钮时则设置为 true
-        loading: false,
-        // 登录参数
+        // // 设置是否有 loading 效果(element-ui) 点击登录按钮时则设置为 true
+        // loading: false,
+        // 登录还是注册切换指标
         on: true,
         // 指定的请求地址和后端地址对应，加上 new Date() 防止获得同样的验证码值
-        captchaUrl: '/captcha?time='+new Date(),
+        captchaUrl: `${requests.CAPTCHA}?time=`+new Date(),
+        // 登录参数-对应后端 LoginModel
         loginForm: {
           username: 'summer',
           password: 'WWW_dts123',
@@ -103,6 +101,7 @@ export default {
           phone: '15244812873',
           smsCode: ''
         },
+        // 校验规则
         rules: {
           // 这里的 username, password, code 是和表单标签里面对应的，不是 vm 属性
           username: [
@@ -130,19 +129,26 @@ export default {
     login() {
         this.$refs.loginForm.validate((valid) => {
           if (valid) {
-           // this.$message({message: '表单提交成功！', type: 'success'});
             // resp 为请求后端成功后返回的 json 对象
-            this.loading = true
+            // this.loading = true
             // 这里的 this.postRequest 是注册在 Vue 中全局变量 - main.js 中配置的
-            this.postRequest('/login', this.loginForm).then(resp=>{
-              // alert(JSON.stringify(resp))
+            this.postRequest(requests.LOGIN, this.loginForm).then(resp => {
               if (resp) {
-                this.loading = false
-               // 存储用户 token 到 session 中
-               const tokenStr = resp.object.tokenHead+resp.object.token
-               window.sessionStorage.setItem('tokenStr', tokenStr)
-              // 登录成功后跳转到 home 页面 - 使用 replace 表示不能回退，而使用 push 则可以回退
-              this.$router.replace('/home')
+                console.log('---------',resp)
+                if (resp.statusCode === 400) {
+                  // 如果验证码未通过！
+                  this.$message.error({message: resp.message})
+                  return
+                } else {
+                  this.$message.success({message: resp.message})
+                }
+                // this.loading = false
+                // 存储用户 token 到 session 中
+                const tokenStr = resp.object.tokenHead+resp.object.token
+                window.sessionStorage.setItem('token', tokenStr)
+                // 登录成功后获取并存入用户信息到 state - TODO
+                // 登录成功后跳转到 home 页面 - 使用 replace 表示不能回退，而使用 push 则可以回退
+                this.$router.replace(requests.HOME)
               }
             })
           } else {
@@ -151,7 +157,6 @@ export default {
           }
         });
     },
-
     /**
      * 用户注册
      */
@@ -161,9 +166,7 @@ export default {
     /**
      * 更新验证码
      */
-    updateCaptcha() {
-      return this.captchaUrl = '/captcha?time='+new Date()
-    },
+    updateCaptcha() {return this.captchaUrl = `${requests.CAPTCHA}?time=`+new Date()}
   }
 }
 </script>

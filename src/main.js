@@ -4,8 +4,9 @@ import router from './router'
 import ElementUI from 'element-ui'
 import 'element-ui/lib/theme-chalk/index.css'
 import store from './store'
-// 全局调用 - 插件形式使用请求
-import {postRequest,deleteRequest,putRequest,getRequest} from "./utils/api";
+// 全局引入 - 插件形式使用请求
+import {postRequest,deleteRequest,putRequest,getRequest} from "./apis/api";
+
 
 Vue.config.productionTip = false
 Vue.use(ElementUI)
@@ -16,9 +17,9 @@ Vue.prototype.getRequest = getRequest;
 
 //程序主入口渲染 app 组件
 new Vue({
-  // 路由组件 - 对应 src/router
+  // 路由组件 - 对应 src/router/index.js
   router,
-  // 状态组件 - 对应 src/store
+  // 状态组件 - 对应 src/store/index.js - 全局
   store,
   render: h => h(App) // 渲染到 App.vue 组件里的内容 (template 标签里的内容)
 }).$mount('#app') // 手动挂载，相当于 el: '#app' index.html 中的 app

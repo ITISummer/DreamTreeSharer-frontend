@@ -14,6 +14,20 @@ rules	validation rules of form
 <!-- editDialogClosed 监听对话框 -->
 <template>
   <el-form ref="updateForm" :model="updateForm" :rules="updateFormRules" label-width="70px">
+    <!-- 头像上传(crop) -->
+    <el-form-item prop="avatarUrl">
+      <ele-upload-image
+          crop
+          ref="upload"
+          v-model="updateForm.avatarURL"
+          :fileSize="1"
+          :action="qiniu.uploadQiniuUrl"
+          :data="qiniu.qiniuData"
+          :responseFn="handleResponse"
+          :handleCropSuccess="handleCropSuccess"
+          @commitCropDataToInvoker="getCropDataFromComponets"
+      ></ele-upload-image>
+    </el-form-item>
     <!--      用户名-->
     <el-form-item label="用户名" prop="username">
       <el-input v-model="updateForm.username" disabled></el-input>
@@ -50,18 +64,6 @@ rules	validation rules of form
         <el-radio label="女"></el-radio>
       </el-radio-group>
     </el-form-item>
-    <!-- 头像上传(crop) -->
-    <el-form-item>
-      <ele-upload-image
-          crop
-          v-model="updateForm.avatarURL"
-          :fileSize="1"
-          :action="qiniu.uploadQiniuUrl"
-          :data="qiniu.qiniuData"
-          :responseFn="handleResponse"
-          :beforeUpload="beforeUpload"
-      ></ele-upload-image>
-    </el-form-item>
     <!--      按钮 -->
     <el-form-item>
       <el-button type="primary" @click="updateUserInfo">Create</el-button>
@@ -72,8 +74,8 @@ rules	validation rules of form
 
 <script>
 // 局部引入
-// import EleUploadImage from "../../Cropper/EleUploadImage";
-import EleUploadImage from "vue-ele-upload-image";
+import EleUploadImage from "../../Cropper/EleUploadImage";
+// import EleUploadImage from "vue-ele-upload-image";
 
 export default {
   components: {EleUploadImage},
@@ -156,6 +158,7 @@ export default {
       }
     }
     return {
+      cropData: {},
       // 查询到的用户信息对象
       updateForm: {},
       qiniu: {
@@ -175,47 +178,24 @@ export default {
     }
   },
   methods: {
-    // 上传前校检格式和大小
-    async beforeUpload(file) {
-      let isImg = false;
-      if (this.fileType.length) {
-        let fileExtension = "";
-        if (file.name.lastIndexOf(".") > -1) {
-          fileExtension = file.name.slice(file.name.lastIndexOf(".") + 1);
-        }
-        isImg = this.fileType.some(type => {
-          if (file.type.indexOf(type) > -1) return true;
-          if (fileExtension && fileExtension.indexOf(type) > -1) return true;
-          return false;
-        });
-      } else {
-        isImg = file.type.indexOf("image") > -1;
-      }
-
-      if (!isImg) {
-        this.$message.error(
-            `文件格式不正确, 请上传${this.fileType.join("/")}图片格式文件!`
-        );
-        return false;
-      }
-
-      if (this.fileSize) {
-        const isLt = file.size / 1024 / 1024 < this.fileSize;
-        if (!isLt) {
-          this.$message.error(`上传头像图片大小不能超过 ${this.fileSize} MB!`);
-          return false;
-        }
-      }
-      // 七牛云所需参数
-      this.qiniu.qiniuData.key = file.name
-      console.log('--------------======1=======-----------')
-      if (await this.getQiniuToken(this.qiniu.qiniuData.key)) {
-        this.uploading = true;
-        console.log('--------------======2=======-----------')
-        return true;
-      }
-      // this.uploading = true;
-      // return true;
+    /**
+     * 获取子组件 $emit() 分发的事件(commitCropDataToInvoker)的值
+     */
+    getCropDataFromComponets(cropData){this.cropData = cropData},
+    /**
+     * https://github.com/dai-siki/vue-image-crop-upload
+     * [vue组件间通信六种方式（完整版）](https://segmentfault.com/a/1190000019208626)
+     * [https://cn.vuejs.org/v2/api/#parent](https://cn.vuejs.org/v2/api/#parent)
+     * fileUrl -> 图片 base64 url
+     */
+    async handleCropSuccess(fileBase64Url) {
+      //这里的 avatarUrl 需要和 handleResponse() 中的 file.avatarUrl 名字一致
+      this.cropData.avatarUrl = fileBase64Url
+      // console.log('handleCropSuccess',this.cropData)
+      // console.log(this.cropData.name)
+      this.qiniu.qiniuData.key = this.cropData.name;
+      await this.getQiniuToken(this.qiniu.qiniuData.key)
+      console.log(this.qiniu.qiniuData.token)
     },
     /**
      * 创建前从后台获取访问七牛云的 token - (key(文件名) bucket, AccessKey, SecretKey)
@@ -225,23 +205,23 @@ export default {
       await this.getRequest(`/qiniu/uploadToken/${key}`)
           .then(function (res) {
             if (res.statusCode === 200) {
-              _this.qiniuData.token = res.object;
+              _this.qiniu.qiniuData.token = res.object;
             } else {
               _this.$message({message: res.message, duration: 2000, type: "warning"});
             }
           });
     },
     /**
-     * 上传图片成功后的处理！
+     * 上传图片成功后的响应
      * res -> 请求远程图床响应返回的数据
      * file -> 上传的图片
      * fileList -> 上传的图片集
      */
     handleResponse(res, file, fileList) {
-      console.log(res)
+      // console.log(res)
       console.log(file)
       // console.log(file.url)
-      return file.url
+      return file.avatarUrl
     },
     /**
      * 展示编辑用户的对话框<br>

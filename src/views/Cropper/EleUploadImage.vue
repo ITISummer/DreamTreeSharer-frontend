@@ -1,103 +1,95 @@
 <template>
   <div class="ele-upload-image">
-    <!-- 上传组件 -->
+    <!--普通上传组件 -->
     <el-upload
-      :accept="accept"
-      :action="action"
-      :data="data"
-      :disabled="uploading"
-      :drag="Boolean(drag)"
-      :headers="headers"
-      :http-request="httpRequest"
-      :limit="limit"
-      :list-type="drag ? 'picture' : 'picture-card'"
-      :multiple="multiple"
-      :name="name"
-      :show-file-list="false"
-      :auto-upload="true"
-      :before-upload="beforeUpload"
-      :on-change="handleChange"
-      :on-error="handleUploadError"
-      :on-exceed="handleExceed"
-      :on-success="handleUploadSuccess"
-      :style="{ marginBottom: multiple && computedValues.length ? '20px' : '0px' }"
-      :withCredentials="withCredentials"
-      ref="upload"
-      v-if="!crop"
-      v-show="isShowUpload">
+        ref="dragUpload"
+        :accept="accept"
+        :action="action"
+        :data="data"
+        :disabled="uploading"
+        :drag="Boolean(drag)"
+        :headers="headers"
+        :http-request="httpRequest"
+        :limit="limit"
+        :list-type="drag ? 'picture' : 'picture-card'"
+        :multiple="multiple"
+        :name="name"
+        :show-file-list="false"
+        :before-upload="beforeUpload"
+        :on-change="handleChange"
+        :on-error="handleUploadError"
+        :on-exceed="handleExceed"
+        :on-success="handleUploadSuccess"
+        :style="{ marginBottom: multiple && computedValues.length ? '20px' : '0px' }"
+        :withCredentials="withCredentials"
+        v-if="!crop"
+        v-show="isShowCrop"
+    >
       <div v-loading="uploading">
         <!-- drag显示 -->
         <template v-if="drag">
           <i class="el-icon-upload"></i>
           <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
         </template>
-
         <!-- 非drag -->
         <template v-else>
-          <div :style="{
-            width: size + 'px',
-            height: size + 'px',
-            lineHeight: size + 'px'
-            }">
+          <div :style="{ width: size + 'px', height: size + 'px', lineHeight: size + 'px' }">
             <i class="el-icon-plus"></i>
           </div>
         </template>
       </div>
-
       <!-- 公共 -->
       <div class="el-upload__tip" slot="tip" v-if="showTip">
         请上传
         <b style="color: #F56C6C">{{ fileType.length ? fileType.join("/") : "图片" }}</b>
         格式文件
-        <template v-if="fileSize">
-          ，且大小不超过
+        <template v-if="fileSize">，且大小不超过
           <b style="color: #F56C6C">{{ fileSize }}MB</b>
         </template>
       </div>
     </el-upload>
-<!--剪切上传：包含 cropper-->
+
+    <!--剪切上传：包含 cropper-->
     <div v-if="crop">
-      <div :style="{
-          width: size + 'px',
-          height: size + 'px',
-          lineHeight: size + 'px'
-        }"
-        @click="isShowCrop = true"
-        class="el-upload el-upload--picture-card"
-        style="margin-bottom: 20px;"
-        v-show="isShowUpload">
+      <div :style="{ width: size + 'px', height: size + 'px', lineHeight: size + 'px' }"
+           @click="isShowCrop = true"
+           class="el-upload el-upload--picture-card"
+           style="margin-bottom: 20px;"
+           v-show="isShowUpload">
         <i class="el-icon-plus avatar-uploader-icon"></i>
       </div>
-<!--vue-image-crop-upload 插件-->
+      <!--vue-image-crop-upload 插件-->
       <cropper
-        :field="name"
-        :headers="headers"
-        :height="cropHeight"
-        :noCircle="cropHeight !== cropWidth"
-        :params="data"
-        :url="action"
-        :width="cropWidth"
-        :withCredentials="withCredentials"
-        @crop-success="handleCropSuccess"
-        @crop-upload-fail="handleCropUploadError"
-        @crop-upload-success="handleCropUploadSuccess"
-        @src-file-set="handleSetFileSet"
-        class="ele-upload-image--cropper"
-        img-format="png"
-        ref="cropper"
-        v-if="isShowCrop"
-        v-model="isShowCrop"></cropper>
+          ref="cropUpload"
+          :field="name"
+          :headers="headers"
+          :height="cropHeight"
+          :noCircle="cropHeight !== cropWidth"
+          :params="data"
+          :url="action"
+          :width="cropWidth"
+          :withCredentials="withCredentials"
+          class="ele-upload-image--cropper"
+          img-format="png"
+          v-if="isShowCrop"
+          v-model="isShowCrop"
+          @src-file-set="handleSrcFileSet"
+          @crop-success="handleCropSuccess"
+          @crop-upload-success="handleCropUploadSuccess"
+          @crop-upload-fail="handleCropUploadError"
+      >
+      </cropper>
     </div>
 
     <!-- 图片列表 -->
     <ele-gallery
-      :lazy="lazy"
-      :remove-fn="handleRemove"
-      :size="size"
-      :sliceSingle="true"
-      :source="value"
-      :thumbSuffix="thumbSuffix"
-      :title="title"/>
+        :lazy="lazy"
+        :remove-fn="handleRemove"
+        :size="size"
+        :sliceSingle="true"
+        :source="value"
+        :thumbSuffix="thumbSuffix"
+        :title="title"/>
   </div>
 </template>
 
@@ -113,21 +105,62 @@ export default {
   },
   data() {
     return {
-      // qiniu: {
-      //   qiniuData: {key: "", token: ""},
-      //   // 七牛云上传储存区域的上传域名（华东、华北、华南、北美、东南亚）
-      //   uploadQiniuUrl: "http://upload-z2.qiniup.com",
-      //   // 七牛云返回储存图片的子域名
-      //   uploadQiniuAddr: "qrne6et6u.hn-bkt.clouddn.com/",
-      // },
       cropData: {},
       isShowCrop: false,
       uploading: false,
       fileList: []
     };
   },
+  watch: {
+    isShowCrop(value) {
+      if (value === false) {
+        this.cropData = {};
+      }
+    }
+  },
+  mounted() {
+    // 插入到body中, 避免弹出层被遮盖
+    if (this.crop && this.$refs.cropper) {
+      document.body.appendChild(this.$refs.cropper.$el);
+    }
+  },
+  computed: {
+    /**
+     * 是否显示提示
+     */
+    showTip() {
+      return this.isShowTip && (this.fileType.length || this.fileSize);
+    },
+    /**
+     * 计算属性
+     */
+    computedValues() {
+      if (this.value) {
+        if (typeof this.value === "string") {
+          return [this.value];
+        } else {
+          return [...this.value];
+        }
+      } else {
+        return [];
+      }
+    },
+    /**
+     * 是否显示上传组件
+     */
+    isShowUpload() {
+      if (this.multiple) {
+        return true;
+      } else {
+        return this.computedValues.length === 0;
+      }
+    },
+    successFiles() {
+      return this.fileList.filter(file => file.status === "success");
+    }
+  },
   props: {
-    beforeUpload: {type: Function},
+    handleCropSuccess: {type: Function},
     // 值
     value: {type: [String, Array], default() {return [];}},
     // 是否剪裁
@@ -177,101 +210,67 @@ export default {
     // 删除前的操作
     beforeRemove: Function
   },
-  computed: {
-    /**
-     * 是否显示提示
-     */
-    showTip() {
-      return this.isShowTip && (this.fileType.length || this.fileSize);
-    },
-    /**
-     * 计算属性
-     */
-    computedValues() {
-      if (this.value) {
-        if (typeof this.value === "string") {
-          return [this.value];
-        } else {
-          return [...this.value];
-        }
-      } else {
-        return [];
-      }
-    },
-    /**
-     * 是否显示上传组件
-     */
-    isShowUpload() {
-      if (this.multiple) {
-        return true;
-      } else {
-        return this.computedValues.length === 0;
-      }
-    },
-    successFiles() {
-      return this.fileList.filter(file => file.status === "success");
-    }
-  },
-  watch: {
-    isShowCrop(value) {
-      if (value === false) {
-        this.cropData = {};
-      }
-    }
-  },
-  mounted() {
-    // 插入到body中, 避免弹出层被遮盖
-    if (this.crop && this.$refs.cropper) {
-      document.body.appendChild(this.$refs.cropper.$el);
-    }
-  },
   methods: {
-    handleSetFileSet(fileName, fileType, fileSize) {
-      const uid = this.cropData.uid || new Date().getTime();
-      this.cropData = {
-        name: fileName,
-        percentage: 0,
-        size: fileSize,
-        type: fileType,
-        status: "ready",
-        uid: uid
-      };
-    },
-    handleCropSuccess(b64Data) {
-      this.cropData.url = b64Data;
-    },
-    handleCropUploadError(status) {
-      this.$message.error("上传失败, 请重试");
-      this.$emit("error", status);
-    },
-    handleCropUploadSuccess(response) {
-      this.cropData.status = "success";
-      this.cropData.percentage = 100;
-      this.cropData.response = response;
-      const file = Object.assign({}, this.cropData);
-      let index = this.fileList.findIndex(item => item.uid === file.uid);
-      if (index > -1) {
-        this.fileList.splice(index, 1, file);
+
+    /**----------以下为 drag 方法-----------*/
+    /**
+     * [drag]上传前校检格式和大小
+     * @param file
+     * @returns {Promise<void>}
+     */
+    async beforeUpload(file) {
+      let isImg = false;
+      if (this.fileType.length) {
+        let fileExtension = "";
+        if (file.name.lastIndexOf(".") > -1) {
+          fileExtension = file.name.slice(file.name.lastIndexOf(".") + 1);
+        }
+        isImg = this.fileType.some(type => {
+          if (file.type.indexOf(type) > -1) return true;
+          if (fileExtension && fileExtension.indexOf(type) > -1) return true;
+          return false;
+        });
       } else {
-        this.fileList.push(file);
+        isImg = file.type.indexOf("image") > -1;
       }
-      this.handleUploadSuccess(response, file, this.fileList);
+
+      if (!isImg) {
+        this.$message.error(
+            `文件格式不正确, 请上传${this.fileType.join("/")}图片格式文件!`
+        );
+        return false;
+      }
+
+      if (this.fileSize) {
+        const isLt = file.size / 1024 / 1024 < this.fileSize;
+        if (!isLt) {
+          this.$message.error(`上传头像图片大小不能超过 ${this.fileSize} MB!`);
+          return false;
+        }
+      }
+      this.uploading = true;
+      return true;
     },
+    /**
+     * [drag] 图片列表改变时
+     * @param file
+     * @param fileList
+     */
     handleChange(file, fileList) {
       this.uploading = false;
       this.fileList = fileList;
     },
-    // 文件个数超出
+    /**
+     * [drag]文件个数超出
+     */
     handleExceed() {
       this.$message.error(`最多上传${this.limit}张图片`);
     },
-    // 上传失败
-    handleUploadError(err) {
-      this.uploading = false;
-      this.$message.error("上传失败, 请重试");
-      this.$emit("error", err);
-    },
-    // 上传成功回调
+    /**
+     * [drag] 上传成功回调
+     * @param response
+     * @param file
+     */
     handleUploadSuccess(response, file) {
       let url = response;
       this.uploading = false;
@@ -291,6 +290,87 @@ export default {
         this.$emit("input", url);
       }
     },
+    /**
+     * 上传失败
+     */
+    handleUploadError(err) {
+      this.uploading = false;
+      this.$message.error("上传失败, 请重试");
+      this.$emit("error", err);
+    },
+
+    /**----------以下为 crop 方法-----------*/
+    /**
+     * 选择图片后
+     */
+    handleSrcFileSet(fileName, fileType, fileSize) {
+      const uid = this.cropData.uid || new Date().getTime();
+      this.cropData = {
+        name: fileName,
+        percentage: 0,
+        size: fileSize,
+        type: fileType,
+        status: "ready",
+        uid: uid
+      };
+      // 将此组件的 cropData 数据域传递给父组件（调用者）
+      this.$emit("commitCropDataToInvoker",this.cropData)
+    },
+    /**
+     * 裁切图片后上传成功
+     */
+    handleCropUploadSuccess(response) {
+      this.cropData.status = "success";
+      this.cropData.percentage = 100;
+      this.cropData.response = response;
+      const file = Object.assign({}, this.cropData);
+      let index = this.fileList.findIndex(item => item.uid === file.uid);
+      if (index > -1) {
+        this.fileList.splice(index, 1, file);
+      } else {
+        this.fileList.push(file);
+      }
+      this.handleUploadSuccess(response, file, this.fileList);
+    },
+    /**
+     * 裁切图片后上传失败
+     */
+    handleCropUploadError(status) {
+      this.$message.error("头像上传失败, 请重试！");
+      this.$emit("error", status);
+    },
+
+    /**----------以下为 公共 方法-----------*/
+    /**
+     * 处理图片移除
+     * @param index
+     */
+    handleRemove(index) {
+      if (!this.beforeRemove) {
+        this.doRemove(index);
+      } else if (typeof this.beforeRemove === "function") {
+        const file = this.multiple
+            ? this.computedValues[index]
+            : this.computedValues;
+
+        const before = this.beforeRemove(file, this.computedValues);
+        if (before && before.then) {
+          before.then(
+              () => {
+                this.doRemove(index);
+              },
+              () => {
+              }
+          );
+        } else if (before !== false) {
+          this.doRemove(index);
+        }
+      }
+    },
+    /**
+     * 移除图片
+     * @param index
+     */
     doRemove(index) {
       if (this.multiple) {
         const data = [...this.computedValues];
@@ -300,27 +380,6 @@ export default {
         this.$emit("input", null);
       }
     },
-    handleRemove(index) {
-      if (!this.beforeRemove) {
-        this.doRemove(index);
-      } else if (typeof this.beforeRemove === "function") {
-        const file = this.multiple
-          ? this.computedValues[index]
-          : this.computedValues;
-
-        const before = this.beforeRemove(file, this.computedValues);
-        if (before && before.then) {
-          before.then(
-            () => {
-              this.doRemove(index);
-            },
-            () => {}
-          );
-        } else if (before !== false) {
-          this.doRemove(index);
-        }
-      }
-    }
   },
 };
 </script>
@@ -329,12 +388,15 @@ export default {
 .ele-upload-image {
   line-height: 1;
 }
+
 .ele-upload-image .el-loading-spinner {
   line-height: 1;
 }
+
 .ele-upload-image .el-icon-plus {
   vertical-align: middle;
 }
+
 .ele-upload-image .el-upload--picture-card {
   width: auto;
   height: auto;
@@ -346,15 +408,19 @@ export default {
 .vue-image-crop-upload.ele-upload-image--cropper {
   z-index: 99;
 }
+
 .ele-upload-image--cropper .vicp-drop-area {
   background-color: #fbfdff !important;
 }
+
 .ele-upload-image--cropper .vicp-icon1-arrow {
   border-bottom-color: #909399 !important;
 }
+
 .ele-upload-image--cropper .vicp-icon1-body {
   background-color: #909399 !important;
 }
+
 .ele-upload-image--cropper .vicp-icon1-bottom {
   border-color: #909399 !important;
 }
