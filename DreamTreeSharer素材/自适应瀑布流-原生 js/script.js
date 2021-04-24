@@ -112,7 +112,7 @@ void function(window, document, undefined) {
   // Fetch JSON string via Ajax, parse to HTML and append to the container.
   var appendCells = function(num) {
     if(loading) {
-      // Avoid sending too many requests to get new cells.
+      // Avoid sending too many constants to get new cells.
       return;
     }
     var xhrRequest = new XMLHttpRequest();
@@ -144,7 +144,7 @@ void function(window, document, undefined) {
   // Fake mode, only for GitHub demo. Delete this function in your project.
   var appendCellsDemo = function(num) {
     if(loading) {
-      // Avoid sending too many requests to get new cells.
+      // Avoid sending too many constants to get new cells.
       return;
     }
     var fragment = document.createDocumentFragment();

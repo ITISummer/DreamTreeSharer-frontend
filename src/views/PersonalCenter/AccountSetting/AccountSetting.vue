@@ -75,88 +75,12 @@ rules	validation rules of form
 <script>
 // 局部引入
 import EleUploadImage from "../../Cropper/EleUploadImage";
-// import EleUploadImage from "vue-ele-upload-image";
+import constants from "../../../apis/constants";
+import validators from "../../../apis/validators";
 
 export default {
   components: {EleUploadImage},
   data() {
-    /**
-     * 验证邮箱格式
-     * @param rule
-     * @param value
-     * @param callback
-     * @returns {*}
-     */
-    const checkEmail = (rule, value, callback) => {
-      if (!value) {
-        return callback(new Error('请输入邮箱！'));
-      }
-      // 验证邮箱的正则表达式
-      const regOfEmail = /^[A-Za-zd]+([-_.][A-Za-zd]+)*@([A-Za-zd]+[-.])+[A-Za-zd]{2,5}$/
-      setTimeout(() => {
-        if (!regOfEmail.test(value)) {
-          callback(new Error('邮箱格式不匹配！'));
-        } else {
-          callback();
-        }
-      }, 500);
-    };
-    /**
-     * 验证手机格式
-     * @param rule
-     * @param value
-     * @param callback
-     * @returns {*}
-     */
-    const checkMobile = (rule, value, callback) => {
-      if (!value) {
-        return callback(new Error('请输入手机号！'));
-      }
-      setTimeout(() => {
-        const regOfMobile = /^1[3456789]\d{9}$/
-        if (!regOfMobile.test(value)) {
-          callback(new Error('手机号格式不正确！'));
-        } else {
-          callback();
-        }
-      }, 500);
-    };
-
-    /**
-     * 验证输入的密码格式
-     * @param rule
-     * @param value
-     * @param callback
-     */
-    const checkPassword = (rule, value, callback) => {
-      // 密码至少包含大写字母，小写字母，数字，且不少于8位
-      const regOfPwd = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[^]{8,16}$/;
-      if (value === '') {
-        callback(new Error('请输入密码！'));
-      } else if (!regOfPwd.test(value)) {
-        callback(new Error('密码至少包含大写字母，小写字母，数字，且不少于8位！'))
-        // this.$refs.ruleForm.validateField('checkPass');
-      } else {
-        callback();
-      }
-    }
-
-    /**
-     * 验证是否与以上密码相同
-     * @param rule
-     * @param value
-     * @param callback
-     * @returns {{updateFormRules: {mobile: [{validator: function(*, *=, *): *, trigger: string}], email: [{validator: function(*, *=, *): *, trigger: string}]}, updateForm: {}}}
-     */
-    const reCheckPassword = (rule, value, callback) => {
-      if (value === '') {
-        callback(new Error('请重新输入密码！'));
-      } else if (value !== this.updateForm.password) {
-        callback(new Error('输入的密码与以上密码不相同！'));
-      } else {
-        callback();
-      }
-    }
     return {
       cropData: {},
       // 查询到的用户信息对象
@@ -168,12 +92,12 @@ export default {
         // 七牛云返回储存图片的子域名
         uploadQiniuAddr: "qrne6et6u.hn-bkt.clouddn.com/",
       },
-      // 修改表单的验证规则 blur: 文本失去焦点
+      // 修改表单的验证规则 blur: 文本失去焦点 - 默认 trigger: 'change'
       updateFormRules: {
-        email: [{validator: checkEmail, trigger: 'blur'}],
-        mobile: [{validator: checkMobile, trigger: 'blur'}],
-        password: [{validator: checkPassword, trigger: 'blur'}],
-        checkPassword: [{validator: reCheckPassword, trigger: 'blur'}],
+        email: [{validator: validators.checkEmail, trigger: 'blur'}],
+        mobile: [{validator: validators.checkMobile, trigger: 'blur'}],
+        password: [{validator: validators.checkPassword, trigger: 'blur'}],
+        checkPassword: [{validator: validators.reCheckPassword.bind(this), trigger: 'blur'}],
       },
     }
   },
@@ -186,6 +110,7 @@ export default {
      * https://github.com/dai-siki/vue-image-crop-upload
      * [vue组件间通信六种方式（完整版）](https://segmentfault.com/a/1190000019208626)
      * [https://cn.vuejs.org/v2/api/#parent](https://cn.vuejs.org/v2/api/#parent)
+     * [如何正确合理使用 JavaScript async/await ！](https://segmentfault.com/a/1190000017718513)
      * fileUrl -> 图片 base64 url
      */
     async handleCropSuccess(fileBase64Url) {
@@ -194,8 +119,9 @@ export default {
       // console.log('handleCropSuccess',this.cropData)
       // console.log(this.cropData.name)
       this.qiniu.qiniuData.key = this.cropData.name;
+      console.log(this.qiniu.qiniuData.token) // ""
       await this.getQiniuToken(this.qiniu.qiniuData.key)
-      console.log(this.qiniu.qiniuData.token)
+      console.log(this.qiniu.qiniuData.token) // 可以获得 token
     },
     /**
      * 创建前从后台获取访问七牛云的 token - (key(文件名) bucket, AccessKey, SecretKey)
@@ -252,8 +178,6 @@ export default {
         if (res.meta.status !== 200) {
           return this.$message.error('更新用户信息失败！')
         }
-        // // 请求成功，关闭对话框
-        // this.editDialogVisible = false
         // 刷新数据列表
         await this.getUserInfo(this.updateForm.id)
         // 提示修改成功

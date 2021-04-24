@@ -2,11 +2,12 @@
 <template>
   <el-container class="main-container">
 <!--    头部-->
-    <Header :search="search"></Header>
+    <Header :search.sync="search"></Header>
     <!--    主体-->
     <el-main  class="main-content">
       <!-- 滚动加载 下面 v-infinite-scroll 的放置位置与瀑布流是否能够加载有关 -->
-      <div v-infinite-scroll="load" infinite-scroll-disabled="disabled" style="margin-top: 40px">
+      <div v-infinite-scroll="load" infinite-scroll-disabled="disabled" class="waterfall-container">
+<!--        封装了 vue-waterfall 插件 -->
         <Waterfall ref="waterfall" :list="list" :gutter="10" :width="240"
          :breakpoints="{
           //当屏幕宽度小于等于1200
@@ -27,9 +28,9 @@
               <div class="cover" :style="initCardStyle(props)" @click="handleClick(props.data)">
                 <img :src="props.data.src" :alt="props.data.src" @load="$refs.waterfall.refresh">
               </div>
-              <div class="name">
-                <p>height:{{ `${Math.floor(props.data.itemWidth / props.data.width * props.data.height)}px` }}</p>
-              </div>
+<!--              <div class="name">-->
+<!--                <p>height:{{ `${Math.floor(props.data.itemWidth / props.data.width * props.data.height)}px` }}</p>-->
+<!--              </div>-->
               <div class="menus">
                 <el-avatar data-title="卡片发布者头像" size="small"
                            src="https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png"
@@ -59,22 +60,26 @@ export default {
       search: '',
       // 图片地址与图片原始高度
       images: [
-        {src: require(`../../assets/images/1.jpg`), width: 400, height: 400},
-        {src: require(`../../assets/images/2.jpg`), width: 500, height: 701},
-        {src: require(`../../assets/images/3.jpg`), width: 500, height: 673},
-        {src: require(`../../assets/images/4.jpg`), width: 600, height: 845},
-        {src: require(`../../assets/images/5.jpg`), width: 600, height: 799},
-        {src: require(`../../assets/images/6.jpg`), width: 597, height: 593},
-        {src: require(`../../assets/images/7.jpg`), width: 650, height: 912},
-        {src: require(`../../assets/images/8.jpg`), width: 500, height: 1411},
-        {src: require(`../../assets/images/9.jpg`), width: 620, height: 835},
-        {src: require(`../../assets/images/10.jpg`), width: 658, height: 940},
-        {src: require(`../../assets/images/11.jpg`), width: 658, height: 658},
-        {src: require(`../../assets/images/12.jpg`), width: 658, height: 688},
-        {src: require(`../../assets/images/13.jpg`), width: 658, height: 862},
-        {src: require(`../../assets/images/14.jpg`), width: 658, height: 877},
-        {src: require(`../../assets/images/15.jpg`), width: 468, height: 662},
-        {src: require(`../../assets/images/16.jpg`), width: 719, height: 1101},
+        {src: `http://qrne6et6u.hn-bkt.clouddn.com/nv1.jpg`},
+        {src: `http://qrne6et6u.hn-bkt.clouddn.com/Snipaste_2021-04-23_17-56-12.png`},
+        {src: `http://qrne6et6u.hn-bkt.clouddn.com/2019-11-30%2012.20.16%201.jpg`},
+        {src: `http://qrne6et6u.hn-bkt.clouddn.com/82222470_10206252600030974_4252574822032211968_o.jpg`},
+        {src: require(`../../assets/images/1.jpg`)},
+        {src: require(`../../assets/images/2.jpg`)},
+        {src: require(`../../assets/images/3.jpg`)},
+        {src: require(`../../assets/images/4.jpg`)},
+        {src: require(`../../assets/images/5.jpg`)},
+        {src: require(`../../assets/images/6.jpg`)},
+        {src: require(`../../assets/images/7.jpg`)},
+        {src: require(`../../assets/images/8.jpg`)},
+        {src: require(`../../assets/images/9.jpg`)},
+        {src: require(`../../assets/images/10.jpg`)},
+        {src: require(`../../assets/images/11.jpg`)},
+        {src: require(`../../assets/images/12.jpg`)},
+        {src: require(`../../assets/images/13.jpg`)},
+        {src: require(`../../assets/images/14.jpg`)},
+        {src: require(`../../assets/images/15.jpg`)},
+        {src: require(`../../assets/images/16.jpg`)},
       ],
       colors: ['#409EFF', '#67C23A', '#E6A23C', '#F56C6C', '#909399'],
       list: [],
@@ -111,9 +116,14 @@ export default {
      */
     addNewList() {
       return new Promise((resolve) => {
-        const list = this.images.map((item, index) => {return {...item, blankColor: this.colors[index % this.colors.length]}});
+        const list = this.images.map((item, index) => {
+          return {
+            ...item,
+            blankColor: this.colors[index % this.colors.length]
+          }
+        });
         this.list.push(...list);
-        setTimeout(() => resolve(), 3000);});
+        setTimeout(() => resolve(), 2000);});
     },
     /**
      *初始化卡片样式
@@ -165,6 +175,9 @@ flex 属性是 flex-grow、flex-shrink 和 flex-basis 属性的简写属性。
   overflow-y: auto;
   //margin-top: 50px;
   //padding: 100px 0 0 0;
+  .waterfall-container{
+    margin-top: 40px;
+  }
   .card { /** 每一张卡片样式 */
     background: #fff;
     border-radius: 5px;

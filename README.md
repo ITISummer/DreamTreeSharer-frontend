@@ -735,3 +735,224 @@ Vue.use(vuex)
 
 整个过程还算顺利，其中报了两个错，搜了下就修复了，但是没做记录，小遗憾吧！决定休息下洗洗睡了！遇到 bug 太累了啊~
 
+# 2021年4月22日 用户注册与用户登录成功信息获取
+
+[获取用户信息]https://www.bilibili.com/video/BV1ar4y1K7qx?p=16&spm_id_from=pageDriver
+
+跟着以上视频学习的！
+
+在弄好了用户登录成功，然后 main.js 中路由导航守卫判断是否当前用户信息存在，如果不存在则发送请求向后台获取后，我在调试过程中发现了这个报错！
+
+```js
+Avoid mutating a prop directly since the value will be overwritten whenever the parent component re-renders. Instead, use a data or computed property based on the prop's value. Prop being mutated: "search"
+```
+
+首先实现前面的功能还是蛮顺利吧！
+
+![](https://raw.githubusercontent.com/ITISummer/FigureBed/master/img/20210422103608.png)
+
+遇到的这个报错我想主要是因为我提取了 Header.vue 组件，然后因为其里面包含搜索框，而搜索框中的内容是通过其他引用到 Header.vue 的父组件通过 Header.vue 中设置的 props 来传递给 Header.vue 的，所以我看上面报错的说明是指：避免在父组件中直接改变子组件(Header.vue) 中通过 props 声明的值，而是通过改变 data 中的值或者基于 props 中的值的 computed property(计算属性) 。但是我产生了一个疑问是：应该在父组件中设置 computed property 还是在子组件中呢？于是我拿起了 google 搜索，将报错 copy 进搜索栏，就得到了以下结果！
+
+参考文章：
+
+https://dev.to/jakzaizzat/avoid-mutating-a-prop-directly-ab9
+https://stackoverflow.com/questions/40574661/avoid-mutating-a-prop-directly-since-the-value-will-be-overwritten
+
+可以有两种写法，但是思想都是一样的！
+
+**子组件 Header.vue 中写法**
+
+```vue
+<template>
+	<input v-model="searchInput">
+</template>
+<script>
+    props: {
+        search: String
+    }
+ // https://dev.to/jakzaizzat/avoid-mutating-a-prop-directly-ab9
+ // https://stackoverflow.com/questions/40574661/avoid-mutating-a-prop-directly-since-the-value-will-be-overwritten
+  computed: {
+    searchInput: {
+      get: function(){
+        return this.search;
+      },
+      set: function(newSearch){
+        // 方式一：[update:] 为特定写法和父组件中 [.sync] 搭配
+        this.$emit('update:search', newSearch)
+        // 方式二：update-search 为自定义事件名
+        // this.$emit('update-search', newSearch)
+      }
+    }
+  },
+</script>
+<style scoped></style>
+```
+
+**父组件 Home.vue 写法**
+
+```vue
+<template>
+<!--方式一-->
+	<Header :search.sync="search" ></Header>
+<!--方式二-->
+	<!-- <Header :search="search" @update-search="updateSearch"></Header> -->
+</template>
+<script>
+	data() {
+        return {
+            search: ''
+        }
+    },
+   // 方式二
+   // methods: {
+   // 	updateSearch(newSearch){this.search = newSearch;}
+   // }
+</script>
+<style scoped></style>
+```
+
+## 注销登录+未登录 bug 解决
+
+[注销登录](https://www.bilibili.com/video/BV1ar4y1K7qx?p=17&spm_id_from=pageDriver)
+
+主要是当用户点击注销后能够有[消息提示框](https://element.eleme.io/#/en-US/component/message-box#confirm)，提示用户是否真的注销，以防用户误操作！还有就是当用户点击确认注销后，清空 windows.sessionStorage 或者 vuex 中 token 和 userInfo，另外，退出到登录页面！
+
+其中有使用到 element-ui 的 [下拉框 Command Event](https://element.eleme.io/#/en-US/component/dropdown#command-event)
+
+[未登录菜单 bug 解决](https://www.bilibili.com/video/BV1ar4y1K7qx?p=19&spm_id_from=pageDriver)
+
+## 在线聊天功能
+
+[GitHub Demo 地址](https://github.com/is-liyiwei/vue-Chat-demo)
+
+[在线聊天功能学习](https://www.bilibili.com/video/BV1ar4y1K7qx?p=61&spm_id_from=pageDriver)
+
+[引入在线聊天功能并调整一些细节](https://www.bilibili.com/video/BV1ar4y1K7qx?p=62&spm_id_from=pageDriver)
+
+http://qrne6et6u.hn-bkt.clouddn.com/nv1.jpg
+
+**安装一些插件**
+
+```bash
+npm install sockjs-client
+npm install stompjs
+```
+
+**安装好后配置 vue.config.js**
+
+```js
+// websocket 代理
+proxyObj['/ws'] = {
+    ws: true,
+    target: 'ws://localhost:8081'
+}
+```
+
+**store/index.js 导包**
+
+```js
+import SockJS from 'sockjs-client'
+import Stomp from 'stompjs'
+```
+
+## 用户注册功能
+
+导入导出时遇到一些报错，特地搜了下 ES6 语法的导入导出，忽然开朗了，哈哈哈~
+
+记录一个滑铁卢，我在我的 `validators.js` 中定义了一些通用的字段验证方法【checkEmail(rule,value,callback),checkMobile(rule,value,callback)...】，但是定义这些方法的时候时分开定义的，暴露的时候是统一暴露的【export defalut{checkEmail,checkMobile,...}】，于是我在 `LoginAndRegister.vue` 中引入的时候使用的是 `import validators from "../../apis/validators";`这样我便可以使用 validators.checkEmail 的方式来调用里面定义的方法！但是，当我在 `validators.js` 中想使用 axios 异步的时候，需要使用到 `api.js` 中的分别定义且分别暴露的使用 axios 封装的 ajax 请求方法【export const getRequest(url,params), export const postRequest(url,params)...】，于是导入的方式还是 `import requestApi from "./api";`，这时候我使用 `requestApi.getRequest` 时，就老是给我报错，说 `getRequest is not defined`，我一直在想是哪里出问题了，后来今早我先搜了下 `ES6 import export` 阅读了这篇文章 [ES6 Modules and How to Use Import and Export in JavaScript](https://www.digitalocean.com/community/tutorials/js-modules-es6) 在阅读过程中，我的脑子里突然意识到了是不是跟 分别暴露和统一暴露有关？于是我验证了下，发现是有关！哎，这就是初学者的烦恼吧！遇到一些低级错误都要 debug 半天！
+
+测试注册功能的时候，我有两个功能需求，一是在用户输入完 用户名 字段时，当鼠标焦点不在用户名输入框时，这时候发送 axios 封装的 Ajax 请求到后台，验证用户名是否已存在，于是我在后台写了如下放行规则：web.ignoring().antMatchers("/get-sms-code/\**","/username-existed/\**") 但是前端发送这两个请求时，老是报错提示：未登录！但是我明明放行了请求的啊！于是我搜到了下：`spring security 放行请求写法` 我本以为是不是我的放行请求路径写法的问题，因为我一直没弄懂放行请求的写法到底是怎么写的，一直是模仿别人怎么写，我就怎么写的。比如，我没弄懂，后面的 `/**` 是啥意思，但是浏览器给我的结果是 [Spring Security 两种资源放行策略，千万别用错了！](https://blog.csdn.net/u012702547/article/details/106395776) 我还是被标题吸引进去了，我看了下，感觉是这篇博文中描述的问题！于是我把后端放行请求的写法改成了如下：
+
+```java
+http.authorizeRequests()
+    .antMatchers("/get-sms-code/**","/username-existed/**").permitAll()
+    .anyRequest().authenticated()
+```
+
+于是后端返回结果就不是提示 **未登录！**了
+
+### 注册时实现按钮倒计时功能
+
+[vue中实现倒计时功能（刷新页面不清除）](https://blog.csdn.net/weixin_42204698/article/details/96474492)
+
+### element-ui validator 表单复用
+
+在开发中，需要对用户提交的表单进行校验规则复用，可以使用 bind() 方法可以用来绑定调用处的的数据以实现参数传递！
+
+不过需要注意的是，在公共方法定义处的模块不要使用箭头函数，而是使用 function 定义方法，因为箭头函数中 this 是指向定义处的父级 this，而使用 function 则 this 指向调用者 this，可参考如下：
+
+ [ElementUI 的校验函数 validator 的传参与复用](https://blog.csdn.net/qq_42941302/article/details/112799014)
+[vue+elementUI项目实现自定义校验规则的传参复用性](https://blog.csdn.net/u012443286/article/details/105258443) 
+
+**本项目使用：**
+
+validators.js 中定义的 checkUsername()
+
+```js
+/**
+ * 验证输入的用户名格式
+ * @param rule
+ * @param value
+ * @param callback
+ * [axios使用及配置明细小记](https://blog.csdn.net/u014225733/article/details/98722635)
+ */
+const checkUsername = function (rule, value, callback){
+    // 移除前后所有空格
+    value = value.trim()
+    if (!value) {
+        callback(new Error('请输入用户名！'));
+    } else if (!constants.REG_OF_USERNAME.test(value)) {
+        callback(new Error('用户名必须是6-10位之间的字母、下划线、@、. 并且不能以数字开头！'))
+    } else if (!this.loginOrReg){ // 如果是注册表单用户名验证，才往后台发送用户名是否重复验证请求
+        // 发送请求到后端验证是否用户名已存在！
+        setTimeout(requestApi.getRequest(`/username-existed/${value}`).then(resp => {
+            console.log(resp)
+        }).catch(error => {
+            console.log(error)
+            }),500)
+    }
+}
+
+// 统一暴露
+export default {
+    checkUsername,
+}
+```
+
+LoginAndRegister.vue 中编写 el-form 的 rules 规则进行调用
+
+```vue
+<template>
+	<el-form ref='regForm' :rules="rules" :model="regForm" v-show="!loginOrReg">
+	    <el-form-item prop="username">
+          <el-input type="text" v-model="regForm.username" placeholder="请输入用户名"></el-input>
+        </el-form-item>
+    </el-form>
+</template>
+<script>
+import validators from "../../apis/validators";
+data(){
+    return {
+        regForm: {
+            username: '',
+        }
+      // 登录还是注册切换指标
+      loginOrReg: true,
+        rules: {
+           username: [{validator: validators.checkUsername.bind(this), required: true, trigger:'blur'}],
+        }
+    }
+}
+</script>
+<style scoped></style>
+```
+
+[“call bind apply in javascript w3schools” Code Answer](https://www.codegrepper.com/code-examples/javascript/call+bind+apply+in+javascript+w3schools)
+
+[javascript，检测对象中是否存在某个属性](https://www.cnblogs.com/kongxianghai/archive/2013/04/12/3015803.html)
+
+### 记录一个小 bug
+
+我本想将 el-form 所有字段验证给提取出来，以达到复用的目的，但是在我将所有字段验证方法给写好了后，测试验证都起作用了，但是，这时候我点击 登录 按钮和 注册按钮时，居然没反应了？？！！！我心累，真的郁闷，在写验证方法前都还好好的，写完后登录和注册不起作用了，没调用方法，也没其他报错，在查找半天无果后，我跑出去散了下心，然后回来洗个澡，再次打开电脑后，我打开了包含那些验证方法的 validators.js ，当我看到 callback() 后，我竟然直接就意识里认定是和这些 callback() 有关，于是我让这些方法不管三七二十一，执行到最后都需要执行下 callback() ，然后重启项目，这次居然可以了，我天！！！人的直觉和意识有时候是被某种力量给定了吧？所以保持努力，你的守护神会在暗处默默帮助你的，即使你看不到听不到，但是会有的，他和我们所在空间不一样，在你无助无力时，就会出现的，助你度过难关！哈哈哈~ （我只是为了记录个 bug）
+

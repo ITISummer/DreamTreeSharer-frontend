@@ -4,6 +4,7 @@
  */
 let proxyObj = {}
 
+// 本地后台代理
 proxyObj['/'] = {
     // websocket
     ws: false,
@@ -17,6 +18,7 @@ proxyObj['/'] = {
         '^/': '/'
     }
 }
+// 七牛云代理
 proxyObj['/upload-api'] = {
     // websocket
     ws: false,
@@ -29,7 +31,11 @@ proxyObj['/upload-api'] = {
         '^/upload-api': ''
     }
 }
-
+// websocket 代理
+proxyObj['/ws'] = {
+    ws: true,
+    target: 'ws://localhost:8081'
+}
 // 请求到 8080，但是会转发到 8081 端口
 module.exports = {
     devServer: {

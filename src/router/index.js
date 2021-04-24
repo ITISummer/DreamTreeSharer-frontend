@@ -6,10 +6,9 @@ import Home from "../views/Home/Home";
 import Comments from "../views/Comments/Comments";
 import Upload from "../views/Upload/Upload";
 import PersonalCenter from "../views/PersonalCenter/PersonalCenter";
-import Logout from "../views/Logout/Logout";
 import PinBoards from "../views/PersonalCenter/PinBoards/PinBoards";
 import AccountSetting from "../views/PersonalCenter/AccountSetting/AccountSetting";
-import Cropper from "../views/Cropper/Cropper"
+import OnlineChat from "../views/PersonalCenter/Chat/OnlineChat";
 // 相当于 controller 层，起转发请求的作用
 Vue.use(VueRouter)
 // 定义 routes 对象数组
@@ -53,22 +52,15 @@ const routes = [
                 name: '梦卡管理',
                 path: `${baseURL}/pin-boards`,
                 component: PinBoards,
-            }
+            },
+            {
+                name: '在线聊天',
+                path: `${baseURL}/chat`,
+                component: OnlineChat,
+            },
         ]
     },
-    {
-        name: '注销',
-        path: `${baseURL}/logout`,
-        component: Logout,
-    },
-    {
-        name: 'cropper',
-        path: `${baseURL}/cropper`,
-        component: Cropper,
-    }
-
 ]
 
 const router = new VueRouter({routes})
-
 export default router

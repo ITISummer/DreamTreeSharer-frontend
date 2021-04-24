@@ -1,14 +1,16 @@
 <template>
   <el-container>
-    <Header :search="search"></Header>
+    <Header :search.sync="search"></Header>
     <el-aside width="200px">
-      <el-menu @select="toggleView">
+      <el-menu @select="toggleView" @open="defaultOpen">
           <el-menu-item index="/account-setting">账户设置</el-menu-item>
           <el-menu-item index="/pin-boards">梦卡管理</el-menu-item>
+        <el-menu-item index="/chat">在线聊天</el-menu-item>
       </el-menu>
     </el-aside>
     <!--    main -->
     <el-main style="padding-top: 62px; background-color: #6e8efb">
+      <h1 v-show="tipOn">欢迎来到个人中心，请点击左侧选项，对您的相关内容进行管理！</h1>
       <router-view/>
     </el-main>
   </el-container>
@@ -21,6 +23,7 @@ export default {
   data() {
     return {
       search: '',
+      tipOn: true
     }
   },
   methods: {
@@ -29,7 +32,12 @@ export default {
      * @param index
      */
     toggleView(index) {
+      this.tipOn = false
       this.$router.push(index)
+    },
+
+    defaultOpen(){
+      this.$router.push('/account-setting')
     }
   }
 }
