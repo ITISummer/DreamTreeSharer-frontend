@@ -956,3 +956,9 @@ data(){
 
 我本想将 el-form 所有字段验证给提取出来，以达到复用的目的，但是在我将所有字段验证方法给写好了后，测试验证都起作用了，但是，这时候我点击 登录 按钮和 注册按钮时，居然没反应了？？！！！我心累，真的郁闷，在写验证方法前都还好好的，写完后登录和注册不起作用了，没调用方法，也没其他报错，在查找半天无果后，我跑出去散了下心，然后回来洗个澡，再次打开电脑后，我打开了包含那些验证方法的 validators.js ，当我看到 callback() 后，我竟然直接就意识里认定是和这些 callback() 有关，于是我让这些方法不管三七二十一，执行到最后都需要执行下 callback() ，然后重启项目，这次居然可以了，我天！！！人的直觉和意识有时候是被某种力量给定了吧？所以保持努力，你的守护神会在暗处默默帮助你的，即使你看不到听不到，但是会有的，他和我们所在空间不一样，在你无助无力时，就会出现的，助你度过难关！哈哈哈~ （我只是为了记录个 bug）
 
+# 2021年4月25日 主页面功能
+
+在更改主页面（Home.vue）功能的时候，由于我的主页面包含我提取出来的 Header.vue 组件，这是一个公共组件，而在 Header.vue 里面我获取了本来是用户登录成功后存入 window.sessionStorage 的用户信息，存储的 key 为 userInfo！而我在我的主页面也需要使用到 userInfo，这样有两种方式可以获取到：一种是像 Header.vue 中获取 userInfo 一样，使用 window.sessionStorage.getItem("userInfo")！但是我觉得每个组件这样写一次都比较麻烦，所以我在想可不可以在 Header.vue 中加载一次，然后通过 this.$emit("getUserInfo", this.userInfo) 给暴露一个事件，然后在需要使用到（包含）Header.vue 的组件中触发这个事件从而获取到 Header.vue 中从 sessionStorage 中获取到的 userInfo！但是，我尝试了下，在主页面中获取 Header.vue 中通过触发 $emit() 暴露出的事件从而获取 userInfo 的方式有一个问题，那就是何时触发这个事件(getUserInfo)比较好？我尝试了下在 Home.vue 组件中使用 mounted{} 选项，但是我没获取到，反而报错，说是未定义的问题！于是在思索了一会儿后，我在想，是不是有一种存储数据的方式类似 window.sessionStorage 或者 window.localStorage 一样可以方便组件获取数据！这时候我的脑子里浮现了“组件间通信”，想起来我之前看过一篇博文讲的是 [vue组件间通信六种方式（完整版）](https://segmentfault.com/a/1190000019208626) 于是我直觉告诉我，我应该使用 vuex 了，如果继续使用 sessionStorage 的话，那将不方便我代码的后续管理，于是我去中文官网学习了下 vuex [#Vuex 是什么？](https://vuex.vuejs.org/zh/#vuex-是什么)
+
+## 对 Vuex 使用的整理
+

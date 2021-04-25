@@ -2,13 +2,17 @@ import axios from "axios";
 import {Message} from "element-ui";
 import router from "../router";
 import requests from "./constants";
-import { Loading } from 'element-ui';
+import {Loading} from 'element-ui';
 import Vue from 'vue'
 
 let loadingInstance;
 let source = axios.CancelToken.source();
-// 请求次数
 let loadingRequestCount = 0;
+
+
+
+
+/*==============================axios 请求与响应拦截器==================================*/
 // [vue axios封装和公共全局loading配置 合并loading请求效果 避免重复请求]
 // (https://blog.csdn.net/weixin_45115705/article/details/99672365)
 /**
@@ -16,7 +20,7 @@ let loadingRequestCount = 0;
  */
 axios.interceptors.request.use(config => {
     config.cancelToken = source.token // 取消请求
-    if(config.cancelToken && config.cancelObj && config.cancelObj.cancel) {
+    if (config.cancelToken && config.cancelObj && config.cancelObj.cancel) {
         config.cancelObj.cancel('中断请求');
         delete config.cancelObj;
     }
@@ -34,7 +38,9 @@ axios.interceptors.request.use(config => {
         config.headers['Authorization'] = token
     }
     return config
-}, error => {console.log(error)})
+}, error => {
+    console.log(error)
+})
 
 /**
  * 响应拦截器-拦截后台返回的数据
@@ -46,7 +52,6 @@ axios.interceptors.response.use(resp => {
     //     // 同理配置了store持久化的就不需要localstorage的了
     //     localStorage.setItem("token", resp.data.token);
     // }
-
     // 响应拦截进来隐藏loading效果，此处采用延时处理是合并loading请求效果，
     // 避免多次请求loading关闭又开启
     // 合并loading请求效果 避免重复请求
@@ -76,17 +81,17 @@ axios.interceptors.response.use(resp => {
     console.log(error)
     const statusCode = error.response.statusCode;
     if (statusCode === 504 || statusCode === 404) {
-        Message.error({message:'服务器掉线啦！( ╯□╰ )|或者您请求的页面不存在咯！'})
+        Message.error({message: '服务器掉线啦！( ╯□╰ )|或者您请求的页面不存在咯！'})
     } else if (statusCode === 403) {
-        Message.error({message:'权限不足，请联系管理员！'})
+        Message.error({message: '权限不足，请联系管理员！'})
     } else if (statusCode === 401) {
-        Message.error({message:'尚未登录，请先登录！'})
+        Message.error({message: '尚未登录，请先登录！'})
         router.replace(requests.ROOT).then(r => true)
     } else {
         if (error.response.data.message) {
-            Message.error({message:error.response.data.message})
+            Message.error({message: error.response.data.message})
         } else {
-            Message.error({message:'未知错误！'})
+            Message.error({message: '未知错误！'})
         }
     }
 
@@ -98,7 +103,7 @@ const showLoading = () => {
     if (loadingRequestCount === 0) {
         // element的服务方式 target 我这边取的是表单 项目是后台系统 每个页面都有表单 类似整个表单loading
         // 和在表单配置v-loading一样的效果，这么做是全局实现了，不用每个页面单独去v-loading
-        loadingInstance = Loading.service({ target: '.el-form'});
+        loadingInstance = Loading.service({target: '.el-form'});
     }
     loadingRequestCount++
 }
@@ -110,12 +115,12 @@ const hideLoading = () => {
     if (loadingRequestCount <= 0) return
     loadingRequestCount--
     if (loadingRequestCount === 0) {
-        Vue.nextTick(()=>{//以服务的方式调用的 Loading 需要异步关闭
+        Vue.nextTick(() => {//以服务的方式调用的 Loading 需要异步关闭
             loadingInstance.close();
         });
     }
 }
-/*===============================================================================*/
+/*===============================axios 请求公共方法===========================*/
 /**
  * 前缀 url
  */
@@ -127,7 +132,7 @@ const baseURL = ''
  * @param params
  * @returns {AxiosPromise}
  */
-export const postRequest = (url,params) => {
+export const postRequest = (url, params) => {
     return axios({
         method: 'post',
         url: `${baseURL}${url}`,
@@ -141,7 +146,7 @@ export const postRequest = (url,params) => {
  * @param params
  * @returns {AxiosPromise}
  */
-export const deleteRequest = (url,params) => {
+export const deleteRequest = (url, params) => {
     return axios({
         method: 'delete',
         url: `${baseURL}${url}`,
@@ -154,7 +159,7 @@ export const deleteRequest = (url,params) => {
  * @param params
  * @returns {AxiosPromise}
  */
-export const putRequest = (url,params) => {
+export const putRequest = (url, params) => {
     return axios({
         method: 'put',
         url: `${baseURL}${url}`,
@@ -167,7 +172,7 @@ export const putRequest = (url,params) => {
  * @param params
  * @returns {AxiosPromise}
  */
-export const getRequest = (url,params) => {
+export const getRequest = (url, params) => {
     return axios({
         method: 'get',
         url: `${baseURL}${url}`,

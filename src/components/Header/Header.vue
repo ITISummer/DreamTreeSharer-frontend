@@ -26,7 +26,6 @@
               <!-- 个人中心：此处需要 PersonalCenter.vue 里暴露 getUserInfo(id) -->
               <el-dropdown-item command="personal-center"><router-link to="/personal-center">个人中心</router-link></el-dropdown-item>
               <el-dropdown-item command="logout">登出</el-dropdown-item>
-              <!--            <el-dropdown-item command="logout"><router-link to="/logout">登出</router-link></el-dropdown-item>-->
             </el-dropdown-menu>
           </el-dropdown>
       </el-col>
@@ -37,6 +36,7 @@
 <script>
 
 import constants from "../../apis/constants";
+import requests from "../../apis/constants"
 
 export default {
   props: {
@@ -44,23 +44,25 @@ export default {
   },
   data() {
     return {
-      userInfo: JSON.parse(window.sessionStorage.getItem('userInfo')),
+      userInfo: window.sessionStorage.getItem('userInfo')
     }
   },
   // https://dev.to/jakzaizzat/avoid-mutating-a-prop-directly-ab9
   // https://stackoverflow.com/questions/40574661/avoid-mutating-a-prop-directly-since-the-value-will-be-overwritten
+  // [Vuex异步请求数据后,在组件中获取状态的方法](https://blog.csdn.net/panyang01/article/details/71750897)
   computed: {
     searchInput: {
-      get: function(){
-        return this.search;
-      },
-      set: function(newSearch){
+      get(){return this.search;},
+      set(newSearch){
         // 方式一：[update:] 为特定写法和父组件中 [.sync] 搭配
         this.$emit('update:search', newSearch)
         // 方式二：update-search 为自定义事件名
         // this.$emit('update-search', newSearch)
-      }
-    }
+      },
+    },
+    // userInfo() {
+    //   return this.$store.state.userInfo
+    // }
   },
   methods: {
     /**

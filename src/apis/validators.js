@@ -13,7 +13,7 @@ const checkEmail = function (rule, value, callback){
     if (!value) {
         return callback(new Error('请输入邮箱！'));
     } else if (!constants.REG_OF_EMAIL.test(value)) {
-            callback(new Error('邮箱格式不匹配！'));
+        callback(new Error('邮箱格式不匹配！'));
     }
     callback();
 };
@@ -29,7 +29,7 @@ const checkMobile = function (rule, value, callback){
     if (!value) {
         return callback(new Error('请输入手机号！'));
     } else if (!constants.REG_OF_MOBILE.test(value)) {
-            callback(new Error('手机号格式不匹配！'));
+        callback(new Error('手机号格式不匹配！'));
     }
     callback();
 };
@@ -79,7 +79,7 @@ const checkUsername = function (rule, value, callback){
         callback(new Error('用户名必须是6-10位之间的字母、下划线、@、. 并且不能以数字开头！'))
     } else if (!this.loginOrReg){ // 如果是注册表单用户名验证，才往后台发送用户名是否重复验证请求
     // 发送请求到后端验证是否用户名已存在！
-    requestApi.getRequest(`/username-existed/${value}`).then(resp => {
+    requestApi.getRequest(`${constants.USERNAME_EXISTED}/${value}`).then(resp => {
         console.log(resp)
     }).catch(error => {
         console.log(error)

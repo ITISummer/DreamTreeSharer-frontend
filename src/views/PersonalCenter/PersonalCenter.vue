@@ -9,10 +9,10 @@
       </el-menu>
     </el-aside>
     <!--    main -->
-    <el-main style="padding-top: 62px; background-color: #6e8efb">
-      <h1 v-show="tipOn">欢迎来到个人中心，请点击左侧选项，对您的相关内容进行管理！</h1>
+<!--    <el-main style="padding-top: 62px; background-color: #6e8efb">-->
+<!--      <h1 v-show="tipOn">欢迎来到个人中心，请点击左侧选项，对您的相关内容进行管理！</h1>-->
       <router-view/>
-    </el-main>
+<!--    </el-main>-->
   </el-container>
 </template>
 

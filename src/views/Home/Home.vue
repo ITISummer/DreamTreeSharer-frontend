@@ -1,142 +1,47 @@
 <!--[瀑布流学习地址](https://www.jianshu.com/p/97b89597ab5c)-->
 <template>
   <el-container class="main-container">
-<!--    头部-->
     <Header :search.sync="search"></Header>
-    <!--    主体-->
-    <el-main  class="main-content">
-      <!-- 滚动加载 下面 v-infinite-scroll 的放置位置与瀑布流是否能够加载有关 -->
-      <div v-infinite-scroll="load" infinite-scroll-disabled="disabled" class="waterfall-container">
-<!--        封装了 vue-waterfall 插件 -->
-        <Waterfall ref="waterfall" :list="list" :gutter="10" :width="240"
-         :breakpoints="{
-          //当屏幕宽度小于等于1200
-            1200: { rowPerView: 4, },
-            //当屏幕宽度小于等于800
-            800: { rowPerView: 3, },
-            //当屏幕宽度小于等于500
-            500: { rowPerView: 2, }
-          }"
-           :animationEffect="effect"
-           :animationDuration="`${duration}s`"
-           :animationDelay="`${delay}s`"
-           backgroundColor="rgb(73, 74, 95)"
-        >
-          <!--            卡片-->
-          <template slot="item" slot-scope="props">
-            <div class="card">
-              <div class="cover" :style="initCardStyle(props)" @click="handleClick(props.data)">
-                <img :src="props.data.src" :alt="props.data.src" @load="$refs.waterfall.refresh">
-              </div>
-<!--              <div class="name">-->
-<!--                <p>height:{{ `${Math.floor(props.data.itemWidth / props.data.width * props.data.height)}px` }}</p>-->
-<!--              </div>-->
-              <div class="menus">
-                <el-avatar data-title="卡片发布者头像" size="small"
-                           src="https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png"
-                           @error="handleEdit(props.data)">
-                </el-avatar>
-                <p data-title="编辑" @click="handleEdit(props.data)"/>
-                <p data-title="删除" @click="handleDelete(props.data)"/>
-              </div>
-            </div>
-          </template>
-        </Waterfall>
-      </div>
-      <p v-if="loading">加载中...</p>
-      <p v-if="noMore">没有更多了</p>
-    </el-main>
+    <WaterfallMain
+    :images="images"
+    :isShowCardFooter="false"
+    :handleClick="handleClick"
+    :handleDelete="handleDelete"
+    :handleEdit="handleEdit"
+    ></WaterfallMain>
   </el-container>
 </template>
 
 <script>
-import Waterfall from 'vue-waterfall-plugin';
 import Header from "../../components/Header/Header";
-// const baseURL = '../../assets/images/'
+import WaterfallMain from "../../components/WaterfallMain/WaterfallMain";
 export default {
-  components: {Waterfall,Header},
+  components: {Header,WaterfallMain},
   data() {
     return {
+      userInfo: JSON.parse(window.sessionStorage.getItem('userInfo')),
       search: '',
-      // 图片地址与图片原始高度
-      images: [
-        {src: `http://qrne6et6u.hn-bkt.clouddn.com/nv1.jpg`},
-        {src: `http://qrne6et6u.hn-bkt.clouddn.com/Snipaste_2021-04-23_17-56-12.png`},
-        {src: `http://qrne6et6u.hn-bkt.clouddn.com/2019-11-30%2012.20.16%201.jpg`},
-        {src: `http://qrne6et6u.hn-bkt.clouddn.com/82222470_10206252600030974_4252574822032211968_o.jpg`},
-        {src: require(`../../assets/images/1.jpg`)},
-        {src: require(`../../assets/images/2.jpg`)},
-        {src: require(`../../assets/images/3.jpg`)},
-        {src: require(`../../assets/images/4.jpg`)},
-        {src: require(`../../assets/images/5.jpg`)},
-        {src: require(`../../assets/images/6.jpg`)},
-        {src: require(`../../assets/images/7.jpg`)},
-        {src: require(`../../assets/images/8.jpg`)},
-        {src: require(`../../assets/images/9.jpg`)},
-        {src: require(`../../assets/images/10.jpg`)},
-        {src: require(`../../assets/images/11.jpg`)},
-        {src: require(`../../assets/images/12.jpg`)},
-        {src: require(`../../assets/images/13.jpg`)},
-        {src: require(`../../assets/images/14.jpg`)},
-        {src: require(`../../assets/images/15.jpg`)},
-        {src: require(`../../assets/images/16.jpg`)},
-      ],
-      colors: ['#409EFF', '#67C23A', '#E6A23C', '#F56C6C', '#909399'],
-      list: [],
       loading: false,
-      effect: 'fadeIn',
-      duration: 1,
-      delay: 0.3,
-      boxWidth: 'auto',
-      effectOptions: [
-        {label: 'fadeIn', value: 'fadeIn'},
-        {label: 'fadeInUp', value: 'fadeInUp'},
-        {label: 'fadeInDown', value: 'fadeInDown'},
-        {label: 'zoomIn', value: 'zoomIn'}
+      images: [
+        {src: `https://i.pinimg.com/236x/4d/ba/24/4dba24872bed032eeaf85e51bbd502b9.jpg`},
+        {src: `https://i.pinimg.com/236x/c3/4b/21/c34b217c65afe3c23bf7edbb86e53ebc.jpg`},
+        {src: `https://i.pinimg.com/236x/8b/0c/f5/8b0cf5fd92f3fe289eeb34f9aaa93e26.jpg`},
+        {src: `https://i.pinimg.com/236x/cc/e0/c5/cce0c5377b48a53f4849a880a0482620.jpg`},
+        {src: `https://i.pinimg.com/236x/27/78/90/27789027d690792a73387d5d066a4b1b.jpg`},
+        {src: `https://i.pinimg.com/236x/ff/dd/4b/ffdd4b3620da73035a6d91f6e20d1fa4.jpg`},
+        {src: `https://i.pinimg.com/236x/8c/c6/6a/8cc66a9ae620e3d3f7c604c497e8085e.jpg`},
+        {src: `https://i.pinimg.com/236x/a5/26/fc/a526fc6db19373194ecdaa6f93f128ca.jpg`},
+        {src: `https://i.pinimg.com/236x/da/45/8f/da458fcfc28c96735cd034761b4b6c3d.jpg`},
+        {src: `https://i.pinimg.com/236x/66/9b/0e/669b0e167a3ecb6ca070a3ddc4979c83.jpg`},
+        {src: `https://i.pinimg.com/236x/9e/f4/19/9ef419bdfc4093bc862253f0fbbc5cee.jpg`},
+        {src: `https://i.pinimg.com/236x/6a/26/ee/6a26eed72595947dd264491769567523.jpg`},
+        {src: `https://i.pinimg.com/236x/cc/e0/c5/cce0c5377b48a53f4849a880a0482620.jpg`},
       ],
     }
   },
 
-  computed: {
-    noMore() {return this.list.length >= 200;},
-    disabled() {return this.loading || this.noMore;}
-  },
 
   methods: {
-    /**
-     * 加载图片
-     */
-    async load() {
-      this.loading = true;
-      await this.addNewList();
-      this.loading = false;
-    },
-    /**
-     * 添加到新 list 中
-     */
-    addNewList() {
-      return new Promise((resolve) => {
-        const list = this.images.map((item, index) => {
-          return {
-            ...item,
-            blankColor: this.colors[index % this.colors.length]
-          }
-        });
-        this.list.push(...list);
-        setTimeout(() => resolve(), 2000);});
-    },
-    /**
-     *初始化卡片样式
-     */
-    initCardStyle(props) {
-      if (this.isSetInitStyle) {
-        return {
-          width: `${props.data.itemWidth - 20}px`,
-          height: `${((props.data.itemWidth - 20) / props.data.width) * props.data.height}px`,
-          backgroundColor: props.data.blankColor
-        };
-      }
-    },
     /**
      * 图片点击
      */
@@ -161,92 +66,5 @@ flex 属性是 flex-grow、flex-shrink 和 flex-basis 属性的简写属性。
 注意：如果元素不是弹性盒模型对象的子元素，则 flex 属性不起作用。
 -->
 <style lang="scss">
-//.main-container {
-//  display: flex;
-//}
-/**
-主体样式
- */
-.main-content {
-  //flex: 1;
-  //background: #66677c;
-  background: #6e8efb;
-  height: 100vh;
-  overflow-y: auto;
-  //margin-top: 50px;
-  //padding: 100px 0 0 0;
-  .waterfall-container{
-    margin-top: 40px;
-  }
-  .card { /** 每一张卡片样式 */
-    background: #fff;
-    border-radius: 5px;
-    overflow: hidden;
-    cursor: pointer;
-    position: relative;
-    transition: 0.2s;
-    top: 0;
-    &:hover {
-      top: -3px;
-    }
-    .cover {
-      margin: 10px 10px 0 10px;
-      img {
-        display: block;
-        width: 100%;
-      }
-    }
-    .name { //卡片底部名字样式
-      background: #fff;
-      color: #666;
-      font-weight: 600;
-      padding: 10px 20px;
-      font-size: 14px;
-    }
-    .menus {// 卡片操作菜单栏
-      padding: 10px;
-      border-top: 1px solid #e7e7e7;
-      text-align: right;
-      p {
-        position: relative;
-        display: inline-block;
-        padding: 4px 10px;
-        text-decoration: none;
-        text-align: center;
-        cursor: pointer;
-        user-select: none;
-        color: white;
-        font-size: 12px;
-        margin-left: 10px;
-        &::before {
-          content: "";
-          position: absolute;
-          top: 0;
-          left: 0;
-          bottom: 0;
-          right: 0;
-          background: linear-gradient(135deg, #6e8efb, #a777e3);
-          border-radius: 4px;
-          transition: box-shadow 0.5s ease, transform 0.2s ease;
-          will-change: transform;
-          box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-          transform: translateY(var(--ty, 0)) rotateX(var(--rx, 0)) rotateY(var(--ry, 0)) translateZ(var(--tz, -12px));
-        }
-        &:hover::before {
-          box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-        }
-        &::after {
-          position: relative;
-          display: inline-block;
-          content: attr(data-title);
-          transition: transform 0.2s ease;
-          font-weight: bold;
-          letter-spacing: 0.01em;
-          will-change: transform;
-          transform: translateY(var(--ty, 0)) rotateX(var(--rx, 0)) rotateY(var(--ry, 0));
-        }
-      }
-    }
-  }
-}
+
 </style>

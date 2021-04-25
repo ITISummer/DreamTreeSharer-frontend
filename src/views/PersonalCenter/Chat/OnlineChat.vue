@@ -3,7 +3,7 @@
 [demo 地址](https://github.com/is-liyiwei/vue-Chat-demo)
 -->
 <template>
-  <div id="app">
+  <el-main id="chat" style="margin-top: 62px; background-color: #6e8efb">
     <div class="sidebar">
       <card></card>
       <list></list>
@@ -12,7 +12,7 @@
       <message></message>
       <user-text></user-text>
     </div>
-  </div>
+  </el-main>
 </template>
 
 <script>
@@ -36,7 +36,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-#app {
+#chat {
   margin: 20px auto;
   width: 800px;
   height: 600px;

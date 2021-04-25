@@ -13,6 +13,7 @@ rules	validation rules of form
 <!-- editDialogVisible 值 为 true 显示对话框 / false 隐藏对话框 -->
 <!-- editDialogClosed 监听对话框 -->
 <template>
+  <el-main style="margin-top: 60px; background-color: #6e8efb">
   <el-form ref="updateForm" :model="updateForm" :rules="updateFormRules" label-width="70px">
     <!-- 头像上传(crop) -->
     <el-form-item prop="avatarUrl">
@@ -70,6 +71,7 @@ rules	validation rules of form
       <el-button @click="resetForm('updateForm')">Cancel</el-button>
     </el-form-item>
   </el-form>
+</el-main>
 </template>
 
 <script>
@@ -84,7 +86,9 @@ export default {
     return {
       cropData: {},
       // 查询到的用户信息对象
-      updateForm: {},
+      updateForm: {
+        password: ''
+      },
       qiniu: {
         qiniuData: {key: "", token: ""},
         // 七牛云上传储存区域的上传域名（华东、华北、华南、北美、东南亚）
@@ -113,22 +117,21 @@ export default {
      * [如何正确合理使用 JavaScript async/await ！](https://segmentfault.com/a/1190000017718513)
      * fileUrl -> 图片 base64 url
      */
-    async handleCropSuccess(fileBase64Url) {
+    async handleCropSuccess(fileBase64Url,field,ki,callback) {
       //这里的 avatarUrl 需要和 handleResponse() 中的 file.avatarUrl 名字一致
       this.cropData.avatarUrl = fileBase64Url
       // console.log('handleCropSuccess',this.cropData)
       // console.log(this.cropData.name)
       this.qiniu.qiniuData.key = this.cropData.name;
-      console.log(this.qiniu.qiniuData.token) // ""
       await this.getQiniuToken(this.qiniu.qiniuData.key)
-      console.log(this.qiniu.qiniuData.token) // 可以获得 token
+      callback()
     },
     /**
      * 创建前从后台获取访问七牛云的 token - (key(文件名) bucket, AccessKey, SecretKey)
      */
     getQiniuToken: async function (key) {
       const _this = this;
-      await this.getRequest(`/qiniu/uploadToken/${key}`)
+      await this.getRequest(`${constants.GET_QINIU_TOKEN_URL}/${key}`)
           .then(function (res) {
             if (res.statusCode === 200) {
               _this.qiniu.qiniuData.token = res.object;
@@ -144,9 +147,8 @@ export default {
      * fileList -> 上传的图片集
      */
     handleResponse(res, file, fileList) {
-      // console.log(res)
       console.log(file)
-      // console.log(file.url)
+      // 往数据库发送异步请求，存入用户上传的头像 TODO
       return file.avatarUrl
     },
     /**
