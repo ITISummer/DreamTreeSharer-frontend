@@ -23,7 +23,8 @@ const store = new Vuex.Store({
       		content:'本项目地址(重构): https://github.com/is-liyiwei',
       		date:now
       	}]
-      },{
+      },
+		{
       	id:2,
       	user:{
       		name:'满天星',

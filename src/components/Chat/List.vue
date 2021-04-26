@@ -34,9 +34,10 @@ export default {
 <style lang="scss" scoped>
 #list {
 	li {
-		padding: 5px 15px;
+		padding: 5px 5px;
 		border-bottom: 1px solid #292C33;
 		cursor: pointer;
+    list-style: none;
 		&:hover {
 			background-color: rgba(255, 255, 255, 0.03);
 		}
@@ -48,6 +49,7 @@ export default {
 		border-radius: 2px;
 		width: 30px;
 		height: 30px;
+    margin-left: -60px;
 		vertical-align: middle;
 	}
 	.name {

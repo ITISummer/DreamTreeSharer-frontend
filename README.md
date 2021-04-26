@@ -96,7 +96,7 @@ npm run serve
 
 ## 项目结构说明
 
-<img src="C:\Users\LCX\AppData\Roaming\Typora\typora-user-images\image-20210331165926659.png" alt="image-20210331165926659" style="zoom:80%;" />
+<img src="https://raw.githubusercontent.com/ITISummer/FigureBed/master/img/image-20210331165926659.png" style="zoom:80%;" />
 
 node_modules: 项目使用到的一些依赖
 
@@ -198,9 +198,9 @@ TypeError: Cannot read property 'post' of undefined
 upload-z1.qiniup.com/:1 Failed to load resource: the server responded with a status of 400 (Bad Request)
 ```
 
-查看响应头后发现“未指定 token”
+查看响应头后发现“未指定 token” 
 
-<img src="C:\Users\LCX\AppData\Roaming\Typora\typora-user-images\image-20210416144801416.png" alt="elemen-ui 上传七牛云报错" style="zoom:80%;" />
+<img src="https://cdn.jsdelivr.net/gh/ITISummer/FigureBed/img/image-20210416144801416.png" style="zoom:80%;" />
 
 [七牛云上传下载操作指南](https://developer.qiniu.com/kodo/kb/1336/upload-download-instructions)
 
@@ -212,7 +212,7 @@ upload-z1.qiniup.com/:1 Failed to load resource: the server responded with a sta
 
 我想这应该是跨域的问题
 
-<img src="C:\Users\LCX\AppData\Roaming\Typora\typora-user-images\image-20210416193629667.png" alt="image-20210416193629667" style="zoom:80%;" />
+<img src="https://cdn.jsdelivr.net/gh/ITISummer/FigureBed/img/image-20210416193629667.png" style="zoom:80%;" />
 
 由于我只设置了本地后台跨域，所以会报错，于是我想是不是能设置多个跨域，后来我查询到了，是可以设置多个跨域的： [webpack开发配置API代理解决跨域问题-devServer](https://segmentfault.com/a/1190000016199721)，添加一个跨域后，问题便解决了！
 
@@ -231,7 +231,7 @@ proxyObj['/upload-api'] = {
 }
 ```
 
-<img src="C:\Users\LCX\AppData\Roaming\Typora\typora-user-images\image-20210416210112427.png" alt="image-20210416210112427" style="zoom:80%;" />
+<img src="https://cdn.jsdelivr.net/gh/ITISummer/FigureBed/img/image-20210416210112427.png" style="zoom:80%;" />
 
 在经过一番仔细研究后发现需要加 http 或者 https 协议头部，于是请求地址变为了 `http://qrne6et6u.hn-bkt.clouddn.com/test.jpg` 这样就可以正确访问了
 
@@ -619,7 +619,7 @@ JSON.parse(window.localStorage.getItem("subscribeList"));    // string -> array
 - `$attrs`：包含了父作用域中不被 prop 所识别 (且获取) 的特性绑定 (class 和 style 除外)。当一个组件没有声明任何 prop 时，这里会包含所有父作用域的绑定 (class 和 style 除外)，并且可以通过 v-bind="$attrs" 传入内部组件。通常配合 interitAttrs 选项一起使用。
 - `$listeners`：包含了父作用域中的 (不含 .native 修饰器的) v-on 事件监听器。它可以通过 v-on="$listeners" 传入内部组件
 
-<img src="https://upload-images.jianshu.io/upload_images/3174701-db162929eb89cb7f?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="img" style="zoom:80%;" />
+<img src="https://cdn.jsdelivr.net/gh/ITISummer/FigureBed/img/3174701-db162929eb89cb7f" alt="img" style="zoom:80%;" />
 
 如上图所示`$attrs`表示没有继承数据的对象，格式为{属性名：属性值}。Vue2.4提供了`$attrs` , `$listeners` 来传递数据与事件，跨级组件之间的通讯变得更简单。简单来说：`$attrs`与`$listeners` 是两个对象，`$attrs` 里存放的是父组件中绑定的非 Props 属性，`$listeners`里存放的是父组件中绑定的非原生事件。
 
@@ -686,7 +686,7 @@ import EleGallery from "vue-ele-gallery";
 
 不过今天我又遇到了新的问题！
 
-在指定 crop 属性，从而使用 \<cropper>  后，然后重写 cropper 中的 crop-success 钩子函数【记录一个小插曲：在将 crop-success 这个钩子函数给暴露给父组件（调用者），从而能够让父组件可以重写的目的，使用的是子组件中使用 props 暴露钩子函数，但是我这时候又想获取子组件中的 data 数据域，于是我查询了下，发现可以在子组件中使用 $emit() 分发事件的方式传递给父组件数据 [vue组件间通信六种方式（完整版）](https://segmentfault.com/a/1190000019208626)】就可以正常从本地后台获取 token 了，但是我发现它内部提交有一些问题：当我上传第一张图片时，提交给远程的 token 为空（但是我本地是生成了 token 并传递给了本地前台的），然后七牛云远程给报：`{"error":"token not specified"}` 然后我上传第二张不同图片后，它内部提交的 token 是第一张图片的 token，所以七牛云远程就报 `{"error":"key doesn't match with scope"}`于是我又上传第三张不同图片，得到的结果是和上传第二张得到的结果一样 `{"error":"key doesn't match with scope"}` 于是我陷入了思考，那是不是我两次上传同一张图片后就能成功呢？于是我测试了下，在连续上传同一张图片后，真的成功了！！！！！，我天！！！但是片刻喜悦过后，我要怎么解决这个问题呢？
+在指定 crop 属性，从而使用 \<cropper>  后，然后重写 cropper 中的 crop-success 钩子函数【记录一个小插曲：在将 crop-success 这个钩子函数给暴露给父组件（调用者），从而能够让父组件可以重写的目的，使用的是子组件中使用 props 暴露钩子函数，但是我这时候又想获取子组件中的 data 数据域，于是我查询了下，发现可以在子组件中使用 $emit() 分发事件的方式传递给父组件数据 [vue组件间通信六种方式（完整版）](https://segmentfault.com/a/1190000019208626)就可以正常从本地后台获取 token 了，但是我发现它内部提交有一些问题：当我上传第一张图片时，提交给远程的 token 为空（但是我本地是生成了 token 并传递给了本地前台的），然后七牛云远程给报：`{"error":"token not specified"}` 然后我上传第二张不同图片后，它内部提交的 token 是第一张图片的 token，所以七牛云远程就报 `{"error":"key doesn't match with scope"}`于是我又上传第三张不同图片，得到的结果是和上传第二张得到的结果一样 `{"error":"key doesn't match with scope"}` 于是我陷入了思考，那是不是我两次上传同一张图片后就能成功呢？于是我测试了下，在连续上传同一张图片后，真的成功了！！！！！，我天！！！但是片刻喜悦过后，我要怎么解决这个问题呢？
 
 ```js
 理想情况下的 key:token 对应关系
@@ -960,5 +960,19 @@ data(){
 
 在更改主页面（Home.vue）功能的时候，由于我的主页面包含我提取出来的 Header.vue 组件，这是一个公共组件，而在 Header.vue 里面我获取了本来是用户登录成功后存入 window.sessionStorage 的用户信息，存储的 key 为 userInfo！而我在我的主页面也需要使用到 userInfo，这样有两种方式可以获取到：一种是像 Header.vue 中获取 userInfo 一样，使用 window.sessionStorage.getItem("userInfo")！但是我觉得每个组件这样写一次都比较麻烦，所以我在想可不可以在 Header.vue 中加载一次，然后通过 this.$emit("getUserInfo", this.userInfo) 给暴露一个事件，然后在需要使用到（包含）Header.vue 的组件中触发这个事件从而获取到 Header.vue 中从 sessionStorage 中获取到的 userInfo！但是，我尝试了下，在主页面中获取 Header.vue 中通过触发 $emit() 暴露出的事件从而获取 userInfo 的方式有一个问题，那就是何时触发这个事件(getUserInfo)比较好？我尝试了下在 Home.vue 组件中使用 mounted{} 选项，但是我没获取到，反而报错，说是未定义的问题！于是在思索了一会儿后，我在想，是不是有一种存储数据的方式类似 window.sessionStorage 或者 window.localStorage 一样可以方便组件获取数据！这时候我的脑子里浮现了“组件间通信”，想起来我之前看过一篇博文讲的是 [vue组件间通信六种方式（完整版）](https://segmentfault.com/a/1190000019208626) 于是我直觉告诉我，我应该使用 vuex 了，如果继续使用 sessionStorage 的话，那将不方便我代码的后续管理，于是我去中文官网学习了下 vuex [#Vuex 是什么？](https://vuex.vuejs.org/zh/#vuex-是什么)
 
+[vuex使用视频教学参考](https://www.bilibili.com/video/BV1hs411E7cB?p=22&spm_id_from=pageDriver)
+
 ## 对 Vuex 使用的整理
+
+<img src="https://raw.githubusercontent.com/ITISummer/FigureBed/master/img/vuex%20%E8%B0%83%E7%94%A8%E8%BF%87%E7%A8%8B.png" style="zoom:80%;" />
+
+## 使用 picgo+github+jsdeliver 搭建个人图床
+
+其实早已使用 GitHub+picGo ！但是今天我想把以前写的博客里存在于本地的图片给上传到 GitHub，我就想 typora 会有这个功能吗？我在typora编辑的博文中显示在本地的图片上鼠标右击了下，果不其然，第三个选项就是 upload image，于是我就网上搜了下 typora 配置上传图片，于是就参考到了下面链接！我想说明下，其实使用 GitHub 来作为图床有一些弊端，就是访问图片链接的话，开代理（翻墙）才可以访问，但是 picgo 上又没有配置 gitee（码云）的功能！作为免费图床，当然还可以选择 sm.sm 但是我觉得可能会不那么稳定，我的意思是怕有一天就倒闭了或者不开放了！所以我选了实力比较强硬的 GitHub，这次搜索我发现了原来可以配置 cdn 来加速访问，所以我配置了 cdn-jsdeliver ！我测试了下，在关闭代理后使用了 cdn 的图片链接可以正常访问，而直接上传到 GitHub 的图片是不能访问的！但是开了代理的话，所有的都能访问！
+
+[typora自动上传图片](https://blog.csdn.net/weixin_41800884/article/details/104718367)
+
+[Github + PicGo + jsDelivr 创建稳定、免费图床](https://www.jianshu.com/p/4a29945ad69c)
+
+[Typora如何通过PicGo自动上传图片到图床](https://www.jianshu.com/p/a3371dc5802e)
 

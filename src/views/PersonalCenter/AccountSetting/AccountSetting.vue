@@ -3,11 +3,8 @@
 [element-ui dialog](https://element.eleme.io/#/en-US/component/dialog)
 [element-ui form](https://element.eleme.io/#/en-US/component/form)
 [custom-validation-rules](https://element.eleme.io/#/en-US/component/form#custom-validation-rules)
-
 model	data of form component
 rules	validation rules of form
-
-
 -->
 <!-- 修改用户的对话框 -->
 <!-- editDialogVisible 值 为 true 显示对话框 / false 隐藏对话框 -->
@@ -75,7 +72,6 @@ rules	validation rules of form
 </template>
 
 <script>
-// 局部引入
 import EleUploadImage from "../../Cropper/EleUploadImage";
 import constants from "../../../apis/constants";
 import validators from "../../../apis/validators";

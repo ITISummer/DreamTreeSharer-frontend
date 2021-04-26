@@ -1,8 +1,8 @@
 <template>
   <WaterfallMain
-      style="margin-top: -60px; background-color: #6e8efb"
+      style="background-color: #6e8efb"
       :images="images"
-      :isShowCardFooter="false"
+      :isShowCardFooter="true"
       :handleClick="handleClick"
       :handleDelete="handleDelete"
       :handleEdit="handleEdit"

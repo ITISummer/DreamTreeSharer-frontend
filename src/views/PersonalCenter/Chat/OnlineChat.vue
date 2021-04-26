@@ -10,7 +10,7 @@
     </div>
     <div class="main">
       <message></message>
-      <user-text></user-text>
+      <UserText></UserText>
     </div>
   </el-main>
 </template>
@@ -20,8 +20,6 @@ import Card from '../../../components/Chat/Card.vue'
 import List from '../../../components/Chat/List.vue'
 import Message from '../../../components/Chat/Message.vue'
 import UserText from '../../../components/Chat/UserText.vue'
-
-
 export default {
   data () {
     return {
@@ -39,7 +37,7 @@ export default {
 #chat {
   margin: 20px auto;
   width: 800px;
-  height: 600px;
+  //height: 600px;
   overflow: hidden;
   border-radius: 10px;
   .sidebar, .main {
