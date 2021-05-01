@@ -5,12 +5,10 @@ import requests from "./constants";
 import {Loading} from 'element-ui';
 import Vue from 'vue'
 
+/*===========================变量===============================*/
 let loadingInstance;
 let source = axios.CancelToken.source();
 let loadingRequestCount = 0;
-
-
-
 
 /*==============================axios 请求与响应拦截器==================================*/
 // [vue axios封装和公共全局loading配置 合并loading请求效果 避免重复请求]
@@ -27,16 +25,15 @@ axios.interceptors.request.use(config => {
     if (!navigator.onLine) { // 断网提示
         source.cancel('网络故障，请检查!')
     }
-    console.log('api.js->axios.interceptors.request.use()')
-    // 请求拦截进来调用显示loading效果
-    showLoading(config)
     // 配置了store持久化的就不需要取 sessionStorage 的了
-    // const token = store.state.token || sessionStorage.getItem('token');
     const token = window.sessionStorage.getItem('token');
     // 如果存在 token，后台未放行的请求都得携带这个 token 才能访问
     if (token) {
         config.headers['Authorization'] = token
     }
+    // 请求拦截进来调用显示loading效果
+    showLoading(config)
+    console.log('api.js->axios.interceptors.request.use()')
     return config
 }, error => {
     console.log(error)
@@ -46,22 +43,15 @@ axios.interceptors.request.use(config => {
  * 响应拦截器-拦截后台返回的数据
  */
 axios.interceptors.response.use(resp => {
-    // // 处理 token - 应该写在登录中！
-    // if (resp.headers.token) {//保存token
-    //     store.commit('SET_TOKEN', resp.headers.token);
-    //     // 同理配置了store持久化的就不需要localstorage的了
-    //     localStorage.setItem("token", resp.data.token);
-    // }
+    console.log('api.js->axios.interceptors.response.use() => success')
     // 响应拦截进来隐藏loading效果，此处采用延时处理是合并loading请求效果，
     // 避免多次请求loading关闭又开启
     // 合并loading请求效果 避免重复请求
-
-    console.log('api.js->axios.interceptors.response.use()')
     setTimeout(() => {
         hideLoading()
     }, 500);
 
-    if (resp.status && resp.status === 200) {
+    if (resp.status === 200) {
         if (resp.data.statusCode === 200) {
             Message.success({message: resp.data.message})
             // 返回数据给前端
@@ -72,29 +62,13 @@ axios.interceptors.response.use(resp => {
         }
     }
 }, error => {
+    console.log('api.js->axios.interceptors.response.use() => error')
     // 响应拦截进来隐藏loading效果，此处采用延时处理是合并loading请求效果，
     // 避免多次请求loading关闭又开启合并loading请求效果 避免重复请求
     setTimeout(() => {
         hideLoading()
-    }, 200);
-    // error.response.data.status
+    }, 500);
     console.log(error)
-    const statusCode = error.response.statusCode;
-    if (statusCode === 504 || statusCode === 404) {
-        Message.error({message: '服务器掉线啦！( ╯□╰ )|或者您请求的页面不存在咯！'})
-    } else if (statusCode === 403) {
-        Message.error({message: '权限不足，请联系管理员！'})
-    } else if (statusCode === 401) {
-        Message.error({message: '尚未登录，请先登录！'})
-        router.replace(requests.ROOT).then(r => true)
-    } else {
-        if (error.response.data.message) {
-            Message.error({message: error.response.data.message})
-        } else {
-            Message.error({message: '未知错误！'})
-        }
-    }
-
 })
 /**
  * 显示loading的函数 并且记录请求次数 ++
@@ -107,7 +81,6 @@ const showLoading = () => {
     }
     loadingRequestCount++
 }
-
 /**
  * 隐藏loading的函数，并且记录请求次数
  */
@@ -127,46 +100,6 @@ const hideLoading = () => {
 // const baseURL = '/api'
 const baseURL = ''
 /**
- * 发送一个 axios 异步 post 请求
- * @param url
- * @param params
- * @returns {AxiosPromise}
- */
-export const postRequest = (url, params) => {
-    return axios({
-        method: 'post',
-        url: `${baseURL}${url}`,
-        data: params
-    })
-}
-
-/**
- * 发送一个 axios 异步 delete 请求
- * @param url
- * @param params
- * @returns {AxiosPromise}
- */
-export const deleteRequest = (url, params) => {
-    return axios({
-        method: 'delete',
-        url: `${baseURL}${url}`,
-        data: params
-    })
-}
-/**
- * 发送一个 axios 异步 put 请求
- * @param url
- * @param params
- * @returns {AxiosPromise}
- */
-export const putRequest = (url, params) => {
-    return axios({
-        method: 'put',
-        url: `${baseURL}${url}`,
-        data: params
-    })
-}
-/**
  * 发送一个 axios 异步 get 请求
  * @param url
  * @param params
@@ -175,6 +108,27 @@ export const putRequest = (url, params) => {
 export const getRequest = (url, params) => {
     return axios({
         method: 'get',
+        url: `${baseURL}${url}`,
+        data: params
+    })
+}
+export const postRequest = (url, params) => {
+    return axios({
+        method: 'post',
+        url: `${baseURL}${url}`,
+        data: params
+    })
+}
+export const deleteRequest = (url, params) => {
+    return axios({
+        method: 'delete',
+        url: `${baseURL}${url}`,
+        data: params
+    })
+}
+export const putRequest = (url, params) => {
+    return axios({
+        method: 'put',
         url: `${baseURL}${url}`,
         data: params
     })

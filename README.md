@@ -72,7 +72,7 @@ nrm use taobao
 
 ### 使用 nrm ls 报错
 
-[nrm报错 [ERR_INVALID_ARG_TYPE] 解决方法]:(https://blog.csdn.net/S_aitama/article/details/113706339)
+[nrm报错 [ERR_INVALID_ARG_TYPE] 解决方法](https://blog.csdn.net/S_aitama/article/details/113706339)
 
 
 
@@ -96,7 +96,7 @@ npm run serve
 
 ## 项目结构说明
 
-<img src="https://raw.githubusercontent.com/ITISummer/FigureBed/master/img/image-20210331165926659.png" style="zoom:80%;" />
+<img src="https://cdn.jsdelivr.net/gh/ITISummer/FigureBed/img/image-2.png" style="zoom:80%;" />
 
 node_modules: 项目使用到的一些依赖
 
@@ -408,9 +408,9 @@ css module前期进行不麻烦的配置，实现的效果比scoped css更优，
 
 而在已经运行好的一个组件下，直接在 \<template> 中添加文本内容，则会报错：
 
-<img src="https://raw.githubusercontent.com/ITISummer/FigureBed/master/img/Snipaste_2021-04-18_21-43-11.png" style="zoom: 80%;" />
+<img src="https://cdn.jsdelivr.net/gh/ITISummer/FigureBed/img/Snipaste_2021-04-18_21-43.png" style="zoom: 80%;" />
 
-<img src="https://raw.githubusercontent.com/ITISummer/FigureBed/master/img/Snipaste_2021-04-18_21-35-15.png" style="zoom:80%;" />
+<img src="https://cdn.jsdelivr.net/gh/ITISummer/FigureBed/img/Snipaste_2021-04-18_21-35.png" style="zoom:80%;" />
 
 另外，使用 vue 时，\<style> 里的样式真难捉摸，我觉得是不是 build 的一些 bug ，明明一样的样式控制代码，有时候去掉跟没去掉样式没啥差别，有时候把直接在标签里在 style 属性里写的样式照搬到 \<style> 中，居然又会有很大的差别！明明已经运行正常的样式，在持续运行一段时间后，居然又变了！哎，反正真心累吧！真的很不想弄样式！
 
@@ -749,7 +749,7 @@ Avoid mutating a prop directly since the value will be overwritten whenever the 
 
 首先实现前面的功能还是蛮顺利吧！
 
-![](https://raw.githubusercontent.com/ITISummer/FigureBed/master/img/20210422103608.png)
+![](https://cdn.jsdelivr.net/gh/ITISummer/FigureBed/img/2021042210360.png)
 
 遇到的这个报错我想主要是因为我提取了 Header.vue 组件，然后因为其里面包含搜索框，而搜索框中的内容是通过其他引用到 Header.vue 的父组件通过 Header.vue 中设置的 props 来传递给 Header.vue 的，所以我看上面报错的说明是指：避免在父组件中直接改变子组件(Header.vue) 中通过 props 声明的值，而是通过改变 data 中的值或者基于 props 中的值的 computed property(计算属性) 。但是我产生了一个疑问是：应该在父组件中设置 computed property 还是在子组件中呢？于是我拿起了 google 搜索，将报错 copy 进搜索栏，就得到了以下结果！
 
@@ -964,15 +964,21 @@ data(){
 
 ## 对 Vuex 使用的整理
 
-<img src="https://raw.githubusercontent.com/ITISummer/FigureBed/master/img/vuex%20%E8%B0%83%E7%94%A8%E8%BF%87%E7%A8%8B.png" style="zoom:80%;" />
+<img src="https://cdn.jsdelivr.net/gh/ITISummer/FigureBed/img/vuex 调用过程 .png" style="zoom:80%;" />
 
 ## 使用 picgo+github+jsdeliver 搭建个人图床
 
-其实早已使用 GitHub+picGo ！但是今天我想把以前写的博客里存在于本地的图片给上传到 GitHub，我就想 typora 会有这个功能吗？我在typora编辑的博文中显示在本地的图片上鼠标右击了下，果不其然，第三个选项就是 upload image，于是我就网上搜了下 typora 配置上传图片，于是就参考到了下面链接！我想说明下，其实使用 GitHub 来作为图床有一些弊端，就是访问图片链接的话，开代理（翻墙）才可以访问，但是 picgo 上又没有配置 gitee（码云）的功能！作为免费图床，当然还可以选择 sm.sm 但是我觉得可能会不那么稳定，我的意思是怕有一天就倒闭了或者不开放了！所以我选了实力比较强硬的 GitHub，这次搜索我发现了原来可以配置 cdn 来加速访问，所以我配置了 cdn-jsdeliver ！我测试了下，在关闭代理后使用了 cdn 的图片链接可以正常访问，而直接上传到 GitHub 的图片是不能访问的！但是开了代理的话，所有的都能访问！
+其实早已使用 GitHub+picGo ！但是今天我想把以前写的博客里存在于本地的图片给上传到 GitHub，我就想 typora 会有这个功能吗？我在 typora 编辑的博文中显示在本地的图片上鼠标右击了下，果不其然，第三个选项就是 upload image，于是我就网上搜了下 typora 配置上传图片，于是就参考到了下面链接！我想说明下，其实使用 GitHub 来作为图床有一些弊端，就是访问图片链接的话，开代理（翻墙）才可以访问，但是 picgo 上又没有配置 gitee（码云）的功能！作为免费图床，当然还可以选择 sm.sm 但是我觉得可能会不那么稳定，我的意思是怕有一天就倒闭了或者不开放了！所以我选了实力比较强硬的 GitHub，这次搜索我发现了原来可以配置 cdn 来加速访问，所以我配置了 cdn-jsdeliver ！我测试了下，在关闭代理后使用了 cdn 的图片链接可以正常访问，而直接上传到 GitHub 的图片是不能访问的！但是开了代理的话，所有的都能访问！
 
 [typora自动上传图片](https://blog.csdn.net/weixin_41800884/article/details/104718367)
 
 [Github + PicGo + jsDelivr 创建稳定、免费图床](https://www.jianshu.com/p/4a29945ad69c)
 
 [Typora如何通过PicGo自动上传图片到图床](https://www.jianshu.com/p/a3371dc5802e)
+
+# 2021年4月27日 记录一个错误
+
+`Uncaught (in promise) NavigationDuplicated: Avoided redundant navigation to current location: "/chat".`
+
+造成这种错误的原因是：使用类似 `this.$router.push('/chat') ` 的使用方式！感觉使用 router.xxx() 进行跳转到同一地址的话，那就会包这个错误！然后使用的是 `<router-link to='/chat'>` 的方式的话，就不会报错！我查了下可以使用一种方式来让浏览器不打印错误，那就是使用 `catch()` 来捕获错误！[具体可参考此文章 - How to solve Avoided redundant navigation to current location error in vue?](https://stackoverflow.com/questions/62462276/how-to-solve-avoided-redundant-navigation-to-current-location-error-in-vue)
 

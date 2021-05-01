@@ -15,15 +15,12 @@ const checkEmail = function (rule, value, callback){
     } else if (!constants.REG_OF_EMAIL.test(value)) {
         callback(new Error('邮箱格式不匹配！'));
     }
+    // callback() 一定要调用！
     callback();
 };
 
 /**
  * 验证手机格式
- * @param rule
- * @param value
- * @param callback
- * @returns {*}
  */
 const checkMobile = function (rule, value, callback){
     if (!value) {
@@ -36,9 +33,6 @@ const checkMobile = function (rule, value, callback){
 
 /**
  * 验证输入的密码格式
- * @param rule
- * @param value
- * @param callback
  */
 const checkPassword = function (rule, value, callback) {
     if (!value) {
@@ -50,14 +44,16 @@ const checkPassword = function (rule, value, callback) {
 }
 /**
  * 验证是否与以上密码相同
- * @param rule
- * @param value
- * @param callback
  * [javascript，检测对象中是否存在某个属性](https://www.cnblogs.com/kongxianghai/archive/2013/04/12/3015803.html)
  */
 const reCheckPassword = function (rule, value, callback) {
-    if (this.hasOwnProperty("regForm") || this.hasOwnProperty("updateForm")) {
-        if (value !== (this.regForm.password || this.updateForm.password)) {
+    if (this.hasOwnProperty("regForm") ) {
+        if (value !== this.regForm.password ) {
+            callback(new Error('输入的密码与以上密码不相同！'));
+        }
+    }
+    if (this.hasOwnProperty("updateForm") ) {
+        if (value !== this.updateForm.password ) {
             callback(new Error('输入的密码与以上密码不相同！'));
         }
     }
@@ -65,9 +61,6 @@ const reCheckPassword = function (rule, value, callback) {
 }
 /**
  * 验证输入的用户名格式
- * @param rule
- * @param value
- * @param callback
  * [axios使用及配置明细小记](https://blog.csdn.net/u014225733/article/details/98722635)
  */
 const checkUsername = function (rule, value, callback){
@@ -85,7 +78,6 @@ const checkUsername = function (rule, value, callback){
         console.log(error)
         })
     }
-    // callback() 一定要调用！
     callback()
 }
 

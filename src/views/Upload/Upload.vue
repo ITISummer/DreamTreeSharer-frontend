@@ -11,7 +11,6 @@ data	上传时附带的额外参数
 -->
 <template>
   <div class="container">
-    <div class="title"><h2>ElementUI的Upload上传图片到七牛云</h2></div>
     <el-upload
         class="upload-demo"
         drag
@@ -23,7 +22,7 @@ data	上传时附带的额外参数
         :on-success="handleSuccess"
         :on-error="handleError"
         >
-      <el-image v-if="imageUrl" :src="imageUrl" class="avatar"></el-image>
+      <img v-if="imageUrl" :src="imageUrl" class="avatar"></img>
       <div v-else class="el-default">
         <i class="el-icon-upload"></i>
         <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
@@ -107,24 +106,19 @@ export default {
 不加 scoped 会对 Comments 组件有很大影响
 加 module 不会有很大影响，而且会去掉对 Comments 组件的影响
 -->
-<style module lang="scss">
+<style scoped lang="scss">
+.container{
+  height: 200px;
 
-.title {
-  margin: 120px 0 40px 0;
+}
+.avatar {
+  width: 100px;
+  display: block;
 }
 .el-default {
   .el-icon-upload {
-    margin-top: 125px;
+    margin-top: 50px;
   }
-}
-.el-upload-dragger {
-  width: 240px;
-  height: 350px;
-}
-.avatar {
-  width: 240px;
-  height: 550px;
-  display: block;
 }
 
 </style>

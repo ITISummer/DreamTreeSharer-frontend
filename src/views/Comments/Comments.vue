@@ -62,7 +62,6 @@
 </template>
 
 <script>
-import Vue from 'vue'
 
 export default {
   data() {
@@ -126,7 +125,7 @@ export default {
      */
     likeClick(item) {
       if (item.isLiked === null) {
-        Vue.$set(item, "isLike", true);
+        this.$set(item, "isLike", true);
         item.likeNum++
       } else {
         if (item.isLiked) {

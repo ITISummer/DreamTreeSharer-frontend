@@ -1,25 +1,72 @@
 <template>
-  <WaterfallMain
-      style="background-color: #6e8efb"
-      :images="images"
-      :isShowCardFooter="true"
-      :handleClick="handleClick"
-      :handleDelete="handleDelete"
-      :handleEdit="handleEdit"
-  ></WaterfallMain>
+  <el-container>
+    <WaterfallMain
+        style="background-color: #6e8efb"
+        :images="images"
+        :isShowCardFooter="true"
+        :handleClick="handleClick"
+        :handleDelete="handleDelete"
+        :handleEdit="handleEdit"
+    ></WaterfallMain>
+    <el-dialog title="Add Your Pins" class="" :visible="showDialog">
+      <!--      <div class="dialog-main">-->
+      <el-row align="middle" justify="center">
+        <el-col :span="12">
+          <Upload class="dialog-upload"></Upload>
+        </el-col>
+        <el-col :span="12">
+          <el-form :model="pinboardForm" class="dialog-form">
+            <el-form-item>
+              <el-input v-model="pinboardForm.title" placeholder="add your pins title" class="form-input"></el-input>
+            </el-form-item>
+            <el-form-item>
+              <el-image :src="userInfo.userAvatarUrl" style="width: 36px; height: 36px"></el-image>
+              <span>{{ userInfo.userUsername }}</span>
+            </el-form-item>
+            <el-form-item class="layout">
+              <el-input type="textarea" maxlength="250" v-model="pinboardForm.content" placeholder="Share Your Dreams~"
+                        @input="this.descInput"></el-input>
+              <span>{{ this.remnant }}</span>
+            </el-form-item>
+          </el-form>
+        </el-col>
+      </el-row>
+      <!--        </div>-->
+      <span slot="footer" class="dialog-footer">
+    <el-button @click="showDialog = false">Cancel</el-button>
+    <el-button type="primary" @click="showDialog = false">Confirm</el-button>
+  </span>
+    </el-dialog>
+    <!--    [admin vue页面右下角添加客服按钮](https://blog.csdn.net/thc1987/article/details/106623974)-->
+    <div class="addPins" v-show="true">
+      <el-popover placement="left-end" trigger="click">
+        <el-button type="text" style="text-align: center;" @click="showDialog=true">add your pins</el-button>
+        <label slot="reference" class="topBtn" title="add"></label>
+      </el-popover>
+    </div>
+  </el-container>
 </template>
 
 <script>
 import Header from "../../../components/Header/Header";
 import WaterfallMain from "../../../components/WaterfallMain/WaterfallMain";
+import Upload from "../../Upload/Upload";
+
 export default {
-  components: {Header,WaterfallMain},
+  components: {Header, WaterfallMain, Upload},
   data() {
     return {
+      tab2Lable: '添加用户',
+      remnant: 250,//备注最大输入250个字符
+      pinboardForm: {
+        title: '',
+        content: '',
+      },
       userInfo: JSON.parse(window.sessionStorage.getItem('userInfo')),
       search: '',
       list: [],
       loading: false,
+      showDialog: false,
       images: [
         {src: `https://i.pinimg.com/236x/4d/ba/24/4dba24872bed032eeaf85e51bbd502b9.jpg`},
         {src: `https://i.pinimg.com/236x/c3/4b/21/c34b217c65afe3c23bf7edbb86e53ebc.jpg`},
@@ -39,21 +86,78 @@ export default {
   },
   methods: {
     /**
+     * 计算文本剩余字数
+     */
+    descInput() {
+      let txtVal = this.pinboardForm.content.length;
+      this.remnant = 250 - txtVal;
+    },
+    /**
      * 图片点击
      */
-    handleClick(item) {this.$message.info(JSON.stringify(item));},
+    handleClick(item) {
+      this.$message.info(JSON.stringify(item));
+    },
     /**
      * 编辑
      */
-    handleEdit() {this.$message.success('编辑');},
+    handleEdit() {
+      this.$message.success('编辑');
+    },
     /**
      * 删除
      */
-    handleDelete() {this.$message.error('删除');},
+    handleDelete() {
+      this.$message.error('删除');
+    },
   }
 }
 
 </script>
 
-<style scoped>
+<style scoped lang="scss">
+.addPins {
+  position: fixed;
+  right: 35px;
+  bottom: 35px;
+  z-index: 999;
+  width: 60px;
+  height: 60px;
+  .topBtn {
+    width: 60px;
+    height: 60px;
+    background-color: #f2f2f2;
+    position: absolute;
+    left: 0;
+    top: 0;
+    border-radius: 50%;
+    cursor: pointer;
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-size: 40px 40px;
+    -webkit-animation: wobble 250ms infinite;
+    animation: wobble 250ms infinite;
+    background-image: url('./imgs/polkadot-new-dot-logo.png');
+  }
+}
+
+.dialog-main {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+
+  .dialog-upload {
+    flex: 1 1 auto;
+  }
+
+  .dialog-form {
+    flex: 2 2 auto;
+    flex-direction: column;
+    //.form-input {
+    // border-top: none;
+    // border-left: none;
+    // border-right: none;
+    //}
+  }
+}
 </style>

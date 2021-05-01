@@ -49,8 +49,8 @@ rules	validation rules of form
     <!--      生日-->
     <el-form-item label="生日">
       <el-col :span="11">
-        <el-form-item prop="date">
-          <el-date-picker type="date" placeholder="选择日期" v-model="updateForm.date"
+        <el-form-item prop="birthday">
+          <el-date-picker type="date" placeholder="选择日期" v-model="updateForm.birthday"
                           style="width: 100%;"></el-date-picker>
         </el-form-item>
       </el-col>
@@ -78,12 +78,26 @@ import validators from "../../../apis/validators";
 
 export default {
   components: {EleUploadImage},
+  mounted() {
+    this.userInfo = JSON.parse(window.sessionStorage.getItem("userInfo"))
+    this.updateForm.username = this.userInfo.userUsername
+    this.updateForm.password = this.userInfo.userPassword
+    this.updateForm.email = this.userInfo.userEmail
+    this.updateForm.mobile = this.userInfo.userPhone
+    this.updateForm.birthday = this.userInfo.userBirthday
+    this.updateForm.sex = this.userInfo.userSex
+  },
   data() {
     return {
       cropData: {},
+      userInfo: {},
       // 查询到的用户信息对象
       updateForm: {
-        password: ''
+        username: '',
+        password: '',
+        email: '',
+        mobile: '',
+        birthday: Date.now(),
       },
       qiniu: {
         qiniuData: {key: "", token: ""},

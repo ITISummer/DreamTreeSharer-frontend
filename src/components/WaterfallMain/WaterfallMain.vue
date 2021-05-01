@@ -54,14 +54,16 @@ export default {
     handleEdit: Function,
     handleDelete: Function,
   },
+  mounted() {
+    this.userInfo = JSON.parse(window.sessionStorage.getItem("userInfo"))
+  },
   data() {
     return {
-      userInfo: window.sessionStorage.getItem("userInfo"),
+      userInfo: {},
       loading: false,
       list: [],
     }
   },
-
   computed: {
     noMore() {return this.list.length >= 200;},
     disabled() {return this.loading || this.noMore;},
@@ -102,13 +104,9 @@ export default {
 主体样式
  */
 .main-content {
-  //flex: 1;
-  //background: #66677c;
   background: #6e8efb;
   height: 100vh;
   overflow-y: auto;
-  //margin-top: 50px;
-  //padding: 100px 0 0 0;
   .waterfall-container{
     margin-top: 40px;
   }

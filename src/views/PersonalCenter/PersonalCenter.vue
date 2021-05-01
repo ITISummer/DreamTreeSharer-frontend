@@ -16,10 +16,6 @@ export default {
       search: '',
     }
   },
-  mounted() {
-    this.$router.push('/account-setting')
-  }
-
 }
 </script>
 <style scoped lang="scss">

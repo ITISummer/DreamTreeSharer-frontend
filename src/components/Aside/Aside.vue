@@ -10,15 +10,14 @@
 
 <script>
 export default {
-
   methods: {
     /**
      * 当点击 menu-item 后，调用此方法会自动传入被点击的 menu-item 的 index
-     * @param index
      */
     toggleView(index) {
       this.tipOn = false
-      this.$router.push(index)
+      this.$router.push(index).catch(error => {
+        console.log('catch redundant path '+index+' in Aside.vue->toggleView')})
     },
     defaultOpen(){
       this.$router.push('/account-setting')
