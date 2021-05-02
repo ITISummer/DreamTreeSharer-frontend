@@ -1,11 +1,13 @@
 <template>
-  <!-- 添加 pin 弹出框容器
-  https://github.com/an-object-is-a/reactjs-pinterest-clone/tree/main/src
+  <!-- [添加 pin 弹出框容器]( https://github.com/an-object-is-a/reactjs-pinterest-clone/tree/main/src)
+  [vue中直接修改props中的值并未给出警告，为啥](https://segmentfault.com/q/1010000015952520)
+  [Vue2在子组件改变父组件传入props值三种方法（利用Vue的设计漏洞实现双向同步）](https://blog.csdn.net/qq_21567385/article/details/109213813)
+  [vue中实现点击空白区域关闭弹窗](https://juejin.cn/post/6911863086487961607)
   -->
-  <div class="add_pin_modal" v-show="showDialog">
+  <div class="add_pin_modal" v-show="showDialog" ref="dialog">
     <div class="add_pin_container">
-      <DialogLeft/>
-      <DialogRight :commentsOrDreamForm="true"/>
+      <DialogLeft :imageUrl="imageUrl"/>
+      <DialogRight :commentsOrDreamForm="commentsOrDreamForm" :showSelect="showSelect"/>
     </div>
   </div>
 </template>
@@ -16,8 +18,32 @@ import DialogLeft from "./DialogLeft";
 import DialogRight from "./DialogRight";
 
 export default {
-  props: {showDialog: Boolean},
-  components: {Upload,DialogLeft,DialogRight}
+  props: {
+    showDialog: Boolean,
+    imageUrl: String,
+    commentsOrDreamForm: Boolean,
+    showSelect: Boolean
+  },
+  components: {Upload, DialogLeft, DialogRight},
+  data() {
+    return {}
+  },
+  // TODO 待完善的点击空白区域关闭弹窗
+  // mounted() {
+  //   document.addEventListener("click", this.bodyCloseMenus);
+  // },
+  // methods: {
+  //   bodyCloseMenus(e) {
+  //     if (this.$refs.dialog && !this.$refs.dialog.contains(e.target)) {
+  //       if (this.showDialog === true) {
+  //         this.$emit("update:showDialog",false)
+  //       }
+  //     }
+  //   },
+  //   beforeDestroy() {
+  //     document.removeEventListener("click", this.bodyCloseMenus);
+  //   },
+  // }
 }
 </script>
 

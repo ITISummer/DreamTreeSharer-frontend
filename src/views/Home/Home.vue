@@ -9,17 +9,27 @@
     :handleDelete="handleDelete"
     :handleEdit="handleEdit"
     ></WaterfallMain>
+    <Dialog
+        :showDialog.sync="showDialog"
+        :commentsOrDreamForm="false"
+        :showSelect="false"
+        :imageUrl="imageUrl"
+    />
+
   </el-container>
 </template>
 
 <script>
 import Header from "../../components/Header/Header";
 import WaterfallMain from "../../components/WaterfallMain/WaterfallMain";
+import Dialog from "../../components/Dialog/Dialog";
 export default {
-  components: {Header,WaterfallMain},
+  components: {Dialog, Header,WaterfallMain},
   data() {
     return {
       userInfo: JSON.parse(window.sessionStorage.getItem('userInfo')),
+      showDialog: false,
+      imageUrl: '',
       search: '',
       loading: false,
       images: [
@@ -45,7 +55,12 @@ export default {
     /**
      * 图片点击
      */
-    handleClick(item) {this.$message.info(JSON.stringify(item));},
+    handleClick(item) {
+      this.$message.info(JSON.stringify(item));
+      this.showDialog = true
+      this.imageUrl = item.src
+      console.log(item.src)
+      },
     /**
      * 编辑
      */

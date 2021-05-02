@@ -11,18 +11,8 @@ data	上传时附带的额外参数
 -->
 <template>
 
-  <!--        <div class="upload_img_container">-->
-  <!--          <div id="dotted_border">-->
-  <!--            <div class="pint_mock_icon_container">-->
-  <!--              <img src="../../assets/images/up-arrow.png" alt="upload_img" class="pint_mock_icon"></div>-->
-  <!--            <div>Click to upload</div>-->
-  <!--            <div>Recommendation: Use high-quality .jpg less than 20MB</div>-->
-  <!--          </div>-->
-  <!--        </div>-->
-
   <div id="upload_container">
     <el-upload
-        class="upload-demo"
         drag
         :show-file-list="false"
         :auto-upload="auto_upload"
@@ -32,7 +22,7 @@ data	上传时附带的额外参数
         :on-success="handleSuccess"
         :on-error="handleError"
         >
-      <img v-if="imageUrl" :src="imageUrl" class="avatar"/>
+      <el-image v-if="imageUrl" :src="imageUrl" class="card"/>
       <div v-else class="el-default">
         <i class="el-icon-upload"></i>
         <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
@@ -44,9 +34,9 @@ data	上传时附带的额外参数
 
 <script>
 export default {
+  props:{imageUrl: String,},
   data() {
     return {
-      imageUrl: "",
       auto_upload: true,
       qiniu: {
         qiniuData: {key: "", token: ""},
@@ -118,5 +108,13 @@ export default {
 -->
 <style scoped lang="scss">
 #upload_container{
+  width: 100%;
+  height: 100%;
+  border-radius: 8px;
+  background-color: #efefef;
+  .card{
+    width: 100%;
+    height: 100%;
+  }
 }
 </style>

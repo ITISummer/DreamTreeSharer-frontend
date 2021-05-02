@@ -6,21 +6,8 @@
         <img src="../../assets/images/ellipse.png" alt="edit" class="pint_mock_icon">
       </div>
     </div>
-<!--    <div class="section2">-->
-<!--      <label for="upload_img" id="upload_img_label" style="display: block;">-->
-<!--        <div class="upload_img_container">-->
-<!--          <div id="dotted_border">-->
-<!--            <div class="pint_mock_icon_container">-->
-<!--              <img src="../../assets/images/up-arrow.png" alt="upload_img" class="pint_mock_icon"></div>-->
-<!--            <div>Click to upload</div>-->
-<!--            <div>Recommendation: Use high-quality .jpg less than 20MB</div>-->
-<!--          </div>-->
-<!--        </div>-->
-<!--        <input type="file" name="upload_img" id="upload_img" value="">-->
-<!--      </label>-->
-<!--    </div>-->
     <div class="section2">
-      <Upload/>
+      <Upload :imageUrl="imageUrl"/>
     </div>
     <!-- 左侧底部 -->
     <div class="section3">
@@ -32,6 +19,7 @@
 <script>
 import Upload from "../../views/Upload/Upload";
 export default {
+  props:{imageUrl: String},
   components: {Upload}
 }
 </script>
@@ -51,39 +39,6 @@ export default {
       }
     }
   }
-  .section2 {
-    #upload_img_label {
-      width: 100%;
-      height: 100%;
-      cursor: pointer;
-      input {
-        width: 0;
-        height: 0;
-        opacity: 0;
-      }
-      .upload_img_container {
-        width: 100%;
-        height: 100%;
-        border-radius: 8px;
-        background-color: #efefef;
-        #dotted_border {
-          width: 100%;
-          height: 100%;
-          border-radius: 8px;
-          border: 1px dashed #dadada;
-          display: flex;
-          flex-direction: column;
-          justify-content: center;
-          align-items: center;
-          text-align: center;
-        }
-      }
-    }
-    .pint_mock_icon_container {
-      background-color: #767676;
-    }
-  }
-
   .section3 {
     .save_from_site {
       width: 340px;

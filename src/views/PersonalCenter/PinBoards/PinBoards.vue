@@ -8,7 +8,11 @@
         :handleDelete="handleDelete"
         :handleEdit="handleEdit"
     ></WaterfallMain>
-    <Dialog :showDialog="showDialog"/>
+    <Dialog
+        :showDialog.sync="showDialog"
+        :commentsOrDreamForm="true"
+        :showSelect="true"
+    />
     <!--[admin vue页面右下角添加客服按钮](https://blog.csdn.net/thc1987/article/details/106623974)-->
     <div class="add_pins_button" v-show="true">
       <el-popover placement="left-end" trigger="click">
@@ -25,19 +29,13 @@ import WaterfallMain from "../../../components/WaterfallMain/WaterfallMain";
 import Dialog from "../../../components/Dialog/Dialog";
 
 export default {
-  components: {Header, WaterfallMain,Dialog},
+  components: {Header, WaterfallMain, Dialog},
   data() {
     return {
-      tab2Lable: '添加用户',
-      remnant: 250,//备注最大输入250个字符
-      pinboardForm: {
-        title: '',
-        content: '',
-      },
       userInfo: JSON.parse(window.sessionStorage.getItem('userInfo')),
+      imageUrl: "https://i.pinimg.com/236x/4d/ba/24/4dba24872bed032eeaf85e51bbd502b9.jpg",
       search: '',
       list: [],
-      loading: false,
       showDialog: false,
       images: [
         {src: `https://i.pinimg.com/236x/4d/ba/24/4dba24872bed032eeaf85e51bbd502b9.jpg`},
@@ -57,13 +55,6 @@ export default {
     }
   },
   methods: {
-    /**
-     * 计算文本剩余字数
-     */
-    descInput() {
-      let txtVal = this.pinboardForm.content.length;
-      this.remnant = 250 - txtVal;
-    },
     /**
      * 图片点击
      */
