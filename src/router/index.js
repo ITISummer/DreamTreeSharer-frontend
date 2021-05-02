@@ -3,7 +3,7 @@ import Vue from 'vue'
 import VueRouter from 'vue-router'
 import LoginAndRegister from "../views/LoginAndRegister/LoginAndRegister";
 import Home from "../views/Home/Home";
-import Comments from "../views/Comments/Comments";
+import Comments from "../components/Comments/Comments";
 import Upload from "../views/Upload/Upload";
 import PersonalCenter from "../views/PersonalCenter/PersonalCenter";
 import PinBoards from "../views/PersonalCenter/PinBoards/PinBoards";

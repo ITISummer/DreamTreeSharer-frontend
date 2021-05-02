@@ -8,40 +8,12 @@
         :handleDelete="handleDelete"
         :handleEdit="handleEdit"
     ></WaterfallMain>
-    <el-dialog title="Add Your Pins" class="" :visible="showDialog">
-      <!--      <div class="dialog-main">-->
-      <el-row align="middle" justify="center">
-        <el-col :span="12">
-          <Upload class="dialog-upload"></Upload>
-        </el-col>
-        <el-col :span="12">
-          <el-form :model="pinboardForm" class="dialog-form">
-            <el-form-item>
-              <el-input v-model="pinboardForm.title" placeholder="add your pins title" class="form-input"></el-input>
-            </el-form-item>
-            <el-form-item>
-              <el-image :src="userInfo.userAvatarUrl" style="width: 36px; height: 36px"></el-image>
-              <span>{{ userInfo.userUsername }}</span>
-            </el-form-item>
-            <el-form-item class="layout">
-              <el-input type="textarea" maxlength="250" v-model="pinboardForm.content" placeholder="Share Your Dreams~"
-                        @input="this.descInput"></el-input>
-              <span>{{ this.remnant }}</span>
-            </el-form-item>
-          </el-form>
-        </el-col>
-      </el-row>
-      <!--        </div>-->
-      <span slot="footer" class="dialog-footer">
-    <el-button @click="showDialog = false">Cancel</el-button>
-    <el-button type="primary" @click="showDialog = false">Confirm</el-button>
-  </span>
-    </el-dialog>
-    <!--    [admin vue页面右下角添加客服按钮](https://blog.csdn.net/thc1987/article/details/106623974)-->
-    <div class="addPins" v-show="true">
+    <Dialog :showDialog="showDialog"/>
+    <!--[admin vue页面右下角添加客服按钮](https://blog.csdn.net/thc1987/article/details/106623974)-->
+    <div class="add_pins_button" v-show="true">
       <el-popover placement="left-end" trigger="click">
-        <el-button type="text" style="text-align: center;" @click="showDialog=true">add your pins</el-button>
-        <label slot="reference" class="topBtn" title="add"></label>
+        <el-button type="text" style="text-align: center;" @click="showDialog = true">add your pins</el-button>
+        <label slot="reference" class="top_btn" title="add you pins"></label>
       </el-popover>
     </div>
   </el-container>
@@ -50,10 +22,10 @@
 <script>
 import Header from "../../../components/Header/Header";
 import WaterfallMain from "../../../components/WaterfallMain/WaterfallMain";
-import Upload from "../../Upload/Upload";
+import Dialog from "../../../components/Dialog/Dialog";
 
 export default {
-  components: {Header, WaterfallMain, Upload},
+  components: {Header, WaterfallMain,Dialog},
   data() {
     return {
       tab2Lable: '添加用户',
@@ -116,14 +88,14 @@ export default {
 </script>
 
 <style scoped lang="scss">
-.addPins {
+.add_pins_button {
   position: fixed;
   right: 35px;
   bottom: 35px;
   z-index: 999;
   width: 60px;
   height: 60px;
-  .topBtn {
+  .top_btn {
     width: 60px;
     height: 60px;
     background-color: #f2f2f2;
@@ -138,26 +110,6 @@ export default {
     -webkit-animation: wobble 250ms infinite;
     animation: wobble 250ms infinite;
     background-image: url('./imgs/polkadot-new-dot-logo.png');
-  }
-}
-
-.dialog-main {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-
-  .dialog-upload {
-    flex: 1 1 auto;
-  }
-
-  .dialog-form {
-    flex: 2 2 auto;
-    flex-direction: column;
-    //.form-input {
-    // border-top: none;
-    // border-left: none;
-    // border-right: none;
-    //}
   }
 }
 </style>

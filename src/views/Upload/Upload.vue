@@ -10,7 +10,17 @@ before-upload	上传文件之前的钩子，参数为上传的文件，若返回
 data	上传时附带的额外参数
 -->
 <template>
-  <div class="container">
+
+  <!--        <div class="upload_img_container">-->
+  <!--          <div id="dotted_border">-->
+  <!--            <div class="pint_mock_icon_container">-->
+  <!--              <img src="../../assets/images/up-arrow.png" alt="upload_img" class="pint_mock_icon"></div>-->
+  <!--            <div>Click to upload</div>-->
+  <!--            <div>Recommendation: Use high-quality .jpg less than 20MB</div>-->
+  <!--          </div>-->
+  <!--        </div>-->
+
+  <div id="upload_container">
     <el-upload
         class="upload-demo"
         drag
@@ -22,12 +32,12 @@ data	上传时附带的额外参数
         :on-success="handleSuccess"
         :on-error="handleError"
         >
-      <img v-if="imageUrl" :src="imageUrl" class="avatar"></img>
+      <img v-if="imageUrl" :src="imageUrl" class="avatar"/>
       <div v-else class="el-default">
         <i class="el-icon-upload"></i>
         <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
+        <div class="el-upload__tip" slot="tip">只能上传jpg/png文件，且不超过2MB</div>
       </div>
-      <div class="el-upload__tip" slot="tip">只能上传jpg/png文件，且不超过2MB</div>
     </el-upload>
   </div>
 </template>
@@ -107,18 +117,6 @@ export default {
 加 module 不会有很大影响，而且会去掉对 Comments 组件的影响
 -->
 <style scoped lang="scss">
-.container{
-  height: 200px;
-
+#upload_container{
 }
-.avatar {
-  width: 100px;
-  display: block;
-}
-.el-default {
-  .el-icon-upload {
-    margin-top: 50px;
-  }
-}
-
 </style>
