@@ -4,17 +4,15 @@
     <Header :search.sync="search"></Header>
     <WaterfallMain
     :images="images"
-    :isShowCardFooter="false"
+    :showCardFooter="false"
     :handleClick="handleClick"
     :handleDelete="handleDelete"
-    :handleEdit="handleEdit"
-    ></WaterfallMain>
+    :handleEdit="handleEdit"/>
     <Dialog
         :showDialog.sync="showDialog"
         :commentsOrDreamForm="false"
         :showSelect="false"
-        :imageUrl="imageUrl"
-    />
+        :imageUrl="imageUrl"/>
 
   </el-container>
 </template>
@@ -31,7 +29,6 @@ export default {
       showDialog: false,
       imageUrl: '',
       search: '',
-      loading: false,
       images: [
         {src: `https://i.pinimg.com/236x/4d/ba/24/4dba24872bed032eeaf85e51bbd502b9.jpg`},
         {src: `https://i.pinimg.com/236x/c3/4b/21/c34b217c65afe3c23bf7edbb86e53ebc.jpg`},
@@ -50,16 +47,14 @@ export default {
     }
   },
 
-
   methods: {
     /**
      * 图片点击
      */
     handleClick(item) {
-      this.$message.info(JSON.stringify(item));
       this.showDialog = true
       this.imageUrl = item.src
-      console.log(item.src)
+      console.log(this.imageUrl)
       },
     /**
      * 编辑
@@ -69,6 +64,7 @@ export default {
      * 删除
      */
     handleDelete() {this.$message.error('删除');},
+
   }
 }
 </script>

@@ -25,25 +25,26 @@ export default {
     showSelect: Boolean
   },
   components: {Upload, DialogLeft, DialogRight},
-  data() {
-    return {}
-  },
+
   // TODO 待完善的点击空白区域关闭弹窗
-  // mounted() {
-  //   document.addEventListener("click", this.bodyCloseMenus);
-  // },
-  // methods: {
-  //   bodyCloseMenus(e) {
-  //     if (this.$refs.dialog && !this.$refs.dialog.contains(e.target)) {
-  //       if (this.showDialog === true) {
-  //         this.$emit("update:showDialog",false)
-  //       }
-  //     }
-  //   },
-  //   beforeDestroy() {
-  //     document.removeEventListener("click", this.bodyCloseMenus);
-  //   },
-  // }
+  mounted() {
+    document.addEventListener("click", this.bodyCloseMenus);
+  },
+
+  methods:{
+    bodyCloseMenus(e) {
+      let self = this
+      if (this.$refs.dialog && !this.$refs.dialog.contains(e.target)) {
+        if (self.showDialog === true) {
+          console.log(e.target)
+          this.$emit("update:showDialog",false)
+        }
+      }
+    },
+    beforeDestroy() {
+      document.removeEventListener("click", this.bodyCloseMenus);
+    },
+  }
 }
 </script>
 

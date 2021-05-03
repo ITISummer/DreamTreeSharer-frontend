@@ -3,21 +3,19 @@
     <WaterfallMain
         style="background-color: #6e8efb"
         :images="images"
-        :isShowCardFooter="true"
+        :showCardFooter="true"
         :handleClick="handleClick"
         :handleDelete="handleDelete"
-        :handleEdit="handleEdit"
-    ></WaterfallMain>
+        :handleEdit="handleEdit"/>
     <Dialog
         :showDialog.sync="showDialog"
         :commentsOrDreamForm="true"
-        :showSelect="true"
-    />
+        :showSelect="true"/>
     <!--[admin vue页面右下角添加客服按钮](https://blog.csdn.net/thc1987/article/details/106623974)-->
     <div class="add_pins_button" v-show="true">
       <el-popover placement="left-end" trigger="click">
-        <el-button type="text" style="text-align: center;" @click="showDialog = true">add your pins</el-button>
-        <label slot="reference" class="top_btn" title="add you pins"></label>
+        <el-button type="text" style="text-align: center;" @click="showDialog = true">Add Your Pins</el-button>
+        <label slot="reference" class="top_btn" title="Add Your Pins"></label>
       </el-popover>
     </div>
   </el-container>
@@ -33,8 +31,8 @@ export default {
   data() {
     return {
       userInfo: JSON.parse(window.sessionStorage.getItem('userInfo')),
-      imageUrl: "https://i.pinimg.com/236x/4d/ba/24/4dba24872bed032eeaf85e51bbd502b9.jpg",
       search: '',
+      imageUrl: "https://i.pinimg.com/236x/4d/ba/24/4dba24872bed032eeaf85e51bbd502b9.jpg",
       list: [],
       showDialog: false,
       images: [

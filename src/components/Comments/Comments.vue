@@ -2,47 +2,54 @@
 [vue + element-ui + scss 仿简书评论模块](https://juejin.cn/post/6844903635063668744)
 -->
 <template>
-  <div class="container">
-    <div class="comment" v-for="item in comments">
+  <div id="comments-container">
+    <div class="comment" v-for="comment in comments">
+<!--      头像、昵称、日期-->
       <div class="info">
-        <img class="avatar" :src="item.fromAvatar" width="36" height="36"/>
+        <img class="avatar" :src="comment.fromAvatar" width="36" height="36"/>
         <div class="right">
-          <div class="name">{{item.fromName}}</div>
-          <div class="date">{{item.date}}</div>
+          <div class="name">{{comment.fromName}}</div>
+          <div class="date">{{comment.date}}</div>
         </div>
       </div>
-      <div class="content">{{item.content}}</div>
+<!--      母评论内容 -->
+      <div class="content">{{comment.content}}</div>
+<!--      点赞与回复选项 -->
       <div class="control">
-        <span class="like" :class="{active: item.isLike}" @click="likeClick(item)">
-          <i class="iconfont icon-like"></i>
-          <span class="like-num">{{item.likeNum > 0 ? item.likeNum + '人赞' : '赞'}}</span>
+        <span class="like" :class="{active: comment.isLiked}" @click="likeClick(comment)">
+          <i class="el-icon-goblet-full"></i>
+          <span class="like-num">{{comment.likeNum > 0 ? comment.likeNum + '人赞' : '赞'}}</span>
         </span>
-        <span class="comment-reply" @click="showCommentInput(item)">
-          <i class="iconfont icon-comment"></i>
+        <span class="comment-reply" @click="showCommentInput(comment)">
+          <i class="el-icon-s-comment"></i>
           <span>回复</span>
         </span>
       </div>
+<!--      子评论-->
       <div class="reply">
-        <div class="item" v-for="reply in item.reply">
+        <div class="item" v-for="reply in comment.reply">
+<!--          子评论 昵称，对应母评论者昵称-->
           <div class="reply-content">
             <span class="from-name">{{reply.fromName}}</span><span>: </span>
             <span class="to-name">@{{reply.toName}}</span>
             <span>{{reply.content}}</span>
           </div>
+<!--         评论日期和评论框 -->
           <div class="reply-bottom">
             <span>{{reply.date}}</span>
-            <span class="reply-text" @click="showCommentInput(item, reply)">
-              <i class="iconfont icon-comment"></i>
+            <span class="reply-text" @click="showCommentInput(comment, reply)">
+              <i class="el-icon-s-comment"></i>
               <span>回复</span>
             </span>
           </div>
         </div>
-        <div class="write-reply" v-if="item.reply.length > 0" @click="showCommentInput(item)">
+<!--        添加母评论-->
+        <div class="write-reply" v-if="comment.reply.length > 0" @click="showCommentInput(comment)">
           <i class="el-icon-edit"></i>
           <span class="add-comment">添加新评论</span>
         </div>
         <transition name="fade">
-          <div class="input-wrapper" v-if="showItemId === item.id">
+          <div class="input-wrapper" v-if="showItemId === comment.id">
             <el-input class="gray-bg-input"
                       v-model="inputComment"
                       type="textarea"
@@ -72,7 +79,7 @@ export default {
         {
           id: 'comment0001', //主键id
           date: '2018-07-05 08:30',  //评论时间
-          ownerId: 'talents100020', //文章的id
+          ownerId: 'talents100020', //图片的id
           fromId: 'errhefe232213',  //评论者id
           fromName: '犀利的评论家',   //评论者昵称
           fromAvatar: 'http://ww4.sinaimg.cn/bmiddle/006DLFVFgy1ft0j2pddjuj30v90uvagf.jpg', //评论者头像
@@ -91,31 +98,31 @@ export default {
               content: '赞同，很靠谱，水平很高',  //评论内容
               date: '2018-07-05 08:35'   //评论时间
             },
-            {
-              id: '34523244545',
-              commentId: 'comment0001',
-              fromId: 'observer567422',
-              fromName: '清晨一缕阳光',
-              fromAvatar: 'http://imgsrc.baidu.com/imgad/pic/item/c2fdfc039245d688fcba1b80aec27d1ed21b245d.jpg',
-              toId: 'observer223432',
-              toName: '夕阳红',
-              toAvatar: 'https://wx4.sinaimg.cn/mw690/69e273f8gy1ft1541dmb7j215o0qv7wh.jpg',
-              content: '大神一个！',
-              date: '2018-07-05 08:50'
-            }
+            // {
+            //   id: '34523244545',
+            //   commentId: 'comment0001',
+            //   fromId: 'observer567422',
+            //   fromName: '清晨一缕阳光',
+            //   fromAvatar: 'http://imgsrc.baidu.com/imgad/pic/item/c2fdfc039245d688fcba1b80aec27d1ed21b245d.jpg',
+            //   toId: 'observer223432',
+            //   toName: '夕阳红',
+            //   toAvatar: 'https://wx4.sinaimg.cn/mw690/69e273f8gy1ft1541dmb7j215o0qv7wh.jpg',
+            //   content: '大神一个！',
+            //   date: '2018-07-05 08:50'
+            // }
           ]
         },
-        {
-          id: 'comment0002',
-          date: '2018-07-05 08:30',
-          ownerId: 'talents100020',
-          fromId: 'errhefe232213',
-          fromName: '毒蛇郭德纲',
-          fromAvatar: 'http://ww1.sinaimg.cn/bmiddle/006DLFVFgy1ft0j2q2p8pj30v90uzmzz.jpg',
-          likeNum: 0,
-          content: '从没见过这么优秀的人',
-          reply: []
-        }
+        // {
+        //   id: 'comment0002',
+        //   date: '2018-07-05 08:30',
+        //   ownerId: 'talents100020',
+        //   fromId: 'errhefe232213',
+        //   fromName: '毒蛇郭德纲',
+        //   fromAvatar: 'http://ww1.sinaimg.cn/bmiddle/006DLFVFgy1ft0j2q2p8pj30v90uzmzz.jpg',
+        //   likeNum: 0,
+        //   content: '从没见过这么优秀的人',
+        //   reply: []
+        // }
       ]
     }
   },
@@ -125,7 +132,7 @@ export default {
      */
     likeClick(item) {
       if (item.isLiked === null) {
-        this.$set(item, "isLike", true);
+        this.$set(item, "isLiked", true);
         item.likeNum++
       } else {
         if (item.isLiked) {
@@ -138,8 +145,8 @@ export default {
     },
     /**
      * 点击评论按钮显示输入框
-     * item: 当前大评论
-     * reply: 当前回复的评论
+     * item: 当前母评论
+     * reply: 当前子评论
      */
     showCommentInput(item, reply) {
       if (reply) {
@@ -149,14 +156,7 @@ export default {
       }
       this.showItemId = item.id
     },
-    /**
-     * 点击取消按钮
-     */
     cancel() {this.showItemId = ''},
-
-    /**
-     * 提交评论
-     */
     commitComment() {console.log(this.inputComment);},
 
   },
@@ -169,10 +169,9 @@ export default {
 2. 加 module 会有很大影响
 -->
 <style scoped lang="scss">
+@import "./scss/index";
 
-@import "../../../public/scss/index";
-
-.container {
+#comments-container {
   padding: 0 10px;
   box-sizing: border-box;
   .comment {

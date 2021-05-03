@@ -31,8 +31,8 @@
             <div class="menus">
               <el-avatar data-title="卡片发布者头像" :src="userInfo.userAvatarUrl"/>
               <span class="user-name">{{userInfo.userUsername}}</span>
-              <p data-title="编辑" @click="handleEdit(props.data)" v-if="isShowCardFooter"/>
-              <p data-title="删除" @click="handleDelete(props.data)" v-if="isShowCardFooter"/>
+              <p data-title="编辑" @click="handleEdit(props.data)" v-if="showCardFooter"/>
+              <p data-title="删除" @click="handleDelete(props.data)" v-if="showCardFooter"/>
             </div>
           </div>
         </template>
@@ -49,7 +49,7 @@ export default {
   components: {Waterfall},
   props: {
     images: {type: Array, default: []},
-    isShowCardFooter: {type: Boolean, default: false},
+    showCardFooter: {type: Boolean, default: false},
     handleClick: Function,
     handleEdit: Function,
     handleDelete: Function,
