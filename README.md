@@ -980,15 +980,15 @@ data(){
 
 `Uncaught (in promise) NavigationDuplicated: Avoided redundant navigation to current location: "/chat".`
 
-造成这种错误的原因是：使用类似 `this.$router.push('/chat') ` 的使用方式！感觉使用 router.xxx() 进行跳转到同一地址的话，那就会包这个错误！然后使用的是 `<router-link to='/chat'>` 的方式的话，就不会报错！我查了下可以使用一种方式来让浏览器不打印错误，那就是使用 `catch()` 来捕获错误！[具体可参考此文章 - How to solve Avoided redundant navigation to current location error in vue?](https://stackoverflow.com/questions/62462276/how-to-solve-avoided-redundant-navigation-to-current-location-error-in-vue)
+造成这种错误的原因是：使用类似 `this.$router.push('/chat') ` 的使用方式！感觉使用 router.xxx() 进行跳转到同一地址的话，那就会报这个错误！然后使用的是 `<router-link to='/chat'>` 的方式的话，就不会报错！我查了下可以使用一种方式来让浏览器不打印错误，那就是使用 `catch()` 来捕获错误！[具体可参考此文章 - How to solve Avoided redundant navigation to current location error in vue?](https://stackoverflow.com/questions/62462276/how-to-solve-avoided-redundant-navigation-to-current-location-error-in-vue)
 
 # 2021年5月3日 实现用户增加卡片静态界面和用户评论界面
 
 对，只是静态界面而已，这两个我觉得会要实现整个功能的完成的话，肯定会花费我很多时间！其实在弄界面的时候就花费了许多时间，差不多两天吧！4月27 没更了是因为出去放空了下，然后 4月30 回来！简单记录下我弄界面的过程！
 
-一开始是想模仿着 pinterest 的界面来弄的，但是无赖我前端基础太差了，我真的没办法分析页面来搭建！所以我就想会不会有别人已经模仿过的 pinterest 的开源代码，于是我就网上搜 “pinterest 模仿” 中文都没搜到，出现的内容都是与 pinterest 网站相关的，然后我换了个思路，搜了下 “pinterest mock in vue” 具体搜索关键词我记不住了，因为那是 27 日晚上搜的，然后我就搜寻到了此网站 [ReactJS Pinterest Clone](https://medium.com/swlh/reactjs-pinterest-clone-f92966c408dd) 看里面的内容真的是专门讲解模仿 pinterest 的，我感觉一下就豁然开朗了，然后里面还给出了GitHub源码 [reactjs-pinterest-clone](https://github.com/an-object-is-a/reactjs-pinterest-clone) 于是我下载下来运行了下，感觉里面的内容和演示的有差别，只能弹出卡片编辑框，其他就没了，不知道是不是我本地运行的问题！但是项目是使用 reactjs 写的，我看不懂啊，而且我也不想看，感觉 reactjs 的语法没有 vue 那么简介吧，比如 vue 都是一个组件中结构，样式，js 代码分开的，而 reactJs 里面貌似都是写在一起的，我就不想看了！然后我在想，会不会有方法将 reactJs 的代码给转换为 vue 的代码，因为毕竟 vue 也是借鉴 reactJs 一些的吧！后来我在网上搜了下“reactJs 和 vue 互转”，果然一搜就有，看有人推荐 **react-to-vue** 这个开源工具，但是我按着教程使用，给我报错，后来我搜了下报错，没仔细看，就放弃使用 react-to-vue 这个工具了！无奈之下，我又开始想，我直接看它里面的卡片编辑框的结构和样式不久好了吗？如果我能够拿到里面的结构和样式，那我就直接迁移到我的项目中，这样就事半功倍了！于是我想直接在浏览器开发模式中将其中对应的结构和样式给 copy 下来，但是这样也很费力，因为其中的样式和结构，我怕 copy 不全！于是我又开始动小聪明了，我在想，会不会有这样一个工具，能够帮我 copy 整个网站的静态页面，我在浏览器中搜了下，然后看有人推荐使用 chrome 的一款插件叫“Save Page WE” ，于是我就安装了这款插件，将网站页面给下载到了本地！接着就是差不多两天的阅读和分析静态源码，然后适配到我的项目中！
+一开始是想模仿着 pinterest 的界面来弄的，但是无赖我前端基础太差了，我真的没办法分析页面来搭建！所以我就想会不会有别人已经模仿过的 pinterest 的开源代码，于是我就网上搜 “pinterest 模仿” 中文都没搜到，出现的内容都是与 pinterest 网站相关的，然后我换了个思路，搜了下 “pinterest mock in vue” 具体搜索关键词我记不住了，因为那是 27 日晚上搜的，然后我就搜寻到了此网站 [ReactJS Pinterest Clone](https://medium.com/swlh/reactjs-pinterest-clone-f92966c408dd) 看里面的内容真的是专门讲解模仿 pinterest 的，我感觉一下就豁然开朗了，然后里面还给出了GitHub源码 [reactjs-pinterest-clone](https://github.com/an-object-is-a/reactjs-pinterest-clone) 于是我下载下来运行了下，感觉里面的内容和演示的有差别，只能弹出卡片编辑框，其他就没了，不知道是不是我本地运行的问题！但是项目是使用 reactjs 写的，我看不懂啊，而且我也不想看，感觉 reactjs 的语法没有 vue 那么简洁吧，比如 vue 都是一个组件中结构，样式，js 代码分开的，而 reactJs 里面貌似都是写在一起的，我就不想看了！然后我在想，会不会有方法将 reactJs 的代码给转换为 vue 的代码，因为毕竟 vue 也是借鉴 reactJs 一些的吧！后来我在网上搜了下“reactJs 和 vue 互转”，果然一搜就有，看有人推荐 **react-to-vue** 这个开源工具，但是我按着教程使用，给我报错，后来我搜了下报错，没仔细看，就放弃使用 react-to-vue 这个工具了！无奈之下，我又开始想，我直接看它里面的卡片编辑框的结构和样式不久好了吗？如果我能够拿到里面的结构和样式，那我就直接迁移到我的项目中，这样就事半功倍了！于是我想直接在浏览器开发模式中将其中对应的结构和样式给 copy 下来，但是这样也很费力，因为其中的样式和结构，我怕 copy 不全！于是我又开始动小聪明了，我在想，会不会有这样一个工具，能够帮我 copy 整个网站的静态页面，我在浏览器中搜了下，然后看有人推荐使用 chrome 的一款插件叫“Save Page WE” ，于是我就安装了这款插件，将网站页面给下载到了本地！接着就是差不多两天的阅读和分析静态源码，然后适配到我的项目中！
 
-# 2021年5月4日 再复习 vue 组件间的通信方式
+# 2021年5月4日 实现卡片编辑和再复习 vue 组件间的通信方式
 
 这次我参考的文章是：
 
@@ -1033,7 +1033,7 @@ created() {
 Uncaught TypeError: Cannot read property '$emit' of undefined
 ```
 
-我网上查询了下，发现这篇文章与我的问题很相似！我仔细看了下下面回答者的代码，发现他写的 eventbus 的写法是
+我网上查询了下，发现这篇文章 [TypeError: Cannot read property '$emit' of undefined vue](https://stackoverflow.com/questions/62460236/typeerror-cannot-read-property-emit-of-undefined-vue) 与我的问题很相似！我仔细看了下下面回答者的代码，发现他写的 eventbus 的写法是
 
 ```js
 // src/event-bus.js
@@ -1042,8 +1042,6 @@ export default new Vue()
 ```
 
 然后导入使用的时候是 `import bus from '@/event-bus'` 在分析片刻后，我在想是不是我导入的问题，然后这时候我突然回想起以前也遇到过使用 import 导入的问题，后来我改了下导入的方式为 `import {EventBus} from '../../apis/eventBus'` 注意加了 `{}` ，这时候再测试就可以了！哎，反正就是初学者的烦恼吧，总是在一些基础问题上困惑许久！
-
-[TypeError: Cannot read property '$emit' of undefined vue](https://stackoverflow.com/questions/62460236/typeerror-cannot-read-property-emit-of-undefined-vue)
 
 **另外，以上业务问题已成功解决！**
 
@@ -1062,3 +1060,104 @@ export default new Vue()
 ## 一、`props` / `$emit`
 
 父组件通过`props`的方式向子组件传递数据，而通过`$emit` 子组件可以向父组件通信。
+
+## 二、 `$children` / `$parent`
+
+通过`$parent`和`$children`就可以访问组件的实例，拿到实例代表什么？代表可以访问此组件的所有方法和`data`
+
+要注意边界情况，如在`#app`上拿`$parent`得到的是`new Vue()`的实例，在这实例上再拿`$parent`得到的是`undefined`，而在最底层的子组件拿`$children`是个空数组。也要注意得到`$parent`和`$children`的值不一样，`$children` 的值是数组，而`$parent`是个对象！
+
+### 总结
+
+上面两种方式用于父子组件之间的通信， 而使用props进行父子组件通信更加普遍; 二者皆不能用于非父子组件之间的通信。
+
+## 三、`provide`/ `inject`
+
+#### 概念:
+
+`provide`/ `inject` 是`vue2.2.0`新增的api, 简单来说就是父组件中通过`provide`来提供变量, 然后再子组件中通过`inject`来注入变量。
+
+> 注意: 这里不论子组件嵌套有多深, 只要调用了`inject` 那么就可以注入`provide`中的数据，而不局限于只能从当前父组件的props属性中回取数据
+
+## 四、`ref` / `refs`
+
+`ref`：如果在普通的 DOM 元素上使用，引用指向的就是 DOM 元素；如果用在子组件上，引用就指向组件实例，可以通过实例直接调用组件的方法或访问数据。
+
+## 五、eventBus
+
+`eventBus` 又称为事件总线，在vue中可以使用它来作为沟通桥梁的概念, 就像是所有组件共用相同的事件中心，可以向该中心注册发送事件或接收事件， 所以组件都可以通知其他组件。
+
+> eventBus也有不方便之处, 当项目较大,就容易造成难以维护的灾难
+
+### 1. 初始化
+
+首先需要创建一个事件总线并将其导出, 以便其他模块可以使用或者监听它.
+
+```js
+// event-bus.js
+import Vue from 'vue'
+export const EventBus = new Vue()
+```
+
+### 2. 发送事件
+
+假设你有两个组件: `additionNum` 和 `showNum`, 这两个组件可以是兄弟组件也可以是父子组件；通过 `EventBus.$emit()`
+
+### 3. 接收事件
+
+通过 `EventBus.$on()` 接收事件
+
+### 4. 移除事件监听者
+
+如果想移除事件的监听, 可以像下面这样操作:
+
+```js
+import { EventBus } from 'event-bus.js'
+EventBus.$off('addition', {})
+```
+
+## 六、Vuex
+
+### 1. Vuex介绍
+
+Vuex 是一个专为 Vue.js 应用程序开发的状态管理模式。它采用集中式存储管理应用的所有组件的状态，并以相应的规则保证状态以一种可预测的方式发生变化.
+Vuex 解决了`多个视图依赖于同一状态`和`来自不同视图的行为需要变更同一状态`的问题，将开发者的精力聚焦于数据的更新而不是数据在组件之间的传递上
+
+### 2. Vuex各个模块
+
+1. `state`：用于数据的存储，是store中的唯一数据源
+2. `getters`：如vue中的计算属性一样，基于state数据的二次包装，常用于数据的筛选和多个数据的相关性计算
+3. `mutations`：类似函数，改变state数据的唯一途径，且不能用于处理异步事件
+4. `actions`：类似于`mutation`，用于提交`mutation`来改变状态，而不直接变更状态，可以包含任意异步操作
+5. `modules`：类似于命名空间，用于项目中将各个模块的状态分开定义和操作，便于维护
+
+## 七、` localStorage` / `sessionStorage`
+
+这种通信比较简单,缺点是数据和状态比较混乱,不太容易维护。
+通过`window.localStorage.getItem(key) `获取数据
+通过`window.localStorage.setItem(key,value) `存储数据
+
+> 注意用`JSON.parse()` / `JSON.stringify()` 做数据格式转换
+> `localStorage` / `sessionStorage`可以结合`vuex`, 实现数据的持久保存,同时使用vuex解决数据和状态混乱问题.
+
+## 八 `$attrs`与 `$listeners`
+
+![vue 组件间关系图](https://segmentfault.com/img/bVbwiWs?w=462&h=402)
+
+现在我们来讨论一种情况， 我们一开始给出的组件关系图中A组件与D组件是隔代关系， 那它们之前进行通信有哪些方式呢？
+
+1. 使用`props`绑定来进行一级一级的信息传递, 如果D组件中状态改变需要传递数据给A, 使用事件系统一级级往上传递
+2. 使用`eventBus`,这种情况下还是比较适合使用, 但是碰到多人合作开发时, 代码维护性较低, 可读性也低
+3. 使用Vuex来进行数据管理, 但是如果仅仅是传递数据, 而不做中间处理,使用Vuex处理感觉有点大材小用了.
+
+在`vue2.4`中，为了解决该需求，引入了`$attrs` 和`$listeners` ， 新增了`inheritAttrs` 选项。 在版本2.4以前，默认情况下,父作用域中不作为 prop 被识别 (且获取) 的特性绑定 (class 和 style 除外)，将会“回退”且作为普通的HTML特性应用在子组件的根元素上。
+
+
+
+## 总结
+
+常见使用场景可以分为三类:
+
+- 父子组件通信: `props`; `$parent` / `$children`; `provide` / `inject` ; `ref` ; `$attrs` / `$listeners`
+- 兄弟组件通信: `eventBus` ; vuex
+- 跨级通信: `eventBus`；Vuex；`provide` / `inject` 、`$attrs` / `$listeners`

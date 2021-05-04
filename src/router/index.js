@@ -9,14 +9,20 @@ import PersonalCenter from "../views/PersonalCenter/PersonalCenter";
 import PinBoards from "../views/PersonalCenter/PinBoards/Pinboards";
 import AccountSetting from "../views/PersonalCenter/AccountSetting/AccountSetting";
 import OnlineChat from "../views/PersonalCenter/Chat/OnlineChat";
-import Parent from "../../vue-componet-communication/1-props& $emit/Parent";
-import Child from "../../vue-componet-communication/1-props& $emit/Child";
+import Parent from "../../vue-componet-communication/8- $attrs & $listeners/Parent";
 // 相当于 controller 层，起转发请求的作用
 Vue.use(VueRouter)
 // 定义 routes 对象数组
 // const baseURL = '/api'
 const baseURL = ''
 const routes = [
+    //----------vue-component-communication 测试使用----------
+    {
+        name: 'parent',
+        path: '/parent',
+        component: Parent,
+    },
+    //----------vue-component-communication 测试使用----------
     // 转发一个请求
     {
         name: '登录',
@@ -61,16 +67,6 @@ const routes = [
                 component: OnlineChat,
             },
         ]
-    },
-    {
-        name: 'parent',
-        path: '/parent',
-        component: Parent,
-    },
-    {
-        name: 'child',
-        path: '/child',
-        component: Child,
     },
 ]
 

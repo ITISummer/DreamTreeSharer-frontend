@@ -15,7 +15,7 @@ export default {
 
   methods:{
     reverseArticles() {
-      this.$emit("reverseArray","jjjjjjjjjjjjjjjj")
+      this.$emit("reverseArray",this.articles.reverse())
     }
   }
 

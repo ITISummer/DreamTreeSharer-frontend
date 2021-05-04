@@ -19,6 +19,11 @@ export const store = new Vuex.Store({
      * 保存和管理所有组件公共（通信）的数据
      */
     state: {
+        // 初始化A和B组件的数据，等待获取
+        //----------vue-component-communication 测试使用----------
+        AMsg: '',
+        BMsg: '',
+        //----------vue-component-communication 测试使用----------
         /** 菜单 */
         routes: [],
         /** 当前登录用户 */
@@ -67,6 +72,16 @@ export const store = new Vuex.Store({
      * Mutation 必须是同步函数
      */
     mutations: {
+        //----------vue-component-communication 测试使用----------
+        receiveAMsg(state, payload) {
+            // 将A组件的数据存放于state
+            state.AMsg = payload.AMsg
+        },
+        receiveBMsg(state, payload) {
+            // 将B组件的数据存放于state
+            state.BMsg = payload.BMsg
+        },
+        //----------vue-component-communication 测试使用----------
         initDreamForm(state,data) {
           state.dreamForm = data
         },
