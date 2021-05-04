@@ -72,7 +72,7 @@ rules	validation rules of form
 </template>
 
 <script>
-import EleUploadImage from "../../Cropper/EleUploadImage";
+import EleUploadImage from "../../../components/Cropper/EleUploadImage";
 import constants from "../../../apis/constants";
 import validators from "../../../apis/validators";
 

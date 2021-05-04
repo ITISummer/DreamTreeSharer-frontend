@@ -23,6 +23,8 @@ export const store = new Vuex.Store({
         routes: [],
         /** 当前登录用户 */
         userInfo: {},
+        /** 用户添加卡片功能所需表单 */
+        dreamForm: {},
         /** 在线聊天系统 */
         sessions: [
             {
@@ -65,6 +67,9 @@ export const store = new Vuex.Store({
      * Mutation 必须是同步函数
      */
     mutations: {
+        initDreamForm(state,data) {
+          state.dreamForm = data
+        },
         /**
          * 初始化菜单
          * @param state state 作为第一个参数
@@ -88,7 +93,6 @@ export const store = new Vuex.Store({
         [INIT_USERINFO](state, data) {
             state.userInfo = data
         },
-
 
         changeCurrentSessionId(state, id) {
             state.currentSessionId = id;
@@ -127,6 +131,9 @@ export const store = new Vuex.Store({
         // initUserInfo({commit},data) {
         //     commit('INIT_USERINFO',data)
         // },
+       initDreamForm(context,data) {
+            context.commit('initDreamForm',data)
+       }
     },
 })
 /** store */

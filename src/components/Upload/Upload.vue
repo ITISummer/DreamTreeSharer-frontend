@@ -33,10 +33,12 @@ data	上传时附带的额外参数
 </template>
 
 <script>
+import {EventBus} from '../../apis/eventBus'
 export default {
-  props:{imageUrl: String,},
+  // props:{imageUrl: String,},
   data() {
     return {
+      imageUrl: '',
       auto_upload: true,
       qiniu: {
         qiniuData: {key: "", token: ""},
@@ -88,6 +90,9 @@ export default {
      */
     handleSuccess: function(res) {
       this.imageUrl = "http://"+this.qiniu.uploadQiniuAddr + res.key;
+      // 向上暴露 imageUrl
+      // this.$emit("update:imageUrl",this.imageUrl)
+      EventBus.$emit('getImageUrl',this.imageUrl)
       this.$message({message: `上传成功！图片地址为：${this.imageUrl}`, type: "success"})
     },
     /**

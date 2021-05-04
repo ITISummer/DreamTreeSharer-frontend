@@ -1,0 +1,3 @@
+参考：
+[vue中8种组件通信方式, 值得收藏!](https://segmentfault.com/a/1190000020053344?utm_source=sf-similar-article)
+[vue组件间通信六种方式（完整版）](https://segmentfault.com/a/1190000019208626)

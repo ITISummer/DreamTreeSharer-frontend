@@ -7,7 +7,8 @@
       </div>
     </div>
     <div class="section2">
-      <Upload :imageUrl="imageUrl"/>
+<!--      <Upload :imageUrl.sync="imageUrl"/>-->
+      <Upload ref="Upload"/>
     </div>
     <!-- 左侧底部 -->
     <div class="section3">
@@ -17,9 +18,9 @@
 </template>
 
 <script>
-import Upload from "../../views/Upload/Upload";
+import Upload from "../Upload/Upload";
 export default {
-  props:{imageUrl: String},
+  // props:{imageUrl: String},
   components: {Upload}
 }
 </script>

@@ -4,11 +4,13 @@ import VueRouter from 'vue-router'
 import LoginAndRegister from "../views/LoginAndRegister/LoginAndRegister";
 import Home from "../views/Home/Home";
 import Comments from "../components/Comments/Comments";
-import Upload from "../views/Upload/Upload";
+import Upload from "../components/Upload/Upload";
 import PersonalCenter from "../views/PersonalCenter/PersonalCenter";
-import PinBoards from "../views/PersonalCenter/PinBoards/PinBoards";
+import PinBoards from "../views/PersonalCenter/PinBoards/Pinboards";
 import AccountSetting from "../views/PersonalCenter/AccountSetting/AccountSetting";
 import OnlineChat from "../views/PersonalCenter/Chat/OnlineChat";
+import Parent from "../../vue-componet-communication/1-props& $emit/Parent";
+import Child from "../../vue-componet-communication/1-props& $emit/Child";
 // 相当于 controller 层，起转发请求的作用
 Vue.use(VueRouter)
 // 定义 routes 对象数组
@@ -59,6 +61,16 @@ const routes = [
                 component: OnlineChat,
             },
         ]
+    },
+    {
+        name: 'parent',
+        path: '/parent',
+        component: Parent,
+    },
+    {
+        name: 'child',
+        path: '/child',
+        component: Child,
     },
 ]
 

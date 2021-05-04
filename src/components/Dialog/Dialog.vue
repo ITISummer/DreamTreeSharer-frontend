@@ -6,21 +6,25 @@
   -->
   <div class="add_pin_modal" v-show="showDialog" ref="dialog">
     <div class="add_pin_container">
-      <DialogLeft :imageUrl="imageUrl"/>
-      <DialogRight :commentsOrDreamForm="commentsOrDreamForm" :showSelect="showSelect"/>
+<!--      <DialogLeft :imageUrl.sync="imageUrl"/>-->
+      <DialogLeft ref="DialogLeft"/>
+      <DialogRight
+          ref="DialogRight"
+          :commentsOrDreamForm="commentsOrDreamForm"
+          :showSelect="showSelect"/>
     </div>
   </div>
 </template>
 
 <script>
-import Upload from "../../views/Upload/Upload";
+import Upload from "../Upload/Upload";
 import DialogLeft from "./DialogLeft";
 import DialogRight from "./DialogRight";
 
 export default {
   props: {
     showDialog: Boolean,
-    imageUrl: String,
+    // imageUrl: String,
     commentsOrDreamForm: Boolean,
     showSelect: Boolean
   },
@@ -30,7 +34,6 @@ export default {
   mounted() {
     document.addEventListener("click", this.bodyCloseMenus);
   },
-
   methods:{
     bodyCloseMenus(e) {
       let self = this
@@ -45,6 +48,7 @@ export default {
       document.removeEventListener("click", this.bodyCloseMenus);
     },
   }
+  // TODO 待完善的点击空白区域关闭弹窗
 }
 </script>
 

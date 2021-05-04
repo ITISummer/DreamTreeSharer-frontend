@@ -982,3 +982,83 @@ data(){
 
 造成这种错误的原因是：使用类似 `this.$router.push('/chat') ` 的使用方式！感觉使用 router.xxx() 进行跳转到同一地址的话，那就会包这个错误！然后使用的是 `<router-link to='/chat'>` 的方式的话，就不会报错！我查了下可以使用一种方式来让浏览器不打印错误，那就是使用 `catch()` 来捕获错误！[具体可参考此文章 - How to solve Avoided redundant navigation to current location error in vue?](https://stackoverflow.com/questions/62462276/how-to-solve-avoided-redundant-navigation-to-current-location-error-in-vue)
 
+# 2021年5月3日 实现用户增加卡片静态界面和用户评论界面
+
+对，只是静态界面而已，这两个我觉得会要实现整个功能的完成的话，肯定会花费我很多时间！其实在弄界面的时候就花费了许多时间，差不多两天吧！4月27 没更了是因为出去放空了下，然后 4月30 回来！简单记录下我弄界面的过程！
+
+一开始是想模仿着 pinterest 的界面来弄的，但是无赖我前端基础太差了，我真的没办法分析页面来搭建！所以我就想会不会有别人已经模仿过的 pinterest 的开源代码，于是我就网上搜 “pinterest 模仿” 中文都没搜到，出现的内容都是与 pinterest 网站相关的，然后我换了个思路，搜了下 “pinterest mock in vue” 具体搜索关键词我记不住了，因为那是 27 日晚上搜的，然后我就搜寻到了此网站 [ReactJS Pinterest Clone](https://medium.com/swlh/reactjs-pinterest-clone-f92966c408dd) 看里面的内容真的是专门讲解模仿 pinterest 的，我感觉一下就豁然开朗了，然后里面还给出了GitHub源码 [reactjs-pinterest-clone](https://github.com/an-object-is-a/reactjs-pinterest-clone) 于是我下载下来运行了下，感觉里面的内容和演示的有差别，只能弹出卡片编辑框，其他就没了，不知道是不是我本地运行的问题！但是项目是使用 reactjs 写的，我看不懂啊，而且我也不想看，感觉 reactjs 的语法没有 vue 那么简介吧，比如 vue 都是一个组件中结构，样式，js 代码分开的，而 reactJs 里面貌似都是写在一起的，我就不想看了！然后我在想，会不会有方法将 reactJs 的代码给转换为 vue 的代码，因为毕竟 vue 也是借鉴 reactJs 一些的吧！后来我在网上搜了下“reactJs 和 vue 互转”，果然一搜就有，看有人推荐 **react-to-vue** 这个开源工具，但是我按着教程使用，给我报错，后来我搜了下报错，没仔细看，就放弃使用 react-to-vue 这个工具了！无奈之下，我又开始想，我直接看它里面的卡片编辑框的结构和样式不久好了吗？如果我能够拿到里面的结构和样式，那我就直接迁移到我的项目中，这样就事半功倍了！于是我想直接在浏览器开发模式中将其中对应的结构和样式给 copy 下来，但是这样也很费力，因为其中的样式和结构，我怕 copy 不全！于是我又开始动小聪明了，我在想，会不会有这样一个工具，能够帮我 copy 整个网站的静态页面，我在浏览器中搜了下，然后看有人推荐使用 chrome 的一款插件叫“Save Page WE” ，于是我就安装了这款插件，将网站页面给下载到了本地！接着就是差不多两天的阅读和分析静态源码，然后适配到我的项目中！
+
+# 2021年5月4日 再复习 vue 组件间的通信方式
+
+这次我参考的文章是：
+
+[vue组件间通信六种方式（完整版）](https://segmentfault.com/a/1190000019208626)
+
+[vue中8种组件通信方式, 值得收藏!](https://segmentfault.com/a/1190000020053344)
+
+其中我觉得第二篇文章写得比较易懂！
+
+## 前言
+
+我先说下我的业务场景需求吧！如下图
+
+![image-20210504121612408](https://cdn.jsdelivr.net/gh/ITISummer/FigureBed/img/image-20210504121612408.png)
+
+我的 Dialog 组件如下图：
+
+![image-20210504122629922](https://cdn.jsdelivr.net/gh/ITISummer/FigureBed/img/image-20210504122629922.png)
+
+如图一所示：我觉得我这个业务需求应该使用到“跨级通信”！本来我是想使用 props 和 $emit() 的，但是这种通信方式只适用于父子组件，如果我要使用此方式的话，那么我得在每一层组件中都写许多重复的 props 属性和 $emit()，我觉得这样写起来不舒服！于是我想是不是可以使用 vuex，但是我只是做数据传递，我并不做数据处理，况且如果使用 vuex，那么我得在 DialogLeft 和 DialogRight 中重复提交两次数据到 vuex，而且提交到的数据对象对应于 state 中的 dreamForm{}！意思是，我得将 DialogRight 中的 1，2，3 属性和 DialogLeft 中的 imageUrl 属性分别提交到一个对象属性中（state 中的 dreamForm{}）我觉得这样在进行数据封装的时候有点复杂，于是我又放弃了！我尝试了使用 “事件总线” ，在尝试过程中，我建立了一个js文件：api/eventBus.js 然后在其中写下：
+
+```js
+import Vue from 'vue'
+export const EventBus = new Vue()
+```
+
+然后在 Upload.vue 中导入 `import EventBus from '../../apis/eventBus'`后，在得到上传文件成功后的地址后使用了 `      EventBus.$emit('getImageUrl',this.imageUrl)` 来分发事件！
+
+同时我也在 Pinboards.vue 引入了 `import EventBus from "../../../apis/eventBus"` 然后写下了
+
+```js
+created() {
+    console.log(EventBus)
+    EventBus.$on('getImageUrl',imageUrl => {
+        console.log(imageUrl)})
+},
+```
+
+但是在测试的时候，我遇到了报错！
+
+```js
+Uncaught TypeError: Cannot read property '$emit' of undefined
+```
+
+我网上查询了下，发现这篇文章与我的问题很相似！我仔细看了下下面回答者的代码，发现他写的 eventbus 的写法是
+
+```js
+// src/event-bus.js
+import Vue from 'vue'
+export default new Vue()
+```
+
+然后导入使用的时候是 `import bus from '@/event-bus'` 在分析片刻后，我在想是不是我导入的问题，然后这时候我突然回想起以前也遇到过使用 import 导入的问题，后来我改了下导入的方式为 `import {EventBus} from '../../apis/eventBus'` 注意加了 `{}` ，这时候再测试就可以了！哎，反正就是初学者的烦恼吧，总是在一些基础问题上困惑许久！
+
+[TypeError: Cannot read property '$emit' of undefined vue](https://stackoverflow.com/questions/62460236/typeerror-cannot-read-property-emit-of-undefined-vue)
+
+**另外，以上业务问题已成功解决！**
+
+在痛定思痛后，我觉得我有必要对 vue 组件间通信方式进行一次深刻的了解并做一些记录，我觉得即使这次花许多时间来了解，对于后来开发也是很有帮助的！
+
+## vue 组件间关系图
+
+![vue 组件间关系图](https://segmentfault.com/img/bVbwiWs?w=462&h=402)
+
+如上图所示, A与B、A与C、B与D、C与E组件之间是父子关系； B与C之间是兄弟关系；A与D、A与E之间是隔代关系； D与E是堂兄关系（非直系亲属）
+针对以上关系我们归类为：
+
+- 父子组件之间通信
+- 非父子组件之间通信(兄弟组件、隔代关系组件等)
+
+## 一、`props` / `$emit`
+
+父组件通过`props`的方式向子组件传递数据，而通过`$emit` 子组件可以向父组件通信。

@@ -3,26 +3,26 @@
     <!-- 内容选择框 -->
     <div class="section1">
       <div class="select_size" v-show="showSelect">
-        <select name="Sharable?" id="pin_size">
-          <option value="yes">分享吧</option>
-          <option value="no">不分享</option>
+        <select name="Sharable?" id="pin_size" v-model="dreamForm.pinboardSharable">
+          <option value="true" label="分享吧"></option>
+          <option value="false" label="不分享"></option>
         </select>
       </div>
-      <div class="save_pin">Save</div>
+      <div class="save_pin" @click="emitDreamForm">Save</div>
     </div>
     <!-- input 输入框 -->
     <div class="section2" v-if="commentsOrDreamForm">
-      <el-form :model="DreamForm">
+      <el-form :model="dreamForm">
         <el-form-item>
           <el-image :src="userInfo.userAvatarUrl" style="width: 36px; height: 36px"></el-image>
           <span>{{ userInfo.userUsername }}</span>
         </el-form-item>
         <el-form-item>
-          <el-input v-model="DreamForm.title" class="new_pin_input" maxlength="20"
+          <el-input v-model="dreamForm.pinboardTitle" class="new_pin_input" maxlength="20"
                     placeholder="Add Your Pins Title~"></el-input>
         </el-form-item>
         <el-form-item class="layout">
-          <el-input type="textarea" class="new_pin_input" maxlength="250" v-model="DreamForm.content"
+          <el-input type="textarea" class="new_pin_input" maxlength="250" v-model="dreamForm.pinboardContent"
                     placeholder="Share Your Dreams~"
                     @input="this.descInput"></el-input>
           <span>{{ this.remnant }}</span>
@@ -37,21 +37,26 @@
 
 <script>
 import Comments from "../Comments/Comments";
+import {EventBus} from "../../apis/eventBus";
+
 export default {
   props: {
     commentsOrDreamForm: Boolean,
     showSelect: Boolean,
   },
   components: {Comments},
+  mounted() {
+    EventBus.$on('getImageUrl',imageUrl => {
+      this.dreamForm.pinboardBgimgUrl = imageUrl
+      console.log('DialogRight.vue->mounted()',this.dreamForm.pinboardBgimgUrl)
+    })
+  },
   data() {
     return{
+      dreamForm: {pinboardTitle: '', pinboardContent: '', pinboardSharable: true, pinboardBgimgUrl: ''},
       userInfo: JSON.parse(window.sessionStorage.getItem('userInfo')),
       tab2Lable: '添加用户',
       remnant: 249,
-      DreamForm: {
-        title: '',
-        content: '',
-      },
     }
   },
   methods: {
@@ -59,9 +64,23 @@ export default {
      * 计算文本剩余字数
      */
     descInput() {
-      let txtVal = this.DreamForm.content.length;
-      this.remnant = 250 - txtVal;
+      let txtVal = this.dreamForm.pinboardContent.length;
+      this.remnant = 249 - txtVal;
     },
+    /** 检查字段并分发事件 getDreamForm 给 Pinboards */
+    emitDreamForm() {
+      const {
+        pinboardTitle: title,
+        pinboardContent: content,
+        pinboardSharable: sharable,
+        pinboardBgimgUrl: imageUrl
+      } = this.dreamForm
+      if (title === '' || content === '' || imageUrl === '') {
+        this.$message({message: '字段不能为空！', type: 'warning'})
+      } else {
+        EventBus.$emit('getDreamForm', this.dreamForm)
+      }
+    }
   }
 }
 </script>
