@@ -1,6 +1,6 @@
 <template>
   <div id="message" v-scroll-bottom="sessions">
-  	<ul v-if="currentSessionId==item.id" v-for="item in sessions">
+  	<ul v-if="currentSessionId === item.id" v-for="item in sessions">
   		<li v-for="entry in item.messages">
   			<p class="time">
   				<span>{{entry.date | time}}</span>
@@ -41,7 +41,7 @@ export default {
       //console.log(el.scrollTop);
       setTimeout(function () {
         el.scrollTop+=9999;
-      },1)
+      },10)
     }
   }
 }

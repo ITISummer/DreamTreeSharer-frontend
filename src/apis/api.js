@@ -93,6 +93,36 @@ const hideLoading = () => {
         });
     }
 }
+/*=============================监听 storage===========================*/
+// export const watchStorage = function (type, key, data) {
+//     if (type === 1) {
+//         // 创建一个StorageEvent事件
+//         let newStorageEvent = document.createEvent('StorageEvent');
+//         const storage = {
+//             setItem: function (k, val) {
+//                 localStorage.setItem(k, val);
+//                 // 初始化创建的事件
+//                 newStorageEvent.initStorageEvent('setItem', false, false, k, null, val, null, null);
+//                 // 派发对象
+//                 window.dispatchEvent(newStorageEvent);
+//             }
+//         }
+//         return storage.setItem(key, data);
+//     } else {
+//         // 创建一个StorageEvent事件
+//         let newStorageEvent = document.createEvent('StorageEvent');
+//         const storage = {
+//             setItem: function (k, val) {
+//                 sessionStorage.setItem(k, val);
+//                 // 初始化创建的事件
+//                 newStorageEvent.initStorageEvent('setItem', false, false, k, null, val, null, null);
+//                 // 派发对象
+//                 window.dispatchEvent(newStorageEvent);
+//             }
+//         }
+//         return storage.setItem(key, data);
+//     }
+// }
 /*===============================axios 请求公共方法===========================*/
 /**
  * 前缀 url

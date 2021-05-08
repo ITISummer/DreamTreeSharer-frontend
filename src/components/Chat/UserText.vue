@@ -1,11 +1,13 @@
 <template>
   <div id="user-text">
-    <textarea placeholder="按 Ctrl + Enter 发送" v-model="content" v-on:keyup="addMessage"></textarea>
+    <textarea placeholder="按 Ctrl + Enter 发送"
+              v-model="content"
+              @keyup="addMessage">
+    </textarea>
   </div>
 </template>
 
 <script>
-import {mapState} from 'vuex'
 
 export default {
   data () {
@@ -14,8 +16,9 @@ export default {
     }
   },
   methods: {
+    // 默认传入 event(事件对象)
   	addMessage (e) {
-  		if (e.ctrlKey && e.keyCode ===13 && this.content.length) {
+  		if (e.ctrlKey && e.keyCode === 13 && this.content.length) {
   			this.$store.commit('addMessage',this.content);
   			this.content='';
   		}

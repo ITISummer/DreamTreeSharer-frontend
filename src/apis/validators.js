@@ -1,7 +1,8 @@
 import constants from "./constants";
 import * as requestApi from "./api";
+import { MessageBox } from 'element-ui';
 
-
+let globalFlag = false;
 /**
  * 验证邮箱格式
  * @param rule
@@ -11,9 +12,11 @@ import * as requestApi from "./api";
  */
 const checkEmail = function (rule, value, callback){
     if (!value) {
-        return callback(new Error('请输入邮箱！'));
+        callback(new Error('请输入邮箱！'));
     } else if (!constants.REG_OF_EMAIL.test(value)) {
         callback(new Error('邮箱格式不匹配！'));
+    } else {
+        globalFlag =  true
     }
     // callback() 一定要调用！
     callback();
@@ -24,12 +27,31 @@ const checkEmail = function (rule, value, callback){
  */
 const checkMobile = function (rule, value, callback){
     if (!value) {
-        return callback(new Error('请输入手机号！'));
+        callback(new Error('请输入手机号！'));
     } else if (!constants.REG_OF_MOBILE.test(value)) {
         callback(new Error('手机号格式不匹配！'));
+    } else {
+        globalFlag =  true
     }
     callback();
+
 };
+
+/** 更改用户邮箱或者手机号 */
+const checkEmailOrMobile = function (rule, value, callback) {
+    if (this.hasOwnProperty('updateForm')) {
+        if (!this.updateForm.flag) {
+            callback(new Error('请选择修改的字段！'))
+        }
+        if (this.updateForm.flag === 'email') {
+            checkEmail(rule,value,callback)
+        } else if (this.updateForm.flag === 'mobile') {
+            checkMobile(rule,value,callback)
+        }
+        this.enableButton = globalFlag
+        globalFlag = false
+    }
+}
 
 /**
  * 验证输入的密码格式
@@ -42,6 +64,7 @@ const checkPassword = function (rule, value, callback) {
     }
     callback();
 }
+
 /**
  * 验证是否与以上密码相同
  * [javascript，检测对象中是否存在某个属性](https://www.cnblogs.com/kongxianghai/archive/2013/04/12/3015803.html)
@@ -70,10 +93,9 @@ const checkUsername = function (rule, value, callback){
         callback(new Error('请输入用户名！'));
     } else if (!constants.REG_OF_USERNAME.test(value)) {
         callback(new Error('用户名必须是6-10位之间的字母、下划线、@、. 并且不能以数字开头！'))
-    } else if (!this.loginOrReg){ // 如果是注册表单用户名验证，才往后台发送用户名是否重复验证请求
+    } else if (!this.showLoginOrReg){ // 如果是注册表单用户名验证，才往后台发送用户名是否重复验证请求
     // 发送请求到后端验证是否用户名已存在！
-    requestApi.getRequest(`${constants.USERNAME_EXISTED}/${value}`).then(resp => {
-        console.log(resp)
+    requestApi.getRequest(`${constants.USERNAME_EXISTED}/${value}`).then(res => {
     }).catch(error => {
         console.log(error)
         })
@@ -81,10 +103,12 @@ const checkUsername = function (rule, value, callback){
     callback()
 }
 
+
 export default {
     checkEmail,
     checkMobile,
     checkPassword,
     checkUsername,
     reCheckPassword,
+    checkEmailOrMobile,
 }

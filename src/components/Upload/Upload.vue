@@ -15,7 +15,6 @@ data	上传时附带的额外参数
     <el-upload
         drag
         :show-file-list="false"
-        :auto-upload="auto_upload"
         :action="qiniu.uploadQiniuUrl"
         :data="qiniu.qiniuData"
         :before-upload="beforeUpload"
@@ -39,7 +38,6 @@ export default {
   data() {
     return {
       imageUrl: '',
-      auto_upload: true,
       qiniu: {
         qiniuData: {key: "", token: ""},
         // 七牛云上传储存区域的上传域名（华东、华北、华南、北美、东南亚）
@@ -47,7 +45,7 @@ export default {
         // 七牛云返回储存图片的子域名
         uploadQiniuAddr: "qrne6et6u.hn-bkt.clouddn.com/",
       }
-    };
+    }
   },
   methods: {
     /**
@@ -70,9 +68,7 @@ export default {
       }
       await this.getQiniuToken(this.qiniu.qiniuData.key)
     },
-    /**
-     * 创建前从后台获取访问七牛云的 token - (key(文件名) bucket, AccessKey, SecretKey)
-     */
+    // * 创建前从后台获取访问七牛云的 token - (key(文件名) bucket, AccessKey, SecretKey)
     getQiniuToken: async function(key) {
       const _this = this;
       await this.getRequest(`/qiniu/uploadToken/${key}`)
@@ -84,21 +80,14 @@ export default {
             }
           });
     },
-    /**
-     * 上传成功
-     * @param res
-     */
+    // * 上传成功
     handleSuccess: function(res) {
       this.imageUrl = "http://"+this.qiniu.uploadQiniuAddr + res.key;
       // 向上暴露 imageUrl
-      // this.$emit("update:imageUrl",this.imageUrl)
       EventBus.$emit('getImageUrl',this.imageUrl)
       this.$message({message: `上传成功！图片地址为：${this.imageUrl}`, type: "success"})
     },
-    /**
-     * 上传失败
-     * @param res
-     */
+    // * 上传失败
     handleError: function(res) {
       this.$message({message: "上传失败", type: "error"});
     }
@@ -106,11 +95,6 @@ export default {
 };
 </script>
 <!--[译] Vue: scoped 样式与 CSS Module 对比](https://juejin.cn/post/6844903673517211655)-->
-<!--
-加 scoped 对自身样式会有很大影响
-不加 scoped 会对 Comments 组件有很大影响
-加 module 不会有很大影响，而且会去掉对 Comments 组件的影响
--->
 <style scoped lang="scss">
 #upload_container{
   width: 100%;

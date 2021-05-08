@@ -1,10 +1,13 @@
 <!--好友列表-->
 <template>
   <div id="list">
-  	<ul style="padding-left: 0px">
-  		<li v-for="item in sessions" :class="{ active: item.id === currentSessionId }" v-on:click="changeCurrentSessionId(item.id)"><!--   :class="[item.id === currentSessionId ? 'active':'']" -->
-  			<img class="avatar" :src="item.user.img" :alt="item.user.name">
-  			<p class="name">{{item.user.name}}</p>
+  	<ul style="padding-left: 0">
+      <!--   :class="[item.id === currentSessionId ? 'active':'']" -->
+  		<li v-for="item in users"
+          :class="{ active: item.userId === currentSessionId }"
+          v-on:click="changeCurrentSessionId(item.userId)">
+  			<img class="avatar" :src="item.userAvatarUrl" :alt="item.userUsername">
+  			<p class="name">{{item.userUsername}}</p>
   		</li>
   	</ul>
   </div>
@@ -14,17 +17,10 @@
 import {mapState} from 'vuex'
 
 export default {
-  data () {
-    return {
-      
-    }
-  },
-  computed: mapState([
-  'sessions',
-  'currentSessionId'
-	]),
+  computed: mapState(['users', 'currentSessionId']),
   methods:{
-  	changeCurrentSessionId:function (id) {
+    // 改变当前会话 id
+  	changeCurrentSessionId(id) {
   		this.$store.commit('changeCurrentSessionId',id)
   	}
   }

@@ -5,11 +5,11 @@
 <template>
   <el-main id="chat" style="margin-top: 62px; background-color: #6e8efb">
     <div class="sidebar">
-      <card></card>
-      <list></list>
+      <Card></Card>
+      <List></List>
     </div>
     <div class="main">
-      <message></message>
+      <Message></Message>
       <UserText></UserText>
     </div>
   </el-main>
@@ -21,15 +21,14 @@ import List from '../../../components/Chat/List.vue'
 import Message from '../../../components/Chat/Message.vue'
 import UserText from '../../../components/Chat/UserText.vue'
 export default {
-  data () {
-    return {
-
-    }
+  components:{Card, List, Message, UserText},
+  mounted() {
+    // 连接后台 websocket - 初始化 websocket 链接
+    console.log('OnlineChat.vue->mounted()-before')
+    // this.$store.dispatch('chatConnect');
+    // this.$store.dispatch('initUsers')
+    console.log('OnlineChat.vue->mounted()-after')
   },
-  mounted:function() {
-    this.$store.dispatch('initData');
-  },
-  components:{Card, List, Message, UserText}
 }
 </script>
 

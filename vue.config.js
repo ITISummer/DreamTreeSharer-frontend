@@ -33,6 +33,8 @@ proxyObj['/upload-api'] = {
 proxyObj['/ws'] = {
     // websocket
     ws: true,
+    // 发送请求头 host 会被设置 target
+    changeOrigin: true,
     target: 'ws://localhost:8081'
 }
 // 请求到 8080，但是会转发到 8081 端口

@@ -21,7 +21,7 @@
       <el-col :span="1" :offset="1">
         <el-dropdown @command="handleCommand">
           <div class="el-dropdown-link">
-            <el-avatar size="large" :src="userInfo.userAvatarUrl"></el-avatar>
+            <el-avatar size="large" :src="userAvatarUrl"></el-avatar>
           </div>
           <el-dropdown-menu slot="dropdown">
             <!-- 个人中心：此处需要 PersonalCenter.vue 里暴露 getUserInfo(id) -->
@@ -41,9 +41,7 @@ import constants from "../../apis/constants"
 import requests from "../../apis/constants"
 
 export default {
-  props: {
-    search: String,
-  },
+  props: {search: String},
   data() {
     return {
       userInfo: {
@@ -59,6 +57,15 @@ export default {
   // https://stackoverflow.com/questions/40574661/avoid-mutating-a-prop-directly-since-the-value-will-be-overwritten
   // [Vuex异步请求数据后,在组件中获取状态的方法](https://blog.csdn.net/panyang01/article/details/71750897)
   computed: {
+    userAvatarUrl: {
+      get() {
+        if (this.userInfo.userAvatarUrl.startsWith("https://")) {
+          return this.userInfo.userAvatarUrl
+        } else {
+          return 'http://qrne6et6u.hn-bkt.clouddn.com/'+this.userInfo.userAvatarUrl
+        }
+      }
+    },
     searchInput: {
       get() {
         return this.search

@@ -17,19 +17,17 @@ import {postRequest, deleteRequest, putRequest, getRequest} from "./apis/api";
  */
 router.beforeEach((to, from, next) => {
     if (window.sessionStorage.getItem('token')) {
-        // 初始化操作（菜单，用户信息等）
         // 判断用户信息是否存在
         // [js 判断一个 object 对象是否为空](https://blog.csdn.net/FungLeo/article/details/78113661)
         if (!window.sessionStorage.getItem('userInfo')) {
-        // if (Object.keys(store.state.userInfo).length === 0) {
-            console.log('----=====---',store.state.userInfo)
+            // if (Object.keys(store.state.userInfo).length === 0) {
             return getRequest(requests.GET_CURRENT_USER_INFO).then(resp => {
                 if (resp) {
                     console.log('main.js->beforeEach->getRequest', resp)
                     // // 存入用户信息
                     window.sessionStorage.setItem('userInfo', JSON.stringify(resp.object))
                     // // store.dispatch() 触发 store 的 action 方法
-                    // store.dispatch('initUserInfo',resp.object).then(r => true)
+                    store.dispatch('initUserInfo',resp.object).then(r => true)
                     next()
                 }
             })
@@ -52,6 +50,14 @@ Vue.prototype.postRequest = postRequest;
 Vue.prototype.deleteRequest = deleteRequest;
 Vue.prototype.putRequest = putRequest;
 Vue.prototype.getRequest = getRequest;
+/**
+ * @description
+ * @param { number } type 1 localStorage 2 sessionStorage
+ * @param { string } key 键
+ * @param { string } data 要存储的数据
+ * @returns
+ */
+// Vue.prototype.$addStorageEvent = watchStorage
 /*==============================程序主入口渲染 app 组件==========================*/
 new Vue({
     // 路由组件 - 对应 src/router/index.js

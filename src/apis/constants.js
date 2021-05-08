@@ -15,6 +15,8 @@ export default {
     HOME: '/home',
     // '/username-existed'
     USERNAME_EXISTED: '/username-existed',
+    // '/get-sms-code'
+    GET_SMS_CODE: '/get-sms-code',
     // password regular expression
     // 密码至少包含大写字母，小写字母，数字，且不少于8位
     REG_OF_PWD: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[^]{8,16}$/,

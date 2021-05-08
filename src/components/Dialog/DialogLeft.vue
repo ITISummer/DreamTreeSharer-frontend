@@ -6,8 +6,8 @@
         <img src="../../assets/images/ellipse.png" alt="edit" class="pint_mock_icon">
       </div>
     </div>
+    <!-- 左侧中部 -->
     <div class="section2">
-<!--      <Upload :imageUrl.sync="imageUrl"/>-->
       <Upload ref="Upload"/>
     </div>
     <!-- 左侧底部 -->

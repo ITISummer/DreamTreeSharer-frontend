@@ -8,23 +8,31 @@
           <option value="false" label="不分享"></option>
         </select>
       </div>
-      <div class="save_pin" @click="emitDreamForm">Save</div>
+      <button class="save_pin" @click="emitDreamForm">Save</button>
     </div>
     <!-- input 输入框 -->
-    <div class="section2" v-if="commentsOrDreamForm">
+    <div v-if="commentsOrDreamForm" class="section2">
       <el-form :model="dreamForm">
         <el-form-item>
-          <el-image :src="userInfo.userAvatarUrl" style="width: 36px; height: 36px"></el-image>
+          <el-image :src="userAvatarUrl" style="width: 36px; height: 36px"></el-image>
           <span>{{ userInfo.userUsername }}</span>
         </el-form-item>
         <el-form-item>
-          <el-input v-model="dreamForm.pinboardTitle" class="new_pin_input" maxlength="20"
-                    placeholder="Add Your Pins Title~"></el-input>
+          <el-input type="text"
+                    v-model="dreamForm.pinboardTitle"
+                    class="new_pin_input"
+                    maxlength="20"
+                    placeholder="Add Your Pins Title~">
+          </el-input>
         </el-form-item>
         <el-form-item class="layout">
-          <el-input type="textarea" class="new_pin_input" maxlength="250" v-model="dreamForm.pinboardContent"
+          <el-input type="textarea"
+                    v-model="dreamForm.pinboardContent"
+                    class="new_pin_input"
+                    maxlength="250"
                     placeholder="Share Your Dreams~"
-                    @input="this.descInput"></el-input>
+                    @input="this.descInput">
+          </el-input>
           <span>{{ this.remnant }}</span>
         </el-form-item>
       </el-form>
@@ -46,28 +54,40 @@ export default {
   },
   components: {Comments},
   mounted() {
-    EventBus.$on('getImageUrl',imageUrl => {
+    EventBus.$on('getImageUrl', imageUrl => {
       this.dreamForm.pinboardBgimgUrl = imageUrl
-      console.log('DialogRight.vue->mounted()',this.dreamForm.pinboardBgimgUrl)
-    })
+    });
   },
   data() {
-    return{
-      dreamForm: {pinboardTitle: '', pinboardContent: '', pinboardSharable: true, pinboardBgimgUrl: ''},
+    return {
       userInfo: JSON.parse(window.sessionStorage.getItem('userInfo')),
-      tab2Lable: '添加用户',
       remnant: 249,
+      dreamForm: {
+        pinboardTitle: '',
+        pinboardContent: '',
+        pinboardSharable: true,
+        pinboardBgimgUrl: ''
+      },
+    }
+  },
+  computed: {
+    userAvatarUrl: {
+      get() {
+        if (this.userInfo.userAvatarUrl.startsWith("https://")) {
+          return this.userInfo.userAvatarUrl
+        } else {
+          return 'http://qrne6et6u.hn-bkt.clouddn.com/' + this.userInfo.userAvatarUrl
+        }
+      }
     }
   },
   methods: {
-    /**
-     * 计算文本剩余字数
-     */
+    // * 计算文本剩余字数
     descInput() {
       let txtVal = this.dreamForm.pinboardContent.length;
       this.remnant = 249 - txtVal;
     },
-    /** 检查字段并分发事件 getDreamForm 给 Pinboards */
+    // 检查字段并分发事件 getDreamForm 给 Pinboards
     emitDreamForm() {
       const {
         pinboardTitle: title,
@@ -87,15 +107,19 @@ export default {
 
 <style scoped lang="scss">
 @import "DialogCommon";
+
 #right_side {
   background-color: orange;
+
   .section1 {
     display: flex;
     justify-content: flex-end;
+
     .select_size {
       width: 236px;
       height: 40px;
       display: flex;
+
       select {
         width: 70%;
         height: 100%;
@@ -106,6 +130,7 @@ export default {
         background-color: #EFEFEF;
       }
     }
+
     .save_pin {
       width: 30%;
       height: 100%;
@@ -118,7 +143,8 @@ export default {
       color: white;
       background-color: #E60023;
       cursor: pointer;
-      &:hover{
+
+      &:hover {
         background-color: rgb(207, 3, 3);
       }
     }

@@ -1,10 +1,9 @@
 <template>
   <el-container>
     <WaterfallMain
-        style="background-color: #6e8efb"
         :images="images"
         :showCardFooter="true"
-        :handleClick="handleClick"
+        :showAvatar="false"
         :handleDelete="handleDelete"
         :handleEdit="handleEdit"/>
     <Dialog
@@ -12,9 +11,9 @@
         :commentsOrDreamForm="true"
         :showSelect="true"/>
     <!--[admin vue页面右下角添加客服按钮](https://blog.csdn.net/thc1987/article/details/106623974)-->
-    <div class="add_pins_button" v-show="true">
+    <div id="add_pins_button" v-show="true">
       <el-popover placement="left-end" trigger="click">
-        <el-button type="text" style="text-align: center;" @click="showDialog = true">Add Your Pins</el-button>
+        <el-button type="text" style="text-align: center;" @click="showDialog = !showDialog">Add Your Pins</el-button>
         <label slot="reference" class="top_btn" title="Add Your Pins"></label>
       </el-popover>
     </div>
@@ -36,51 +35,31 @@ export default {
   },
   data() {
     return {
-      userInfo: JSON.parse(window.sessionStorage.getItem('userInfo')),
       dreamForm: {
         pinboardSharable: true,
         pinboardBgimgUrl: '',
         pinboardTitle: '',
         pinboardContent: '',
       },
+      userInfo: JSON.parse(window.sessionStorage.getItem('userInfo')),
       search: '',
-      imageUrl: "https://i.pinimg.com/236x/4d/ba/24/4dba24872bed032eeaf85e51bbd502b9.jpg",
       list: [],
       showDialog: false,
+      imageUrl: "https://i.pinimg.com/236x/4d/ba/24/4dba24872bed032eeaf85e51bbd502b9.jpg",
       images: [
-        // {src: `https://i.pinimg.com/236x/4d/ba/24/4dba24872bed032eeaf85e51bbd502b9.jpg`},
-        // {src: `https://i.pinimg.com/236x/c3/4b/21/c34b217c65afe3c23bf7edbb86e53ebc.jpg`},
-        // {src: `https://i.pinimg.com/236x/8b/0c/f5/8b0cf5fd92f3fe289eeb34f9aaa93e26.jpg`},
-        // {src: `https://i.pinimg.com/236x/cc/e0/c5/cce0c5377b48a53f4849a880a0482620.jpg`},
-        // {src: `https://i.pinimg.com/236x/27/78/90/27789027d690792a73387d5d066a4b1b.jpg`},
-        // {src: `https://i.pinimg.com/236x/ff/dd/4b/ffdd4b3620da73035a6d91f6e20d1fa4.jpg`},
-        // {src: `https://i.pinimg.com/236x/8c/c6/6a/8cc66a9ae620e3d3f7c604c497e8085e.jpg`},
-        // {src: `https://i.pinimg.com/236x/a5/26/fc/a526fc6db19373194ecdaa6f93f128ca.jpg`},
-        // {src: `https://i.pinimg.com/236x/da/45/8f/da458fcfc28c96735cd034761b4b6c3d.jpg`},
-        // {src: `https://i.pinimg.com/236x/66/9b/0e/669b0e167a3ecb6ca070a3ddc4979c83.jpg`},
-        // {src: `https://i.pinimg.com/236x/9e/f4/19/9ef419bdfc4093bc862253f0fbbc5cee.jpg`},
-        // {src: `https://i.pinimg.com/236x/6a/26/ee/6a26eed72595947dd264491769567523.jpg`},
         {src: `https://i.pinimg.com/236x/cc/e0/c5/cce0c5377b48a53f4849a880a0482620.jpg`},
       ],
     }
   },
   methods: {
-    /**
-     * 图片点击
-     */
-    handleClick(item) {
-      this.$message.info(JSON.stringify(item));
-    },
-    /**
-     * 编辑
-     */
+    // * 编辑
     handleEdit() {
+      // 弹出编辑框，TODO 发送请求向数据库更新一个 pinboard
       this.$message.success('编辑');
     },
-    /**
-     * 删除
-     */
+    // * 删除
     handleDelete() {
+      // TODO 发送请求向数据库移除一个 pinboard 同时移除其下的评论和点赞信息
       this.$message.error('删除');
     },
   }
@@ -89,7 +68,7 @@ export default {
 </script>
 
 <style scoped lang="scss">
-.add_pins_button {
+#add_pins_button {
   position: fixed;
   right: 35px;
   bottom: 35px;

@@ -1,6 +1,6 @@
 <template>
   <!--    瀑布流主体-->
-  <el-main class="main-content">
+  <el-main id="main-content">
     <!-- 滚动加载 下面 v-infinite-scroll 的放置位置与瀑布流是否能够加载有关 -->
     <div v-infinite-scroll="load" infinite-scroll-disabled="disabled" class="waterfall-container">
       <!--        封装了 vue-waterfall 插件 -->
@@ -29,8 +29,10 @@
               <el-image :src="props.data.src" :alt="props.data.src" @load="$refs.waterfall.refresh"/>
             </div>
             <div class="menus">
-              <el-avatar data-title="卡片发布者头像" :src="userInfo.userAvatarUrl"/>
+              <div v-show="showAvatar">
+              <el-avatar data-title="卡片发布者头像" :src="userAvatarUrl"/>
               <span class="user-name">{{userInfo.userUsername}}</span>
+              </div>
               <p data-title="编辑" @click="handleEdit(props.data)" v-if="showCardFooter"/>
               <p data-title="删除" @click="handleDelete(props.data)" v-if="showCardFooter"/>
             </div>
@@ -50,12 +52,14 @@ export default {
   props: {
     images: {type: Array, default: []},
     showCardFooter: {type: Boolean, default: false},
+    showAvatar: {type: Boolean,default: true},
     handleClick: Function,
     handleEdit: Function,
     handleDelete: Function,
   },
   mounted() {
     this.userInfo = JSON.parse(window.sessionStorage.getItem("userInfo"))
+    // this.userInfo = this.$store.state.userInfo
   },
   data() {
     return {
@@ -65,45 +69,55 @@ export default {
     }
   },
   computed: {
-    noMore() {return this.list.length >= 200;},
-    disabled() {return this.loading || this.noMore;},
+    noMore() {
+      return this.list.length >= 200;
+    },
+    disabled() {
+      return this.loading || this.noMore;
+    },
+    userAvatarUrl: {
+      get() {
+        if (this.userInfo.userAvatarUrl.startsWith("https://")) {
+          return this.userInfo.userAvatarUrl
+        } else {
+          return 'http://qrne6et6u.hn-bkt.clouddn.com/' + this.userInfo.userAvatarUrl
+        }
+      }
+    },
   },
-  methods: {
-    /**
-     * 加载图片
-     */
-    async load() {
-      this.loading = true;
-      await this.addNewList();
-      this.loading = false;
-    },
-    /**
-     * 添加到新 list 中
-     * [es6 扩展运算符 三个点（...）](https://blog.csdn.net/qq_30100043/article/details/53391308)
-     */
-    addNewList() {
-      // axios 异步向数据库发送请求 TODO
-      // 然后使用 const list = this.images.map()
-      return new Promise((resolve) => {
-        const list = this.images.map((item, index) => {
-          return {...item}
+    methods: {
+      /**
+       * 加载图片
+       */
+      async load() {
+        this.loading = true;
+        await this.addNewList();
+        this.loading = false;
+      },
+      /**
+       * 添加到新 list 中
+       * [es6 扩展运算符 三个点（...）](https://blog.csdn.net/qq_30100043/article/details/53391308)
+       */
+      addNewList() {
+        // axios 异步向数据库发送请求 TODO
+        // 然后使用 const list = this.images.map()
+        return new Promise((resolve) => {
+          const list = this.images.map((item, index) => {
+            return {...item}
+          });
+          this.list.push(...list);
+          setTimeout(() => resolve(), 2000);
         });
-        this.list.push(...list);
-        setTimeout(() => resolve(), 2000);
-      });
-    },
-  }
-};
+      },
+    }
+}
 </script>
 
 <style scoped lang="scss">
-//.main-container {
-//  display: flex;
-//}
 /**
 主体样式
  */
-.main-content {
+#main-content {
   background: #6e8efb;
   height: 100vh;
   overflow-y: auto;
