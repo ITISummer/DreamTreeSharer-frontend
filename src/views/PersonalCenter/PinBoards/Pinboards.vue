@@ -5,6 +5,7 @@
         :showCardFooter="true"
         :showAvatar="false"
         :handleDelete="handleDelete"
+        :handle-click="handleClick"
         :handleEdit="handleEdit"/>
     <Dialog
         :showDialog.sync="showDialog"
@@ -25,44 +26,73 @@ import Header from "../../../components/Header/Header";
 import WaterfallMain from "../../../components/WaterfallMain/WaterfallMain";
 import Dialog from "../../../components/Dialog/Dialog";
 import {EventBus} from "../../../apis/eventBus"
+import {getRequest,deleteRequest} from "../../../apis/api";
+
 export default {
   components: {Header, WaterfallMain, Dialog},
   mounted() {
-    EventBus.$on('getDreamForm', dreamForm=>{
-      this.dreamForm = dreamForm
-      console.log("Pinboards->mounted()",this.dreamForm)
+    // 这里的 images 初始化从数据库获取 TODO
+    getRequest('get-pinboards').then(res=>{
+      this.images = res.object
+      console.log(this.images)
+    }).catch(err=>{
+      console.log(err)
     })
+    EventBus.$on('getDreamForm',data => {
+      console.log(data)
+      this.images.push(data)
+      console.log(this.images.length)
+    })
+    EventBus.$on('getShowDialog',showDialog => {
+      this.showDialog = showDialog
+      console.log(this.showDialog)
+      })
   },
   data() {
     return {
-      dreamForm: {
-        pinboardSharable: true,
-        pinboardBgimgUrl: '',
-        pinboardTitle: '',
-        pinboardContent: '',
-      },
+      // dreamForm: {
+      //   pinboardSharable: true,
+      //   pinboardBgimgUrl: '',
+      //   pinboardTitle: '',
+      //   pinboardContent: '',
+      //   pinUsername: '',
+      //   pinUserAvatarUrl: '',
+      // },
       userInfo: JSON.parse(window.sessionStorage.getItem('userInfo')),
       search: '',
       list: [],
       showDialog: false,
       imageUrl: "https://i.pinimg.com/236x/4d/ba/24/4dba24872bed032eeaf85e51bbd502b9.jpg",
-      images: [
-        {src: `https://i.pinimg.com/236x/cc/e0/c5/cce0c5377b48a53f4849a880a0482620.jpg`},
-      ],
+      images: [],
     }
   },
   methods: {
+    handleClick(item) {
+      this.$message.warning(item.pinboardBgimgUrl);
+    },
     // * 编辑
-    handleEdit() {
+    handleEdit(item) {
       // 弹出编辑框，TODO 发送请求向数据库更新一个 pinboard
+      EventBus.$emit('getShowDialog',true)
+      EventBus.$emit('initImageUrl',item.pinboardBgimgUrl)
       this.$message.success('编辑');
     },
     // * 删除
-    handleDelete() {
+    handleDelete(item) {
       // TODO 发送请求向数据库移除一个 pinboard 同时移除其下的评论和点赞信息
+      deleteRequest(`delete-one-pinboard/${item.pinboardId}`).then(res=>{
+        console.log(res)
+      }).catch(err=>{
+        console.log(err)
+      })
+      console.log(item.pinboardId)
       this.$message.error('删除');
     },
-  }
+  },
+  // [vue中event bus被触发多次问题](https://segmentfault.com/q/1010000009710635)
+  // beforeDestroy() {
+  //   EventBus.$off('getDreamForm')
+  // }
 }
 
 </script>

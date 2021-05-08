@@ -21,6 +21,9 @@ export default {
     initDreamForm(state, data) {
         state.dreamForm = data
     },
+    initDialog(state,data) {
+        state.showDialog = data
+    },
     /**
      * 初始化菜单
      * @param state state 作为第一个参数

@@ -34,7 +34,11 @@ data	上传时附带的额外参数
 <script>
 import {EventBus} from '../../apis/eventBus'
 export default {
-  // props:{imageUrl: String,},
+  mounted() {
+    EventBus.$on('initImageUrl',data=>{
+      this.imageUrl = data
+    })
+  },
   data() {
     return {
       imageUrl: '',

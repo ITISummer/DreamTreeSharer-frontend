@@ -34,7 +34,6 @@ export default {
     /** 初始化用户聊天列表 */
     initUsers(context) {
         getRequest('/get-user-list').then(resp => {
-            console.log('actions.js->initUsers',resp)
             if (resp) {
                 context.commit('INIT_USERS', resp.object)
             }
@@ -46,5 +45,8 @@ export default {
     },
     initDreamForm(context, data) {
         context.commit('initDreamForm', data)
+    },
+    initDialog(context, data) {
+        context.commit('initDialog',data)
     }
 }

@@ -46,13 +46,14 @@
 <script>
 import Comments from "../Comments/Comments";
 import {EventBus} from "../../apis/eventBus";
+import {postRequest} from "../../apis/api";
 
 export default {
+  components: {Comments},
   props: {
     commentsOrDreamForm: Boolean,
     showSelect: Boolean,
   },
-  components: {Comments},
   mounted() {
     EventBus.$on('getImageUrl', imageUrl => {
       this.dreamForm.pinboardBgimgUrl = imageUrl
@@ -66,7 +67,9 @@ export default {
         pinboardTitle: '',
         pinboardContent: '',
         pinboardSharable: true,
-        pinboardBgimgUrl: ''
+        pinboardBgimgUrl: '',
+        pinUsername: '',
+        pinUserAvatarUrl: '',
       },
     }
   },
@@ -95,10 +98,17 @@ export default {
         pinboardSharable: sharable,
         pinboardBgimgUrl: imageUrl
       } = this.dreamForm
+      this.dreamForm.pinUsername = this.userInfo.userUsername
+      this.dreamForm.pinUserAvatarUrl = this.userInfo.userAvatarUrl
       if (title === '' || content === '' || imageUrl === '') {
         this.$message({message: '字段不能为空！', type: 'warning'})
       } else {
-        EventBus.$emit('getDreamForm', this.dreamForm)
+        // 当用户添加一个 pin 时，往数据库中插入一条数据，并根据是否分享来决定是否往 pinboards.vue 传递一条数据
+        postRequest('/add-one-pinboard', this.dreamForm).catch(err=>{
+          console.log(err)
+        })
+        EventBus.$emit('getDreamForm',this.dreamForm)
+        EventBus.$emit('getShowDialog',false)
       }
     }
   }

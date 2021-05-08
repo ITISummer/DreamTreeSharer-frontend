@@ -8,8 +8,8 @@ export default {
     AMsg: '',
     BMsg: '',
     //----------vue-component-communication 测试使用----------
-    /** 菜单 */
-    routes: [],
+    // showDialog
+    showDialog: false,
     /** 当前登录用户 */
     userInfo: {},
     /** 用户添加卡片功能所需表单 */

@@ -24,6 +24,7 @@ import DialogRight from "./DialogRight";
 export default {
   components: {Upload, DialogLeft, DialogRight},
   props: {
+    // imageUrl: '',
     showDialog: Boolean,
     commentsOrDreamForm: Boolean,
     showSelect: Boolean

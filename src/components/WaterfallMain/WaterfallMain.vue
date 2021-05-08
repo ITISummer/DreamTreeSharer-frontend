@@ -11,10 +11,10 @@
             //当屏幕宽度小于等于800
             800: { rowPerView: 4},
             //当屏幕宽度小于等于500
-            500: { rowPerView: 2}
+            500: { rowPerView: 3}
           }"
          animationEffect="fadeIn"
-         :animationDuration="3+'s'"
+         :animationDuration="2+'s'"
          :animationDelay="0.6+'s'"
          backgroundColor="rgb(73, 74, 95)"
       >
@@ -25,13 +25,13 @@
         -->
         <template slot="item" slot-scope="props">
           <div class="card">
-            <div class="cover" @click="handleClick(props.data)">
-              <el-image :src="props.data.src" :alt="props.data.src" @load="$refs.waterfall.refresh"/>
+            <div class="cover">
+              <el-image :src="props.data.pinboardBgimgUrl" @click="handleClick(props.data)" :alt="props.data.pinboardBgimgUrl" @load="$refs.waterfall.refresh"/>
             </div>
             <div class="menus">
               <div v-show="showAvatar">
-              <el-avatar data-title="卡片发布者头像" :src="userAvatarUrl"/>
-              <span class="user-name">{{userInfo.userUsername}}</span>
+              <el-avatar data-title="卡片发布者头像" :src="props.data.pinUserAvatarUrl"/>
+              <span class="user-name">{{props.data.pinUsername}}</span>
               </div>
               <p data-title="编辑" @click="handleEdit(props.data)" v-if="showCardFooter"/>
               <p data-title="删除" @click="handleDelete(props.data)" v-if="showCardFooter"/>
@@ -70,7 +70,7 @@ export default {
   },
   computed: {
     noMore() {
-      return this.list.length >= 200;
+      return this.list.length >= this.images.length;
     },
     disabled() {
       return this.loading || this.noMore;
@@ -106,7 +106,7 @@ export default {
             return {...item}
           });
           this.list.push(...list);
-          setTimeout(() => resolve(), 2000);
+          setTimeout(() => resolve(), 1000);
         });
       },
     }

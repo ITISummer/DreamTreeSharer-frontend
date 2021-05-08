@@ -20,7 +20,6 @@
 <script>
 import Upload from "../Upload/Upload";
 export default {
-  // props:{imageUrl: String},
   components: {Upload}
 }
 </script>
