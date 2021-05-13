@@ -4,6 +4,7 @@
       <el-menu-item index="/account-setting">账户设置</el-menu-item>
       <el-menu-item index="/pin-boards">梦卡管理</el-menu-item>
       <el-menu-item index="/chat">在线聊天</el-menu-item>
+      <el-menu-item index="/favorites">个人收藏</el-menu-item>
     </el-menu>
   </el-aside>
 </template>

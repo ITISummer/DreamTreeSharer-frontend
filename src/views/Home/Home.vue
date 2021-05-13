@@ -2,7 +2,7 @@
 <template>
 <!--  这里改动 class 为 id，可能会有显示错误-->
   <el-container id="main-container">
-    <Header></Header>
+    <Header/>
     <WaterfallMain
         :images="images"
         :showSaveBtnInWaterfall="true"
@@ -69,7 +69,7 @@ export default {
     // 收藏一个 Pin
     savePin(item){
       // TODO 存储用户保存的 pin
-      this.postRequest(`add-one-pin/${item.pinboardId}`).then(res=>true).catch(err=>{
+      this.postRequest(`favorite-one-pin/${item.pinboardId}`).then(res=>true).catch(err=>{
         console.log(err)
       })
 

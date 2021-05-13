@@ -50,11 +50,11 @@
         </el-dropdown>
       </el-col>
     </el-row>
-<!--    分页模糊查询(用户名，梦卡类型，梦卡标题)-->
+    <!--    分页模糊查询(用户名，梦卡类型，梦卡标题)-->
     <Pagination
-      ref="pagination"
-      :search="search"
-      :flag="flag"
+        ref="pagination"
+        :search="search"
+        :flag="flag"
     />
   </el-header>
 </template>
@@ -63,6 +63,7 @@
 import constants from "../../apis/constants"
 import requests from "../../apis/constants"
 import Pagination from "../Pagination/Pagination";
+
 export default {
   components: {Pagination},
   data() {

@@ -40,10 +40,17 @@
               <div class="dream-content">{{props.data.pinboardContent}}</div>
             </div>
             <div class="menus">
-              <div v-if="showAvatar" class="avatarAndLike">
+<!--              Home 页所需-->
+              <div v-if="showAvatar" class="avatar-and-like">
                 <el-avatar :title="props.data.userUsername" :src="'http://qrne6et6u.hn-bkt.clouddn.com/'+props.data.userAvatarUrl"/>
                 <span class="like-num">👍{{props.data.likeNum}}</span>
               </div>
+<!--              Favorites 页所需-->
+              <div v-else-if="showSavedFrom" class="save-from">
+                <strong>Saved From: </strong>
+                <router-link :to="{path: '/profile',query:{username:props.data.userUsername}}"><span>{{props.data.userUsername}}</span></router-link>
+              </div>
+<!--              Pinboards 页所需-->
               <div v-else class="edit">
                 <p data-title="编辑" @click="handleEdit(props.data)"/>
                 <p data-title="删除" @click="handleDelete(props.data)"/>
@@ -66,6 +73,7 @@ export default {
   props: {
     images: {type: Array, default: []},
     showAvatar: {type: Boolean, default: true},
+    showSavedFrom: {type: Boolean, default: false},
     showSaveBtnInWaterfall: {type:Boolean, default: true},
     like: Function,
     savePin: Function,
@@ -194,9 +202,18 @@ export default {
       padding: 10px;
       border-top: 1px solid #e7e7e7;
       text-align: right;
-      .avatarAndLike{
+      .avatar-and-like{
         display: flex;
         justify-content: space-between;
+      }
+      .save-from{
+        text-align: left;
+        strong{
+          font-size: 14px;
+        }
+        a{
+          font-size: 12px;
+        }
       }
       .edit{
         display: flex;

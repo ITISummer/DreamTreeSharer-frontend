@@ -5,13 +5,23 @@
   [element-ui table中的图片的显示 解决方案](https://blog.csdn.net/DianaGreen7/article/details/81169893)
   -->
   <el-dialog title="Shipping address" :visible.sync="dialogTableVisible">
-    <el-table :data="gridData">
+    <el-table :data="gridData" v-if="flag === '1'">
       <el-table-column label="用户头像" width="150" prop="userAvatarUrl">
         <template slot-scope="scope" property="userAvatarUrl" style="cursor: pointer">
           <el-avatar size="large" :src="'http://qrne6et6u.hn-bkt.clouddn.com/'+scope.row.userAvatarUrl"></el-avatar>
         </template>
       </el-table-column>
       <el-table-column label="用户名" width="200" prop="userUsername">
+      </el-table-column>
+    </el-table>
+<!-- 模糊分页查询 pin-title 或者 pin-type 后的展示 table -->
+    <el-table :data="gridData" v-else>
+      <el-table-column label="梦卡背景图" width="150" prop="pinboardBgimgUrl">
+        <template slot-scope="scope"  style="cursor: pointer">
+          <el-image fit="cover" style="width: 100px; height: 100px" :src="scope.row.pinboardBgimgUrl"></el-image>
+        </template>
+      </el-table-column>
+      <el-table-column :label="flag === '2'? '梦卡类型':'梦卡标题'" width="200" prop="pinboardTitle">
       </el-table-column>
     </el-table>
     <el-pagination

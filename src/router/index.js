@@ -3,13 +3,13 @@ import Vue from 'vue'
 import VueRouter from 'vue-router'
 import LoginAndRegister from "../views/LoginAndRegister/LoginAndRegister";
 import Home from "../views/Home/Home";
-import Comments from "../components/Comments/Comments";
-import Upload from "../components/Upload/Upload";
 import PersonalCenter from "../views/PersonalCenter/PersonalCenter";
 import PinBoards from "../views/PersonalCenter/PinBoards/Pinboards";
 import AccountSetting from "../views/PersonalCenter/AccountSetting/AccountSetting";
 import OnlineChat from "../views/PersonalCenter/Chat/OnlineChat";
 import Parent from "../../vue-componet-communication/8- $attrs & $listeners/Parent";
+import Favorites from "../views/Favorites/Favorites";
+import Profile from "../views/Profile/Profile";
 // 相当于 controller 层，起转发请求的作用
 Vue.use(VueRouter)
 // 定义 routes 对象数组
@@ -37,14 +37,9 @@ const routes = [
         component: Home,
     },
     {
-        name: '评论',
-        path: `${baseURL}/comments`,
-        component: Comments,
-    },
-    {
-        name: '上传',
-        path: `${baseURL}/upload`,
-        component: Upload,
+        name: '个人首页',
+        path: `${baseURL}/profile`,
+        component: Profile,
     },
     {
         name: '个人中心',
@@ -65,6 +60,11 @@ const routes = [
                 name: '在线聊天',
                 path: `${baseURL}/chat`,
                 component: OnlineChat,
+            },
+            {
+                name: '收藏夹',
+                path: `${baseURL}/favorites`,
+                component: Favorites,
             },
         ]
     },
