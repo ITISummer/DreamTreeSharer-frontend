@@ -24,6 +24,9 @@ export default {
     initDialog(state,data) {
         state.showDialog = data
     },
+    initPinboardInfo(state, data) {
+        state.pinboardInfo = data
+    },
     /**
      * 初始化菜单
      * @param state state 作为第一个参数

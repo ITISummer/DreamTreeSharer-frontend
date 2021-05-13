@@ -2,7 +2,7 @@
 <template>
   <div id="card">
   	<header>
-  		<img class="avatar" :src="user.userAvatarUrl">
+  		<img class="avatar" :src="'http://qrne6et6u.hn-bkt.clouddn.com/'+user.userAvatarUrl">
   		<p class="name">{{user.userUsername}}</p>
   	</header>
   	<footer>
@@ -15,7 +15,8 @@
 export default {
   data () {
     return {
-      user: JSON.parse(window.sessionStorage.getItem('userInfo'))
+      // user: JSON.parse(window.sessionStorage.getItem('userInfo'))
+      user: this.$store.state.userInfo
     }
   }
 }

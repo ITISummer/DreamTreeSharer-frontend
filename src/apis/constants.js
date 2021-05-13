@@ -36,4 +36,7 @@ export default {
     // 验证邮箱的正则表达式
     REG_OF_EMAIL: /^[A-Za-zd]+([-_.][A-Za-zd]+)*@([A-Za-zd]+[-.])+[A-Za-zd]{2,5}$/,
     REG_OF_MOBILE: /^1[3456789]\d{9}$/,
+    /*----------------------------Comments.vue-------------------------*/
+    // 头像地址
+    BaseUrl: 'http://qrne6et6u.hn-bkt.clouddn.com/',
 }

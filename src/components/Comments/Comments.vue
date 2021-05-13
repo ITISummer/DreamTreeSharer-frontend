@@ -1,55 +1,45 @@
 <!--评论模块
 [vue + element-ui + scss 仿简书评论模块](https://juejin.cn/post/6844903635063668744)
+[时间格式化及操作（moment.js篇）](https://segmentfault.com/a/1190000016117935)
+[momentjs 中文网 #显示](http://momentjs.cn/docs/#/displaying/)
+[Array.from()](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Array/from)
+1. 保存原 Comments.vue
+2. 修改 Comments.vue
+	1. DialogRight.vue 展示卡片发布者头像和用户名
+	2. 有评论按钮，点击可以评论（只有一级评论）
+	3. 评论需要展示评论者的（头像）和用户名
 -->
 <template>
   <div id="comments-container">
     <div class="comment" v-for="comment in comments">
-<!--      头像、昵称、日期-->
+      <!--      头像、评论者昵称、日期-->
       <div class="info">
-        <img class="avatar" :src="comment.fromAvatar" width="36" height="36"/>
+        <img class="avatar" :src="'http://qrne6et6u.hn-bkt.clouddn.com/'+comment.fromAvatar" width="36" height="36"/>
         <div class="right">
-          <div class="name">{{comment.fromName}}</div>
-          <div class="date">{{comment.date}}</div>
+          <div class="name">{{ comment.fromName }}</div>
+          <div class="date">{{ comment.date }}</div>
         </div>
       </div>
-<!--      母评论内容 -->
-      <div class="content">{{comment.content}}</div>
-<!--      点赞与回复选项 -->
+      <div class="content">{{ comment.content }}</div>
+      <!--      点赞选项 -->
       <div class="control">
         <span class="like" :class="{active: comment.isLiked}" @click="likeClick(comment)">
-          <i class="el-icon-goblet-full"></i>
-          <span class="like-num">{{comment.likeNum > 0 ? comment.likeNum + '人赞' : '赞'}}</span>
-        </span>
-        <span class="comment-reply" @click="showCommentInput(comment)">
-          <i class="el-icon-s-comment"></i>
-          <span>回复</span>
+          <span class="like-num">👍{{ comment.likeNum > 0 ? comment.likeNum + '人赞' : '赞' }}</span>
         </span>
       </div>
-<!--      子评论-->
+    </div>
+    <button @click="loadComments" v-if="showLoadBtn">点击加载更多评论</button>
+    <div v-else>没有更多评论~</div>
+    <div class="comment">
       <div class="reply">
-        <div class="item" v-for="reply in comment.reply">
-<!--          子评论 昵称，对应母评论者昵称-->
-          <div class="reply-content">
-            <span class="from-name">{{reply.fromName}}</span><span>: </span>
-            <span class="to-name">@{{reply.toName}}</span>
-            <span>{{reply.content}}</span>
-          </div>
-<!--         评论日期和评论框 -->
-          <div class="reply-bottom">
-            <span>{{reply.date}}</span>
-            <span class="reply-text" @click="showCommentInput(comment, reply)">
-              <i class="el-icon-s-comment"></i>
-              <span>回复</span>
-            </span>
-          </div>
-        </div>
-<!--        添加母评论-->
-        <div class="write-reply" v-if="comment.reply.length > 0" @click="showCommentInput(comment)">
+        <!--        添加母评论-->
+        <div class="write-reply" @click="showCommentInput">
           <i class="el-icon-edit"></i>
           <span class="add-comment">添加新评论</span>
         </div>
+        <!--      评论输入框  -->
         <transition name="fade">
-          <div class="input-wrapper" v-if="showItemId === comment.id">
+          <div class="input-wrapper" v-show="showInput">
             <el-input class="gray-bg-input"
                       v-model="inputComment"
                       type="textarea"
@@ -69,169 +59,198 @@
 </template>
 
 <script>
-
+import constants from "../../apis/constants";
+import {EventBus} from "../../apis/eventBus";
+import {postRequest, getRequest, putRequest} from "../../apis/api";
+// 分页查询评论
+let limit = 2
+let offset = 0
 export default {
   data() {
     return {
+      showLoadBtn: false,
       inputComment: '',
       showItemId: '',
-      comments: [
-        {
-          id: 'comment0001', //主键id
-          date: '2018-07-05 08:30',  //评论时间
-          ownerId: 'talents100020', //图片的id
-          fromId: 'errhefe232213',  //评论者id
-          fromName: '犀利的评论家',   //评论者昵称
-          fromAvatar: 'http://ww4.sinaimg.cn/bmiddle/006DLFVFgy1ft0j2pddjuj30v90uvagf.jpg', //评论者头像
-          likeNum: 3, //点赞人数
-          content: '非常靠谱的程序员',  //评论内容
-          reply: [  //回复，或子评论
-            {
-              id: '34523244545',  //主键id
-              commentId: 'comment0001',  //父评论id，即父亲的id
-              fromId: 'observer223432',  //评论者id
-              fromName: '夕阳红',  //评论者昵称
-              fromAvatar: 'https://wx4.sinaimg.cn/mw690/69e273f8gy1ft1541dmb7j215o0qv7wh.jpg', //评论者头像
-              toId: 'errhefe232213',  //被评论者id
-              toName: '犀利的评论家',  //被评论者昵称
-              toAvatar: 'http://ww4.sinaimg.cn/bmiddle/006DLFVFgy1ft0j2pddjuj30v90uvagf.jpg',  //被评论者头像
-              content: '赞同，很靠谱，水平很高',  //评论内容
-              date: '2018-07-05 08:35'   //评论时间
-            },
-            // {
-            //   id: '34523244545',
-            //   commentId: 'comment0001',
-            //   fromId: 'observer567422',
-            //   fromName: '清晨一缕阳光',
-            //   fromAvatar: 'http://imgsrc.baidu.com/imgad/pic/item/c2fdfc039245d688fcba1b80aec27d1ed21b245d.jpg',
-            //   toId: 'observer223432',
-            //   toName: '夕阳红',
-            //   toAvatar: 'https://wx4.sinaimg.cn/mw690/69e273f8gy1ft1541dmb7j215o0qv7wh.jpg',
-            //   content: '大神一个！',
-            //   date: '2018-07-05 08:50'
-            // }
-          ]
-        },
-        // {
-        //   id: 'comment0002',
-        //   date: '2018-07-05 08:30',
-        //   ownerId: 'talents100020',
-        //   fromId: 'errhefe232213',
-        //   fromName: '毒蛇郭德纲',
-        //   fromAvatar: 'http://ww1.sinaimg.cn/bmiddle/006DLFVFgy1ft0j2q2p8pj30v90uzmzz.jpg',
-        //   likeNum: 0,
-        //   content: '从没见过这么优秀的人',
-        //   reply: []
-        // }
-      ]
+      showInput: false,
+      comments: [],
+      pinboardInfo: {},
     }
   },
+  initComment() {
+    // TODO 向后端发送请求，请求评论用到分页查询 - 默认加载两条评论
+    EventBus.$on('getPinboardInfoFromHome', value=>{
+      offset = 0
+      this.comments = []
+      this.pinboardInfo = value
+      this.loadComments();
+    })
+  },
   methods: {
-    /**
-     * 点赞
-     */
+    showCommentInput() {
+      this.showInput = !this.showInput
+    },
+    // 取消评论
+    cancel() {
+      this.showItemId = ''
+      this.showInput = false
+    },
+
+    // 加载更多评论 - 分页查询
+    loadComments() {
+      // getRequest(`/get-comments/${this.$store.state.pinboardInfo.pinboardId}/${limit}/${offset}`).then(res=>{
+            getRequest(`/get-comments/${this.pinboardInfo.pinboardId}/${limit}/${offset}`).then(res=>{
+        if (res) {
+        Array.from(res.object,value=>{
+          this.comments.push(value)
+        })
+          if (res.object.length < limit) {
+            this.showLoadBtn = false
+          }else {
+            offset += 2
+            this.showLoadBtn = true
+          }
+        } else {
+          this.showLoadBtn = false
+        }
+      }).catch(err=>{
+        console.log(err)
+      })
+    },
+
+    // * 点赞
     likeClick(item) {
+      console.log(item)
       if (item.isLiked === null) {
         this.$set(item, "isLiked", true);
         item.likeNum++
       } else {
         if (item.isLiked) {
+          // TODO 发送请求更新点赞数
           item.likeNum--
         } else {
+          // TODO 发送请求更新点赞数
           item.likeNum++
         }
         item.isLiked = !item.isLiked;
       }
+      putRequest(`update-like-num/${item.commentId}/${item.likeNum}`).then(res=>true).catch(err=>{
+        console.log(err)
+      })
     },
-    /**
-     * 点击评论按钮显示输入框
-     * item: 当前母评论
-     * reply: 当前子评论
-     */
-    showCommentInput(item, reply) {
-      if (reply) {
-        this.inputComment = "@" + reply.fromName + " "
-      } else {
-        this.inputComment = ''
-      }
-      this.showItemId = item.id
-    },
-    cancel() {this.showItemId = ''},
-    commitComment() {console.log(this.inputComment);},
 
+    // 确认提交评论
+    commitComment() {
+      if (this.inputComment !== '') {
+        // 每次添加前new一个comment以防止数据覆盖
+        const comment = {
+          date: this.$moment(Date.now()).format('yyyy-MM-DD HH:mm:ss'),  //评论时间
+          // pinboardId: this.$store.state.pinboardInfo.pinboardId,//图片的id
+          pinboardId: this.pinboardInfo.pinboardId,//图片的id
+          fromId: this.$store.state.userInfo.userId, //评论者id
+          fromName: this.$store.state.userInfo.userUsername,  //评论者昵称
+          fromAvatar: this.$store.state.userInfo.userAvatarUrl,//评论者头像
+          likeNum: 0, //点赞人数
+          content: this.inputComment,  //评论内容
+        }
+        console.log(comment)
+        //TODO 向后台发送请求添加一个评论，如果后台返回成功，则将 comment push 进 comments，后台需要返回 commentId
+        postRequest('/add-one-comment',comment).then(res=>{
+          if (res && res.statusCode === 200) {
+            comment.commentId = res.object
+            this.showInput = false
+            this.showLoadBtn = true
+            this.inputComment = ''
+          }
+        }).catch(err=>{
+          console.log(err)
+        })
+      }
+    },
   },
-  created() {console.log(this.comments)}
 }
 </script>
 
-<!--
-1. 加与不加 scoped 无影响
-2. 加 module 会有很大影响
--->
 <style scoped lang="scss">
 @import "./scss/index";
 
 #comments-container {
+  width: 100%;
+  height: 90%;
   padding: 0 10px;
   box-sizing: border-box;
+  overflow-y: scroll;
+
   .comment {
     display: flex;
     flex-direction: column;
     padding: 10px;
     border-bottom: 1px solid $border-fourth;
+
     .info {
       display: flex;
       align-items: center;
+
       .avatar {
         border-radius: 50%;
       }
+
       .right {
         display: flex;
         flex-direction: column;
         margin-left: 10px;
+
         .name {
           font-size: 16px;
           color: $text-main;
           margin-bottom: 5px;
           font-weight: 500;
         }
+
         .date {
           font-size: 12px;
           color: $text-minor;
         }
       }
     }
+
     .content {
       font-size: 16px;
       color: $text-main;
       line-height: 20px;
       padding: 10px 0;
     }
+
     .control {
       display: flex;
       align-items: center;
       font-size: 14px;
       color: $text-minor;
+
       .like {
         display: flex;
         align-items: center;
         margin-right: 20px;
         cursor: pointer;
+
         &.active, &:hover {
           color: $color-main;
         }
+
         .iconfont {
           font-size: 14px;
           margin-right: 5px;
         }
       }
+
       .comment-reply {
         display: flex;
         align-items: center;
         cursor: pointer;
+
         &:hover {
           color: $text-333;
         }
+
         .iconfont {
           font-size: 16px;
           margin-right: 5px;
@@ -239,47 +258,11 @@ export default {
       }
 
     }
+
     .reply {
       margin: 10px 0;
       border-left: 2px solid $border-first;
-      .item {
-        margin: 0 10px;
-        padding: 10px 0;
-        border-bottom: 1px dashed $border-third;
-        .reply-content {
-          display: flex;
-          align-items: center;
-          font-size: 14px;
-          color: $text-main;
-          .from-name {
-            color: $color-main;
-          }
-          .to-name {
-            color: $color-main;
-            margin-left: 5px;
-            margin-right: 5px;
-          }
-        }
-        .reply-bottom {
-          display: flex;
-          align-items: center;
-          margin-top: 6px;
-          font-size: 12px;
-          color: $text-minor;
-          .reply-text {
-            display: flex;
-            align-items: center;
-            margin-left: 10px;
-            cursor: pointer;
-            &:hover {
-              color: $text-333;
-            }
-            .icon-comment {
-              margin-right: 5px;
-            }
-          }
-        }
-      }
+
       .write-reply {
         display: flex;
         align-items: center;
@@ -287,38 +270,48 @@ export default {
         color: $text-minor;
         padding: 10px;
         cursor: pointer;
+
         &:hover {
           color: $text-main;
         }
+
         .el-icon-edit {
           margin-right: 5px;
         }
       }
+
       .fade-enter-active, fade-leave-active {
         transition: opacity 0.5s;
       }
+
       .fade-enter, .fade-leave-to {
         opacity: 0;
       }
+
       .input-wrapper {
         padding: 10px;
+
         .gray-bg-input, .el-input__inner {
           /*background-color: #67C23A;*/
         }
+
         .btn-control {
           display: flex;
           justify-content: flex-end;
           align-items: center;
           padding-top: 10px;
+
           .cancel {
             font-size: 16px;
             color: $text-normal;
             margin-right: 20px;
             cursor: pointer;
+
             &:hover {
               color: $text-333;
             }
           }
+
           .confirm {
             font-size: 16px;
           }

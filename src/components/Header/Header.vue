@@ -1,3 +1,10 @@
+<!--
+  https://dev.to/jakzaizzat/avoid-mutating-a-prop-directly-ab9
+  https://stackoverflow.com/questions/40574661/avoid-mutating-a-prop-directly-since-the-value-will-be-overwritten
+  [Vuex异步请求数据后,在组件中获取状态的方法](https://blog.csdn.net/panyang01/article/details/71750897)
+  ---------------------
+
+-->
 <template>
   <!--    头部-->
   <el-header>
@@ -11,8 +18,18 @@
         </router-link>
       </el-col>
       <el-col :span="14" :offset="1">
-        <el-input type="text" placeholder="Type something" prefix-icon="el-icon-search"
-                  v-model="searchInput"></el-input>
+        <el-input type="text"
+                  placeholder="Type something..."
+                  class="input-with-select"
+                  v-model="search"
+        >
+          <el-select v-model="flag" slot="prepend" placeholder="Select">
+            <el-option label="用户名" value="1"></el-option>
+            <el-option label="梦卡类型" value="2"></el-option>
+            <el-option label="梦卡标题" value="3"></el-option>
+          </el-select>
+          <el-button slot="append" icon="el-icon-search" @click="validate"></el-button>
+        </el-input>
       </el-col>
       <el-col :span="2" :offset="1">
         <span class="user-name">{{ userInfo.userUsername }}</span>
@@ -21,10 +38,10 @@
       <el-col :span="1" :offset="1">
         <el-dropdown @command="handleCommand">
           <div class="el-dropdown-link">
-            <el-avatar size="large" :src="userAvatarUrl"></el-avatar>
+            <el-avatar size="large"
+                       :src="'http://qrne6et6u.hn-bkt.clouddn.com/'+this.userInfo.userAvatarUrl"/>
           </div>
           <el-dropdown-menu slot="dropdown">
-            <!-- 个人中心：此处需要 PersonalCenter.vue 里暴露 getUserInfo(id) -->
             <el-dropdown-item command="personal-center">
               <router-link to="/account-setting">个人中心</router-link>
             </el-dropdown-item>
@@ -33,67 +50,42 @@
         </el-dropdown>
       </el-col>
     </el-row>
+<!--    分页模糊查询(用户名，梦卡类型，梦卡标题)-->
+    <Pagination
+      ref="pagination"
+      :search="search"
+      :flag="flag"
+    />
   </el-header>
 </template>
 
 <script>
 import constants from "../../apis/constants"
 import requests from "../../apis/constants"
-
+import Pagination from "../Pagination/Pagination";
 export default {
-  props: {search: String},
+  components: {Pagination},
   data() {
     return {
-      userInfo: {
-        userUsername: '',
-        userAvatarUrl: ''
-      },
+      userInfo: this.$store.state.userInfo,
+      search: '',
+      flag: '',
     }
   },
-  mounted() {
-    this.userInfo = JSON.parse(window.sessionStorage.getItem("userInfo"))
-  },
-  // https://dev.to/jakzaizzat/avoid-mutating-a-prop-directly-ab9
-  // https://stackoverflow.com/questions/40574661/avoid-mutating-a-prop-directly-since-the-value-will-be-overwritten
-  // [Vuex异步请求数据后,在组件中获取状态的方法](https://blog.csdn.net/panyang01/article/details/71750897)
-  computed: {
-    userAvatarUrl: {
-      get() {
-        if (this.userInfo.userAvatarUrl.startsWith("https://")) {
-          return this.userInfo.userAvatarUrl
-        } else {
-          return 'http://qrne6et6u.hn-bkt.clouddn.com/'+this.userInfo.userAvatarUrl
-        }
-      }
-    },
-    searchInput: {
-      get() {
-        return this.search
-      },
-      set(newSearch) {
-        // 方式一：[update:] 为特定写法和父组件中 [.sync] 搭配
-        this.$emit('update:search', newSearch)
-        // 方式二：update-search 为自定义事件名
-        // this.$emit('update-search', newSearch)
-      },
-    },
-    // userInfo() {
-    //   return this.$store.state.userInfo
-    // }
-  },
   methods: {
-    /**
-     * 跳转到在线聊天页面
+    /*
+    [vue.js，如何在父组件调用子组件的方法？](https://segmentfault.com/q/1010000005345202)
      */
+    validate() {
+      this.$refs.pagination.validate()
+    },
+    // * 跳转到在线聊天页面
     goChat() {
       this.$router.push(constants.CHAT).catch(() => {
         console.log('catch redundant path ' + constants.CHAT + ' in Header.vue->goChat')
       })
     },
-    /**
-     * 处理 logout 功能
-     * @param command
-     */
+    // * 处理 logout 功能
     handleCommand(command) {
       if (command === 'logout') {
         this.$confirm('此操作将注销登录！是否继续？', 'Warning', {
@@ -136,24 +128,33 @@ export default {
   z-index: 999;
   border-radius: 20px;
   padding-top: 10px;
+
   .el-dropdown-link {
     cursor: pointer;
     color: #409EFF;
   }
+
   .el-image {
     cursor: pointer;
     border-radius: 13px;
   }
+
   .router-link-active {
     text-decoration: none;
   }
+
   .el-icon-chat-dot-round {
     cursor: pointer;
     color: black;
     margin-left: 5px;
   }
 }
+
 a { // 去除 router-link 下划线
   text-decoration: none;
 }
+
+//.el-table-column{
+//  cursor: pointer;
+//}
 </style>

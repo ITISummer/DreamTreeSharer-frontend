@@ -1,5 +1,6 @@
 <!--
 [在线聊天功能学习](https://www.bilibili.com/video/BV1ar4y1K7qx?p=61&spm_id_from=pageDriver)
+[](https://www.bilibili.com/video/BV1tZ4y1P7dT?p=264&spm_id_from=pageDriver)
 [demo 地址](https://github.com/is-liyiwei/vue-Chat-demo)
 -->
 <template>

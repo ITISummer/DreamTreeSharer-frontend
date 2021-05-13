@@ -1,6 +1,6 @@
 <template>
   <el-container>
-    <Header :search.sync="search"></Header>
+    <Header></Header>
     <Aside></Aside>
     <router-view/>
   </el-container>
@@ -11,11 +11,6 @@ import Header from "../../components/Header/Header";
 import Aside from "../../components/Aside/Aside";
 export default {
   components: {Header,Aside},
-  data() {
-    return {
-      search: '',
-    }
-  },
 }
 </script>
 <style scoped lang="scss">

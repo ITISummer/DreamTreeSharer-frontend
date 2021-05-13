@@ -120,7 +120,8 @@ import {getRequest, putRequest} from "../../../apis/api";
 export default {
   components: {EleUploadImage},
   mounted() {
-    this.userInfo = JSON.parse(window.sessionStorage.getItem("userInfo"))
+    // this.userInfo = JSON.parse(window.sessionStorage.getItem("userInfo"))
+    // this.userInfo = this.$store.state.userInfo
     this.updateForm.username = this.userInfo.userUsername
     this.updateForm.password = this.userInfo.userPassword
     this.updateForm.email = this.userInfo.userEmail
@@ -134,7 +135,7 @@ export default {
       updatePwdDialog: false,
       enableButton: false,
       cropData: {},
-      userInfo: {},
+      userInfo: this.$store.state.userInfo,
       // 查询到的用户信息对象
       updateForm: {
         username: '',
@@ -176,9 +177,9 @@ export default {
               // 更新密码成功
               if (res.statusCode === 200) {
                 this.updatePwdDialog = false
-                let sessionValue = JSON.parse(window.sessionStorage.getItem('userInfo'))
-                sessionValue.userPassword = this.updateForm.password
-                window.sessionStorage.setItem('userInfo', JSON.stringify(sessionValue))
+                // let sessionValue = JSON.parse(window.sessionStorage.getItem('userInfo'))
+                // sessionValue.userPassword = this.updateForm.password
+                // window.sessionStorage.setItem('userInfo', JSON.stringify(sessionValue))
               }
             }).catch(err => {
               // 更新密码失败
@@ -201,12 +202,12 @@ export default {
             let sessionValue = JSON.parse(window.sessionStorage.getItem('userInfo'))
             if (this.updateForm.flag === 'email') {
               this.updateForm.email = this.updateForm.emailOrMobile
-              sessionValue.userEmail = this.updateForm.emailOrMobile
-              window.sessionStorage.setItem('userInfo', JSON.stringify(sessionValue))
+              // sessionValue.userEmail = this.updateForm.emailOrMobile
+              // window.sessionStorage.setItem('userInfo', JSON.stringify(sessionValue))
             } else {
               this.updateForm.mobile = this.updateForm.emailOrMobile
-              sessionValue.userPhone = this.updateForm.emailOrMobile
-              window.sessionStorage.setItem('userInfo', JSON.stringify(sessionValue))
+              // sessionValue.userPhone = this.updateForm.emailOrMobile
+              // window.sessionStorage.setItem('userInfo', JSON.stringify(sessionValue))
             }
           }
           console.log(res)

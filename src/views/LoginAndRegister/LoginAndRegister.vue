@@ -42,7 +42,7 @@
                   style="width: 250px; margin-right: 5px"></el-input>
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" @click="updateSmsCode" :disabled="!BtnStatus">
+        <el-button type="primary" @click="getSmsCode" :disabled="!BtnStatus">
           {{ BtnStatus ? '获取验证码' : `${countDownTime}秒后获取` }}
         </el-button>
         <el-button type="primary" @click="register" style="width: 100%">注册</el-button>
@@ -152,7 +152,7 @@ export default {
       })
     },
     // * 更新手机验证码
-    updateSmsCode() {
+    getSmsCode() {
       this.getRequest(`${constants.GET_SMS_CODE}/${this.regForm.phone}`).then((res) => {
         if (resp.statusCode === 200) {
           this.$message.success(resp.message + '您的验证码为：' + resp.object)

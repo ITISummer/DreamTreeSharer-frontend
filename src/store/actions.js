@@ -24,7 +24,7 @@ export default {
         let token = window.sessionStorage.getItem('token')
         context.state.stomp.connect({'Auth-Token': token}, success => {
             console.log('actions.js->stomp.connect()')
-            context.state.stomp.subscribe('/queue/chat', msg => {
+            context.state.stomp.subscribe('/user/queue/chat', msg => {
                 console.log('actions.js->chatConnect->msg.body',msg.body)
             })
         }, error => {
@@ -38,6 +38,10 @@ export default {
                 context.commit('INIT_USERS', resp.object)
             }
         })
+    },
+    /** 初始化 pinboardInfo */
+    initPinboardInfo(context,data) {
+      context.commit('initPinboardInfo',data)
     },
     /**存入用户信息*/
     initUserInfo(context, data) {

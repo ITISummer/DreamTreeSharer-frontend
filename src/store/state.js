@@ -14,6 +14,8 @@ export default {
     userInfo: {},
     /** 用户添加卡片功能所需表单 */
     dreamForm: {},
+    /** 用户评论卡片 */
+    pinboardInfo: {},
     /** 在线聊天系统 */
     sessions: Map,
     users: [], // 用户聊天朋友列表

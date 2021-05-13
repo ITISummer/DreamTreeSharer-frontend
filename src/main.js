@@ -4,7 +4,10 @@ import router from './router'
 import ElementUI from 'element-ui'
 import 'element-ui/lib/theme-chalk/index.css'
 import {store} from './store'
-import requests from './apis/constants'
+import requests from './apis/constants'// 引入moment
+import moment from 'moment'
+import 'moment/locale/zh-cn'
+
 // 全局引入 - 插件形式使用请求
 import {postRequest, deleteRequest, putRequest, getRequest} from "./apis/api";
 
@@ -19,12 +22,11 @@ router.beforeEach((to, from, next) => {
     if (window.sessionStorage.getItem('token')) {
         // 判断用户信息是否存在
         // [js 判断一个 object 对象是否为空](https://blog.csdn.net/FungLeo/article/details/78113661)
-        if (!window.sessionStorage.getItem('userInfo')) {
-            // if (Object.keys(store.state.userInfo).length === 0) {
+        // if (!window.sessionStorage.getItem('userInfo')) {
+        if (Object.keys(store.state.userInfo).length === 0) {
             return getRequest(requests.GET_CURRENT_USER_INFO).then(resp => {
                 if (resp) {
-                    console.log('main.js->beforeEach->getRequest', resp)
-                    // // 存入用户信息
+                    // 存入用户信息
                     window.sessionStorage.setItem('userInfo', JSON.stringify(resp.object))
                     // // store.dispatch() 触发 store 的 action 方法
                     store.dispatch('initUserInfo',resp.object).then(r => true)
@@ -44,6 +46,10 @@ router.beforeEach((to, from, next) => {
     }
 })
 /*==============================vue 全局配置==================================*/
+// 使用中文时间
+moment.locale('zh-cn')
+Vue.prototype.$moment = moment
+
 Vue.config.productionTip = false
 Vue.use(ElementUI)
 Vue.prototype.postRequest = postRequest;

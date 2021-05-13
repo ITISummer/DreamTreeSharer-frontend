@@ -1,6 +1,6 @@
 <template>
   <div class="side" id="left_side">
-    <!-- 左侧头部-三圆点 -->
+    <!-- 左侧头部 -->
     <div class="section1">
       <div class="pint_mock_icon_container">
         <img src="../../assets/images/ellipse.png" alt="edit" class="pint_mock_icon">
@@ -11,7 +11,7 @@
       <Upload ref="Upload"/>
     </div>
     <!-- 左侧底部 -->
-    <div class="section3">
+    <div class="section3" v-show="showSaveFromSiteBtn">
       <div class="save_from_site">Save from site</div>
     </div>
   </div>
@@ -19,8 +19,30 @@
 
 <script>
 import Upload from "../Upload/Upload";
+import {EventBus} from "../../apis/eventBus";
+
 export default {
-  components: {Upload}
+  components: {Upload},
+  mounted() {
+    EventBus.$on('showSaveFromSiteBtn',value=>{
+      this.showSaveFromSiteBtn = value
+    });
+
+    // this.$nextTick(() => {
+    //   document.addEventListener('click', (e) => {
+    //     console.log(e.target)
+    //     if (!this.$refs.dd.contains(e.target)) {
+    //       // this.dialog = false;
+    //       this.$emit('update:showDialog', false)
+    //     }
+    //   })
+    // })
+  },
+  data() {
+    return {
+      showSaveFromSiteBtn: true
+    }
+  }
 }
 </script>
 

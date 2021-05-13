@@ -35,8 +35,8 @@ data	上传时附带的额外参数
 import {EventBus} from '../../apis/eventBus'
 export default {
   mounted() {
-    EventBus.$on('initImageUrl',data=>{
-      this.imageUrl = data
+    EventBus.$on('initImageUrl',value=>{
+      this.imageUrl = value
     })
   },
   data() {
@@ -73,26 +73,27 @@ export default {
       await this.getQiniuToken(this.qiniu.qiniuData.key)
     },
     // * 创建前从后台获取访问七牛云的 token - (key(文件名) bucket, AccessKey, SecretKey)
-    getQiniuToken: async function(key) {
+    async getQiniuToken(key) {
       const _this = this;
-      await this.getRequest(`/qiniu/uploadToken/${key}`)
-          .then(function(res) {
-            if (res.statusCode === 200) {
+      await this.getRequest(`/qiniu/uploadToken/${key}`).then(res=>{
+            if (res && res.statusCode === 200) {
               _this.qiniu.qiniuData.token = res.object;
             } else {
               _this.$message({message: res.message, duration: 2000, type: "warning"});
             }
-          });
+          }).catch(err=>{
+        console.log('Upload.vue->getQiniuToken->err',err)
+      });
     },
     // * 上传成功
-    handleSuccess: function(res) {
+    handleSuccess(res){
       this.imageUrl = "http://"+this.qiniu.uploadQiniuAddr + res.key;
       // 向上暴露 imageUrl
-      EventBus.$emit('getImageUrl',this.imageUrl)
+      EventBus.$emit('getImageUrlFromUpload',this.imageUrl)
       this.$message({message: `上传成功！图片地址为：${this.imageUrl}`, type: "success"})
     },
     // * 上传失败
-    handleError: function(res) {
+    handleError(res){
       this.$message({message: "上传失败", type: "error"});
     }
   }

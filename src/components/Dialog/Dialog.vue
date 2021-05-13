@@ -6,12 +6,13 @@
   [vue中实现点击空白区域关闭弹窗](https://juejin.cn/post/6911863086487961607)
   -->
   <div class="add_pin_modal" v-show="showDialog">
+    <i class="el-icon-close close-btn" @click="closeDialog"></i>
     <div class="add_pin_container">
       <DialogLeft ref="DialogLeft"/>
       <DialogRight
           ref="DialogRight"
-          :commentsOrDreamForm="commentsOrDreamForm"
-          :showSelect="showSelect"/>
+          :showCommentsOrDreamForm="showCommentsOrDreamForm"
+          />
     </div>
   </div>
 </template>
@@ -24,17 +25,18 @@ import DialogRight from "./DialogRight";
 export default {
   components: {Upload, DialogLeft, DialogRight},
   props: {
-    // imageUrl: '',
     showDialog: Boolean,
-    commentsOrDreamForm: Boolean,
-    showSelect: Boolean
+    showCommentsOrDreamForm: Boolean,
   },
-// TODO 待完善的点击空白区域关闭弹窗
+  methods: {
+    closeDialog() {
+      this.$emit('update:showDialog',false)
+    }
+  }
 }
 </script>
 
 <style scoped lang="scss">
-/* -------------------------------------------- */
 .add_pin_modal {
   width: 100%;
   height: 100%;
@@ -44,8 +46,43 @@ export default {
   transform: translate(-50%, -50%);
   z-index: 999;
   background-color: rgba(0, 0, 0, 0.5);
-}
 
+}
+.close-btn{
+  width:60px;
+  height:60px;
+  border:2px solid white;
+  border-radius: 50%;
+  position: relative;
+  &:hover{
+    cursor: pointer;
+    background: #3a8ee6;
+  }
+  &:before{
+    content: '';
+    display: block;
+    position: absolute;
+    width:90%;
+    height:2px;
+    background: white;
+    transform:rotate(45deg);
+    -webkit-transform:rotate(45deg);
+    top:30px;
+    left:5%;
+  }
+  &:after{
+    content: '';
+    display: block;
+    position: absolute;
+    width:90%;
+    height:2px;
+    background: white;
+    transform:rotate(-45deg);
+    -webkit-transform:rotate(-45deg);
+    top:30px;
+    left:5%;
+  }
+}
 .add_pin_container {
   padding: 35px;
   width: 780px;

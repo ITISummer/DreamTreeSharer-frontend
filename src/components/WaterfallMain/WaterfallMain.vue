@@ -3,38 +3,51 @@
   <el-main id="main-content">
     <!-- 滚动加载 下面 v-infinite-scroll 的放置位置与瀑布流是否能够加载有关 -->
     <div v-infinite-scroll="load" infinite-scroll-disabled="disabled" class="waterfall-container">
-      <!--        封装了 vue-waterfall 插件 -->
+      <!--      waterfall 组件 -->
       <Waterfall ref="waterfall" :list="list" :gutter="10" :width="250"
-           :breakpoints="{
-            //当屏幕宽度小于等于1200
-            1200: { rowPerView: 5},
-            //当屏幕宽度小于等于800
-            800: { rowPerView: 4},
-            //当屏幕宽度小于等于500
-            500: { rowPerView: 3}
-          }"
-         animationEffect="fadeIn"
-         :animationDuration="2+'s'"
-         :animationDelay="0.6+'s'"
-         backgroundColor="rgb(73, 74, 95)"
+                 :breakpoints="{
+                  //当屏幕宽度小于等于1200
+                  1200: { rowPerView: 5},
+                  //当屏幕宽度小于等于800
+                  800: { rowPerView: 4},
+                  //当屏幕宽度小于等于500
+                  500: { rowPerView: 3}
+                }"
+                 animationEffect="fadeIn"
+                 :animationDuration="2+'s'"
+                 :animationDelay="0.6+'s'"
+                 backgroundColor="rgb(73, 74, 95)"
       >
         <!--
           图片插槽-item，props 就代表一张图片插槽的属性！
           props.data = {src,blankColor,itemWidth}
-          itemWidth 对应 <Waterfall>中的 width
+          itemWidth 对应 <Waterfall>中的 width 属性
         -->
         <template slot="item" slot-scope="props">
           <div class="card">
+            <div v-show="showSaveBtnInWaterfall">
+              <el-button type="danger" round class="save-btn" @click="savePin(props.data)">Save</el-button>
+            </div>
+            <div v-show="showSaveBtnInWaterfall">
+              <el-button type="danger" round class="thumb" @click="like(props.data)">👍</el-button>
+            </div>
             <div class="cover">
-              <el-image :src="props.data.pinboardBgimgUrl" @click="handleClick(props.data)" :alt="props.data.pinboardBgimgUrl" @load="$refs.waterfall.refresh"/>
+              <el-image :src="props.data.pinboardBgimgUrl" @click="handleClick(props.data)"
+                        :alt="props.data.pinboardBgimgUrl" @load="$refs.waterfall.refresh"/>
+            </div>
+            <div class="dream">
+              <div class="dream-title">{{props.data.pinboardTitle}}</div>
+              <div class="dream-content">{{props.data.pinboardContent}}</div>
             </div>
             <div class="menus">
-              <div v-show="showAvatar">
-              <el-avatar data-title="卡片发布者头像" :src="props.data.pinUserAvatarUrl"/>
-              <span class="user-name">{{props.data.pinUsername}}</span>
+              <div v-if="showAvatar" class="avatarAndLike">
+                <el-avatar :title="props.data.userUsername" :src="'http://qrne6et6u.hn-bkt.clouddn.com/'+props.data.userAvatarUrl"/>
+                <span class="like-num">👍{{props.data.likeNum}}</span>
               </div>
-              <p data-title="编辑" @click="handleEdit(props.data)" v-if="showCardFooter"/>
-              <p data-title="删除" @click="handleDelete(props.data)" v-if="showCardFooter"/>
+              <div v-else class="edit">
+                <p data-title="编辑" @click="handleEdit(props.data)"/>
+                <p data-title="删除" @click="handleDelete(props.data)"/>
+              </div>
             </div>
           </div>
         </template>
@@ -47,19 +60,18 @@
 
 <script>
 import Waterfall from 'vue-waterfall-plugin';
+
 export default {
   components: {Waterfall},
   props: {
     images: {type: Array, default: []},
-    showCardFooter: {type: Boolean, default: false},
-    showAvatar: {type: Boolean,default: true},
+    showAvatar: {type: Boolean, default: true},
+    showSaveBtnInWaterfall: {type:Boolean, default: true},
+    like: Function,
+    savePin: Function,
     handleClick: Function,
     handleEdit: Function,
     handleDelete: Function,
-  },
-  mounted() {
-    this.userInfo = JSON.parse(window.sessionStorage.getItem("userInfo"))
-    // this.userInfo = this.$store.state.userInfo
   },
   data() {
     return {
@@ -75,56 +87,42 @@ export default {
     disabled() {
       return this.loading || this.noMore;
     },
-    userAvatarUrl: {
-      get() {
-        if (this.userInfo.userAvatarUrl.startsWith("https://")) {
-          return this.userInfo.userAvatarUrl
-        } else {
-          return 'http://qrne6et6u.hn-bkt.clouddn.com/' + this.userInfo.userAvatarUrl
-        }
-      }
-    },
   },
-    methods: {
-      /**
-       * 加载图片
-       */
-      async load() {
-        this.loading = true;
-        await this.addNewList();
-        this.loading = false;
-      },
-      /**
-       * 添加到新 list 中
-       * [es6 扩展运算符 三个点（...）](https://blog.csdn.net/qq_30100043/article/details/53391308)
-       */
-      addNewList() {
-        // axios 异步向数据库发送请求 TODO
-        // 然后使用 const list = this.images.map()
-        return new Promise((resolve) => {
-          const list = this.images.map((item, index) => {
-            return {...item}
-          });
-          this.list.push(...list);
-          setTimeout(() => resolve(), 1000);
+  methods: {
+    // * 加载图片
+    async load() {
+      this.loading = true;
+      await this.addNewList();
+      this.loading = false;
+    },
+    /**
+     * 添加到新 list 中
+     * [es6 扩展运算符 三个点(...)](https://blog.csdn.net/qq_30100043/article/details/53391308)
+     */
+    addNewList() {
+      // axios 异步向数据库发送请求 TODO
+      // 然后使用 const list = this.images.map()
+      return new Promise((resolve) => {
+        const list = this.images.map((item, index) => {
+          return {...item}
         });
-      },
-    }
+        this.list.push(...list);
+        setTimeout(() => resolve(), 1000);
+      });
+    },
+  }
 }
 </script>
 
 <style scoped lang="scss">
-/**
-主体样式
- */
 #main-content {
   background: #6e8efb;
   height: 100vh;
   overflow-y: auto;
-  .waterfall-container{
+  .waterfall-container {
     margin-top: 40px;
   }
-  .card { /** 每一张卡片样式 */
+  .card { //每一张卡片样式
     background: #fff;
     border-radius: 5px;
     overflow: hidden;
@@ -134,12 +132,54 @@ export default {
     top: 0;
     &:hover {
       top: -3px;
+      background: rgba(201, 147, 147, 0.1);
+      .save-btn{// 设置按钮显示
+        display: block;
+      }
+      .thumb{
+        display: block;
+      }
+      .dream{
+        display: block;
+      }
+    }
+    .save-btn{
+      display: none;
+      position: absolute;
+      top: 0px;
+      left: 0px;
+      z-index: 100;
+    }
+    .thumb{
+      display: none;
+      position: absolute;
+      top: 0px;
+      right: 10px;
+      z-index: 100;
+      background: url("thumb.png") no-repeat;
+      border-style: none;
     }
     .cover {
       margin: 10px 10px 0 10px;
       img {
         display: block;
         width: 100%;
+      }
+    }
+    .dream{
+      display: none;
+      position: absolute;
+      left: 20%;
+      top: 30%;
+      color: #f3cf06;
+      font-size: xx-small;
+      z-index: 101;
+      .dream-title{
+        color: #3a8ee6;
+        text-align: center;
+      }
+      .dream-content{
+        text-align: center;
       }
     }
     .name { //卡片底部名字样式
@@ -149,10 +189,20 @@ export default {
       padding: 10px 20px;
       font-size: 14px;
     }
-    .menus {// 卡片操作菜单栏
+
+    .menus { // 卡片操作菜单栏
       padding: 10px;
       border-top: 1px solid #e7e7e7;
       text-align: right;
+      .avatarAndLike{
+        display: flex;
+        justify-content: space-between;
+      }
+      .edit{
+        display: flex;
+        justify-content: space-between;
+      }
+
       p {
         position: relative;
         display: inline-block;
@@ -164,6 +214,7 @@ export default {
         color: white;
         font-size: 12px;
         margin-left: 10px;
+
         &::before {
           content: "";
           position: absolute;
@@ -178,9 +229,11 @@ export default {
           box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
           transform: translateY(var(--ty, 0)) rotateX(var(--rx, 0)) rotateY(var(--ry, 0)) translateZ(var(--tz, -12px));
         }
+
         &:hover::before {
           box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
         }
+
         &::after {
           position: relative;
           display: inline-block;
