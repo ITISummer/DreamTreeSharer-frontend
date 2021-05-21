@@ -37,6 +37,12 @@ export default {
     REG_OF_EMAIL: /^[A-Za-zd]+([-_.][A-Za-zd]+)*@([A-Za-zd]+[-.])+[A-Za-zd]{2,5}$/,
     REG_OF_MOBILE: /^1[3456789]\d{9}$/,
     /*----------------------------Comments.vue-------------------------*/
-    // 头像地址
-    BaseUrl: 'http://qrne6et6u.hn-bkt.clouddn.com/',
+    qiniu: {
+        qiniuData: {key: "", token: ""},
+        // 七牛云上传储存区域的上传域名（华东、华北、华南、北美、东南亚）
+        uploadQiniuUrl: "http://upload-z1.qiniup.com",
+        // 七牛云返回储存图片的子域名
+        //华南 -  uploadQiniuAddr: "qrne6et6u.hn-bkt.clouddn.com/",
+        uploadQiniuAddr: "http://qt72k9qhl.hb-bkt.clouddn.com/"
+    }
 }

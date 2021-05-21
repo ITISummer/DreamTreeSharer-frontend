@@ -27,16 +27,6 @@ export default {
     EventBus.$on('showSaveFromSiteBtn',value=>{
       this.showSaveFromSiteBtn = value
     });
-
-    // this.$nextTick(() => {
-    //   document.addEventListener('click', (e) => {
-    //     console.log(e.target)
-    //     if (!this.$refs.dd.contains(e.target)) {
-    //       // this.dialog = false;
-    //       this.$emit('update:showDialog', false)
-    //     }
-    //   })
-    // })
   },
   data() {
     return {

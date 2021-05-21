@@ -3,11 +3,6 @@
 [时间格式化及操作（moment.js篇）](https://segmentfault.com/a/1190000016117935)
 [momentjs 中文网 #显示](http://momentjs.cn/docs/#/displaying/)
 [Array.from()](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Array/from)
-1. 保存原 Comments.vue
-2. 修改 Comments.vue
-	1. DialogRight.vue 展示卡片发布者头像和用户名
-	2. 有评论按钮，点击可以评论（只有一级评论）
-	3. 评论需要展示评论者的（头像）和用户名
 -->
 <template>
   <div id="comments-container">
@@ -61,7 +56,6 @@
 <script>
 import constants from "../../apis/constants";
 import {EventBus} from "../../apis/eventBus";
-import {postRequest, getRequest, putRequest} from "../../apis/api";
 // 分页查询评论
 let limit = 2
 let offset = 0
@@ -98,7 +92,7 @@ export default {
     // 加载更多评论 - 分页查询
     loadComments() {
       // getRequest(`/get-comments/${this.$store.state.pinboardInfo.pinboardId}/${limit}/${offset}`).then(res=>{
-            getRequest(`/get-comments/${this.pinboardInfo.pinboardId}/${limit}/${offset}`).then(res=>{
+            this.getRequest(`/get-comments/${this.pinboardInfo.pinboardId}/${limit}/${offset}`).then(res=>{
         if (res) {
         Array.from(res.object,value=>{
           this.comments.push(value)
@@ -133,7 +127,7 @@ export default {
         }
         item.isLiked = !item.isLiked;
       }
-      putRequest(`update-like-num/${item.commentId}/${item.likeNum}`).then(res=>true).catch(err=>{
+      this.putRequest(`update-like-num/${item.commentId}/${item.likeNum}`).then(res=>true).catch(err=>{
         console.log(err)
       })
     },
@@ -154,7 +148,7 @@ export default {
         }
         console.log(comment)
         //TODO 向后台发送请求添加一个评论，如果后台返回成功，则将 comment push 进 comments，后台需要返回 commentId
-        postRequest('/add-one-comment',comment).then(res=>{
+        this.postRequest('/add-one-comment',comment).then(res=>{
           if (res && res.statusCode === 200) {
             comment.commentId = res.object
             this.showInput = false

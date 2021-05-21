@@ -21,7 +21,7 @@ export default {
   methods:{
     // 改变当前会话 id
   	changeCurrentSessionId(id) {
-  		this.$store.commit('changeCurrentSessionId',id)
+  		this.$store.dispatch('changeCurrentSessionId',id)
   	}
   }
 }

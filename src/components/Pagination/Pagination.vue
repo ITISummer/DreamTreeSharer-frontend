@@ -1,27 +1,30 @@
 <template>
 <div>
   <!--
-  dialog 显示分页查询
   [element-ui table中的图片的显示 解决方案](https://blog.csdn.net/DianaGreen7/article/details/81169893)
+  [element UI 的row-click事件如何使用参数？](https://blog.csdn.net/Gochan_Tao/article/details/79606066)
   -->
   <el-dialog title="Shipping address" :visible.sync="dialogTableVisible">
     <el-table :data="gridData" v-if="flag === '1'">
       <el-table-column label="用户头像" width="150" prop="userAvatarUrl">
-        <template slot-scope="scope" property="userAvatarUrl" style="cursor: pointer">
-          <el-avatar size="large" :src="'http://qrne6et6u.hn-bkt.clouddn.com/'+scope.row.userAvatarUrl"></el-avatar>
+        <template slot-scope="scope" property="userAvatarUrl">
+          <el-avatar size="large" :src="getBaseUrl+scope.row.userAvatarUrl"></el-avatar>
         </template>
       </el-table-column>
       <el-table-column label="用户名" width="200" prop="userUsername">
+        <template slot-scope="scope" property="userUsername">
+          <router-link :to="{path: '/profile',query:{username:scope.row.userUsername}}"><span>{{scope.row.userUsername}}</span></router-link>
+        </template>
       </el-table-column>
     </el-table>
 <!-- 模糊分页查询 pin-title 或者 pin-type 后的展示 table -->
-    <el-table :data="gridData" v-else>
+    <el-table :data="gridData" v-else @row-click="rowClick">
       <el-table-column label="梦卡背景图" width="150" prop="pinboardBgimgUrl">
-        <template slot-scope="scope"  style="cursor: pointer">
+        <template slot-scope="scope">
           <el-image fit="cover" style="width: 100px; height: 100px" :src="scope.row.pinboardBgimgUrl"></el-image>
         </template>
       </el-table-column>
-      <el-table-column :label="flag === '2'? '梦卡类型':'梦卡标题'" width="200" prop="pinboardTitle">
+      <el-table-column :label="flag === '2'? '梦卡类型':'梦卡标题'" width="200" :prop="flag === '2'? 'pinboardType':'pinboardTitle'">
       </el-table-column>
     </el-table>
     <el-pagination
@@ -32,26 +35,48 @@
         :page-size="size">
     </el-pagination>
   </el-dialog>
+
+  <Dialog
+      :showDialog.sync="showDialog"
+      :showCommentsOrDreamForm="false"
+      :showSelect="false"/>
 </div>
 </template>
 
 <script>
+import {EventBus} from "../../apis/eventBus";
+
 export default {
   props: {
    search: '',
    flag: '',
   },
+  computed: {
+    getBaseUrl() {
+      return this.baseUrl;
+    }
+  },
   data() {
     return{
       dialogTableVisible: false,
       // 分页查询
-      size: 2, // 每页数量[5,21] 的奇数
+      size: 5, // 每页数量[5,21] 的奇数
       currentPage: 1, // 初始查询页
       gridData: [],
       total: 0,
+      showDialog: false
     }
   },
   methods: {
+    rowClick(item) {
+      console.log(item)
+      // 获取图片元数据后，设置 dialog 显示为 true，通过 $emit()
+      this.showDialog = true
+      EventBus.$emit('getPinboardInfoFromHome', item)
+      EventBus.$emit('initImageUrl', item.pinboardBgimgUrl)
+      EventBus.$emit('showSaveBtn', false)
+      EventBus.$emit('showSaveFromSiteBtn', false)
+    },
     // 当前页
     currentChange(currentPage) {
       console.log(currentPage)
@@ -76,9 +101,7 @@ export default {
       this.getRequest(`/fuzzy-search/${this.flag}/${this.search}/${this.size}/${this.currentPage}`).then(res =>{
         if (res) {
           this.total = res.object.total
-          console.log(this.total)
           this.gridData = res.object.records
-          console.log(res.object)
         } else {
           this.$message.warning('已无更多数据！')
         }

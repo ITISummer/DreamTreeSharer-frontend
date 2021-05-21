@@ -23,13 +23,12 @@ import Header from "../../components/Header/Header";
 import WaterfallMain from "../../components/WaterfallMain/WaterfallMain";
 import Dialog from "../../components/Dialog/Dialog";
 import {EventBus} from "../../apis/eventBus";
-import {getRequest} from "../../apis/api";
 
 export default {
   components: {Dialog, Header, WaterfallMain},
   mounted() {
     // 获取用户分享的 pinboard
-    getRequest('/get-sharable-pin').then(res => {
+    this.getRequest('/get-sharable-pin').then(res => {
       if (res) {
         this.images = res.object
       }
@@ -40,7 +39,7 @@ export default {
   },
   data() {
     return {
-      userInfo: this.$store.state.userInfo,
+      userInfo: this.$store.state.user.userInfo,
       showDialog: false,
       images: [],
     }

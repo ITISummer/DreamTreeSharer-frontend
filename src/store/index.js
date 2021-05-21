@@ -3,10 +3,11 @@ import Vuex from 'vuex'
 import state from "./state";
 import mutations from "./mutations";
 import actions from "./actions";
+import getters from "./getters"
+import user from "./modules/user";
+import chat from "./modules/chat";
 
 Vue.use(Vuex)
-
-const now = new Date();
 
 
 /**
@@ -16,13 +17,18 @@ const now = new Date();
  * 不管在树的哪个位置，任何组件都能获取状态或者触发行为！
  */
 export const store = new Vuex.Store({
+    modules: {
+        user,
+        chat
+    },
     state,
     mutations,
     actions,
+    getters,
 })
 /** store */
 store.watch(function (state) {
-    return state.sessions
+    return state.chat.sessions
 }, function (val) {
     console.log('CHANGE: ', val);
     localStorage.setItem('vue-chat-session', JSON.stringify(val));

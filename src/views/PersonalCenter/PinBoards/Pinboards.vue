@@ -27,17 +27,16 @@
 </template>
 
 <script>
-import Header from "../../../components/Header/Header";
-import WaterfallMain from "../../../components/WaterfallMain/WaterfallMain";
-import Dialog from "../../../components/Dialog/Dialog";
-import {EventBus} from "../../../apis/eventBus"
-import {getRequest, deleteRequest} from "../../../apis/api";
+import Header from "@/components/Header/Header";
+import WaterfallMain from "@/components/WaterfallMain/WaterfallMain";
+import Dialog from "@/components/Dialog/Dialog";
+import {EventBus} from "@/apis/eventBus"
 
 export default {
   components: {Header, WaterfallMain, Dialog},
   mounted() {
     // 这里的 images 初始化从数据库获取 TODO
-    getRequest('get-pinboards').then(res => {
+    this.getRequest('get-pinboards').then(res => {
       if (res) {
         this.images = res.object
       } else {
@@ -50,11 +49,15 @@ export default {
       this.showDialog = value
       console.log(showDialog)
     });
+    EventBus.$on('getADreamForm', value => {
+      console.log(value)
+      // this.images.push(value)
+    });
   },
   data() {
     return {
       dreamForm: {},
-      userInfo: this.$store.state.userInfo,
+      userInfo: this.$store.state.user.userInfo,
       search: '',
       list: [],
       showDialog: false,
@@ -66,7 +69,7 @@ export default {
     initDreamForm() {
       this.showDialog = !this.showDialog
       EventBus.$emit('initImageUrl', '')
-      EventBus.$emit('initDreamForm', {})
+      // EventBus.$emit('initDreamForm', {})
       EventBus.$emit('saveOrUpdate',true)
     },
     handleClick(item) {
@@ -85,7 +88,7 @@ export default {
       this.$confirm('确认删除吗？', '删除一个pin', 'warning').then(res => {
         if (res) {
           // TODO 发送请求向数据库移除一个 pinboard 同时移除其下的评论和点赞信息
-          deleteRequest(`delete-one-pinboard/${item.pinboardId}`).then(res => {
+          this.deleteRequest(`delete-one-pinboard/${item.pinboardId}`).then(res => {
             console.log(res)
           }).catch(err => {
             console.log(err)

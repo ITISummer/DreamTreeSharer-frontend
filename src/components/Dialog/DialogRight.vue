@@ -12,7 +12,7 @@
     </div>
     <div class="section1" v-else>
       <div>
-        <el-avatar data-title="卡片发布者头像" :src="'http://qrne6et6u.hn-bkt.clouddn.com/'+this.pinboardInfo.userAvatarUrl"/>
+        <el-avatar data-title="卡片发布者头像" :src="getUserAvatarUrl"/>
         <span class="user-name">{{this.pinboardInfo.userUsername}}</span>
         <span class="date">{{this.pinboardInfo.pinboardCreateTime}}</span>
       </div>
@@ -21,7 +21,7 @@
     <div class="section2" v-if="showCommentsOrDreamForm">
       <el-form :model="dreamForm">
         <el-form-item>
-          <el-avatar :src="'http://qrne6et6u.hn-bkt.clouddn.com/' + this.userInfo.userAvatarUrl"/>
+          <el-avatar :src="getUserAvatarUrl"/>
           <span>{{ userInfo.userUsername }}</span>
         </el-form-item>
         <el-form-item>
@@ -51,17 +51,18 @@
 </template>
 
 <script>
-// 组件懒加载
-// const Comments = () => import('../Comments/Comments')
 import Comments from "../Comments/Comments";
 import {EventBus} from "../../apis/eventBus";
-import {postRequest,putRequest} from "../../apis/api";
 
 export default {
   components: {Comments},
   props: {
     showCommentsOrDreamForm: Boolean,
-    // showSelect: Boolean,
+  },
+  computed: {
+    getUserAvatarUrl() {
+      return this.baseUrl+this.userInfo.userAvatarUrl
+    }
   },
   mounted() {
     EventBus.$on('getImageUrlFromUpload',imageUrl=>{
@@ -86,8 +87,7 @@ export default {
       pinboardInfo: {},
       saveOrUpdate: true,
       showSaveBtn: true,
-      // userInfo: JSON.parse(window.sessionStorage.getItem('userInfo')),
-      userInfo: this.$store.state.userInfo,
+      userInfo: this.$store.state.user.userInfo,
       dreamForm: {
         pinboardTitle: '',
         pinboardContent: '',
@@ -121,9 +121,10 @@ export default {
         this.$message({message: '字段不能为空！', type: 'warning'})
       } else {
         // 当用户添加一个 pin 时，往数据库中插入一条数据，并根据是否分享来决定是否往 pinboards.vue 传递一条数据
-        postRequest('/add-one-pinboard', this.dreamForm).then(res=>{
+        this.postRequest('/add-one-pinboard', this.dreamForm).then(res=>{
           if (res && res.statusCode === 200) {
             EventBus.$emit('getShowDialog',false)
+            EventBus.$emit('getADreamForm',this.dreamForm)
           }
         }
         ).catch(err=>{
@@ -142,7 +143,7 @@ export default {
         if (title === '' || content === '' || imageUrl === '') {
           this.$message({message: '字段不能为空！', type: 'warning'})
         } else {
-          putRequest('/update-pinboard',this.dreamForm).then(res => {
+          this.putRequest('/update-pinboard',this.dreamForm).then(res => {
             if (res && res.statusCode === 200) {
               EventBus.$emit('getShowDialog',false)
             }

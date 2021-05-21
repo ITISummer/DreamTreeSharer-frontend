@@ -33,6 +33,7 @@ data	上传时附带的额外参数
 
 <script>
 import {EventBus} from '../../apis/eventBus'
+import constants from "../../apis/constants";
 export default {
   mounted() {
     EventBus.$on('initImageUrl',value=>{
@@ -42,13 +43,7 @@ export default {
   data() {
     return {
       imageUrl: '',
-      qiniu: {
-        qiniuData: {key: "", token: ""},
-        // 七牛云上传储存区域的上传域名（华东、华北、华南、北美、东南亚）
-        uploadQiniuUrl: "http://upload-z2.qiniup.com",
-        // 七牛云返回储存图片的子域名
-        uploadQiniuAddr: "qrne6et6u.hn-bkt.clouddn.com/",
-      }
+      qiniu: constants.qiniu
     }
   },
   methods: {
@@ -87,7 +82,7 @@ export default {
     },
     // * 上传成功
     handleSuccess(res){
-      this.imageUrl = "http://"+this.qiniu.uploadQiniuAddr + res.key;
+      this.imageUrl = this.qiniu.uploadQiniuAddr + res.key;
       // 向上暴露 imageUrl
       EventBus.$emit('getImageUrlFromUpload',this.imageUrl)
       this.$message({message: `上传成功！图片地址为：${this.imageUrl}`, type: "success"})

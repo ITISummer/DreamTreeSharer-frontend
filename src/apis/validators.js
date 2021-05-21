@@ -97,12 +97,11 @@ const checkUsername = function (rule, value, callback){
     // 发送请求到后端验证是否用户名已存在！
     requestApi.getRequest(`${constants.USERNAME_EXISTED}/${value}`).then(res => {
     }).catch(error => {
-        console.log(error)
+        console.log("validator->checkUsername->error",error)
         })
     }
     callback()
 }
-
 
 export default {
     checkEmail,

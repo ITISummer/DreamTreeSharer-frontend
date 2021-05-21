@@ -10,7 +10,7 @@
       <div class="profile">
         <div class="content">
           <img alt="背景缺失" class="bg" src="./images/1.jpg">
-          <img alt="头像缺失" class="avatar" :src="'http://qrne6et6u.hn-bkt.clouddn.com/'+this.userInfo.userAvatarUrl">
+          <img alt="头像缺失" class="avatar" :src="getUserAvatarUrl">
           <div class="text">
             <h1>{{this.username}}</h1>
             <p>What is your dream?</p>
@@ -38,6 +38,11 @@ export default {
     return {
       username: '',
       userInfo: {}
+    }
+  },
+  computed: {
+    getUserAvatarUrl() {
+      return this.baseUrl+this.userInfo.userAvatarUrl
     }
   },
   mounted() {

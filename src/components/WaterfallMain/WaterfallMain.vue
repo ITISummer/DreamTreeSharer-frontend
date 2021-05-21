@@ -42,7 +42,7 @@
             <div class="menus">
 <!--              Home 页所需-->
               <div v-if="showAvatar" class="avatar-and-like">
-                <el-avatar :title="props.data.userUsername" :src="'http://qrne6et6u.hn-bkt.clouddn.com/'+props.data.userAvatarUrl"/>
+                <el-avatar :title="props.data.userUsername" :src="getBaseUrl+props.data.userAvatarUrl"/>
                 <span class="like-num">👍{{props.data.likeNum}}</span>
               </div>
 <!--              Favorites 页所需-->
@@ -83,7 +83,7 @@ export default {
   },
   data() {
     return {
-      userInfo: {},
+      // userInfo: {},
       loading: false,
       list: [],
     }
@@ -95,6 +95,9 @@ export default {
     disabled() {
       return this.loading || this.noMore;
     },
+    getBaseUrl() {
+      return this.baseUrl
+    }
   },
   methods: {
     // * 加载图片

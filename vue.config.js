@@ -28,7 +28,8 @@ proxyObj['/upload-api'] = {
     pathRewrite: {
         '^/upload-api': ''
     }
-}
+},
+
 // websocket 代理 - 实现在线聊天功能需要
 proxyObj['/ws'] = {
     // websocket

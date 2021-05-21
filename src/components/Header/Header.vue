@@ -10,7 +10,7 @@
   <el-header>
     <el-row align="middle" justify="center">
       <el-col :span="2">
-        <el-image style="width: 36px; height: 36px" :src="require('@/assets/logo.png')"></el-image>
+        <el-image style="width: 36px; height: 36px" :src="require('@/assets/images/logo.png')"></el-image>
       </el-col>
       <el-col :span="2">
         <router-link to="/home">
@@ -39,7 +39,7 @@
         <el-dropdown @command="handleCommand">
           <div class="el-dropdown-link">
             <el-avatar size="large"
-                       :src="'http://qrne6et6u.hn-bkt.clouddn.com/'+this.userInfo.userAvatarUrl"/>
+                       :src="getUserAvatarUrl"></el-avatar>
           </div>
           <el-dropdown-menu slot="dropdown">
             <el-dropdown-item command="personal-center">
@@ -63,14 +63,24 @@
 import constants from "../../apis/constants"
 import requests from "../../apis/constants"
 import Pagination from "../Pagination/Pagination";
+import { mapGetters } from 'vuex'
 
 export default {
   components: {Pagination},
   data() {
     return {
-      userInfo: this.$store.state.userInfo,
+      userInfo: this.$store.state.user.userInfo,
       search: '',
       flag: '',
+    }
+  },
+  computed: {
+  // 使用对象展开运算符将 getter 混入 computed 对象中
+    ...mapGetters([
+      'getUserInfo',
+    ]),
+    getUserAvatarUrl() {
+      return this.baseUrl+this.userInfo.userAvatarUrl
     }
   },
   methods: {

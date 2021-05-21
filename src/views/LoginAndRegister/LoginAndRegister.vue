@@ -1,6 +1,6 @@
 // 模板页面
 <template>
-  <!--  一个模板的根标签，必须得有 -->
+  <!--  一个模板的根标签，必须得有且只有一个 -->
   <div>
     <!--      登录模块-->
     <el-form ref="loginForm" :rules="rules" :model="loginForm" v-show="showLoginOrReg" class="lrContainer">
@@ -54,6 +54,7 @@
 <script>
 import constants from "../../apis/constants";
 import validators from "../../apis/validators";
+
 export default {
   /**
    * 当一个 Vue 实例被创建时，它将 data 对象中的所有的
@@ -87,9 +88,11 @@ export default {
       },
       // 校验规则
       rules: {
-        // [ElementUI 的校验函数 validator 的传参与复用](https://blog.csdn.net/qq_42941302/article/details/112799014)
-        // [vue+elementUI项目实现自定义校验规则的传参复用性](https://blog.csdn.net/u012443286/article/details/105258443)
-        // 这里的 username, password, code 是和表单标签里面对应的，不是 vm 属性
+        /*
+         [ElementUI 的校验函数 validator 的传参与复用](https://blog.csdn.net/qq_42941302/article/details/112799014)
+         [vue+elementUI项目实现自定义校验规则的传参复用性](https://blog.csdn.net/u012443286/article/details/105258443)
+         这里的 username, password, code 是和表单标签里面对应的，prop 应该和 form 中相关属性同名
+         */
         username: [{validator: validators.checkUsername.bind(this), trigger: 'blur'}],
         password: [{validator: validators.checkPassword, trigger: 'blur'}],
         captcha: [{len: 4, message: "图形验证码长度应该为4", trigger: 'blur'}],
@@ -101,11 +104,16 @@ export default {
   },
 
   methods: {
-    // * 更新验证码
+    /**
+     * 更新验证码
+     * @returns {string}
+     */
     updateCaptcha() {
       return this.captchaUrl = `${constants.CAPTCHA}?time=` + new Date()
     },
-    // * 用户登录
+    /**
+     * 用户登录
+     */
     login() {
       this.$refs.loginForm.validate((valid) => {
         if (valid) {
@@ -116,9 +124,9 @@ export default {
               // 存储用户 token 到 session 中
               const tokenStr = res.object.tokenHead + res.object.token
               window.sessionStorage.setItem('token', tokenStr)
+              /*
               // 登录成功后获取并存入用户信息到 state - main.js 中
               // 登录成功后跳转到 home 页面 - 使用 replace 表示不能回退，而使用 push 则可以回退
-              /*
               查看此逻辑的话，结合 main.js 中路由导航守卫配置
               页面跳转 - 查询用户输入的路劲，
               如果没有登录则跳转到登录页面让用户登录，
@@ -136,7 +144,9 @@ export default {
       });
     },
 
-    // * 用户注册
+    /**
+     * 用户注册
+     */
     register() {
       this.$refs.regForm.validate(valid => {
         if (valid) {
@@ -151,21 +161,20 @@ export default {
         }
       })
     },
-    // * 更新手机验证码
+    /**
+     * 更新手机验证码
+     */
     getSmsCode() {
       this.getRequest(`${constants.GET_SMS_CODE}/${this.regForm.phone}`).then((res) => {
         if (resp.statusCode === 200) {
           this.$message.success(resp.message + '您的验证码为：' + resp.object)
         }
-        // else {
-        //   this.$message.warning(resp.message)
-        // }
         if (res) {
-        // 设置按钮倒计时防刷新效果
-        let smsCodeEndTime = (new Date()).getTime() + 30000;
-        // 将当前时间戳存入 localSotrage
-        window.localStorage.setItem('smsCodeEndTime', JSON.stringify(smsCodeEndTime))
-        this.cutDownTime(smsCodeEndTime)
+          // 设置按钮倒计时防刷新效果
+          let smsCodeEndTime = (new Date()).getTime() + 30000;
+          // 将当前时间戳存入 localSotrage
+          window.localStorage.setItem('smsCodeEndTime', JSON.stringify(smsCodeEndTime))
+          this.cutDownTime(smsCodeEndTime)
         }
       }).catch(error => {
         console.log(error)
@@ -173,6 +182,7 @@ export default {
     },
     /**
      * 倒计时
+     * @param smsCodeEndTime
      */
     cutDownTime(smsCodeEndTime) {
       this.BtnStatus = false;
@@ -193,10 +203,6 @@ export default {
   }
 }
 </script>
-<!--
-1. 加上与不加 scoped 有很大影响
-2. 加 module 与加 scoped 一样，会让格式很乱
--->
 <style lang="scss">
 .lrContainer {
   border-radius: 15px;
@@ -207,15 +213,18 @@ export default {
   background: #fff;
   border: 1px solid #eaeaea;
   box-shadow: 0 0 25px #cac6c6;
+
   .title {
     margin: 0 auto 40px auto;
     text-align: center;
   }
 }
+
 .login-rememberMe {
   text-align: left;
   margin: 0 0 15px 0;
 }
+
 .el-form-item__content {
   display: flex;
   align-items: center;

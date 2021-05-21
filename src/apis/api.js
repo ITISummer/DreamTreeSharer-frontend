@@ -4,6 +4,7 @@ import router from "../router";
 import requests from "./constants";
 import {Loading} from 'element-ui';
 import Vue from 'vue'
+import constants from "./constants";
 
 /*===========================变量===============================*/
 let loadingInstance;
@@ -28,6 +29,7 @@ axios.interceptors.request.use(config => {
     // 配置了store持久化的就不需要取 sessionStorage 的了
     const token = window.sessionStorage.getItem('token');
     // 如果存在 token，后台未放行的请求都得携带这个 token 才能访问
+    // 这里的请求头 Authorization 对应后端配置的请求头 key
     if (token) {
         config.headers['Authorization'] = token
     }
@@ -53,22 +55,47 @@ axios.interceptors.response.use(resp => {
 
     if (resp.status === 200) {
         if (resp.data.statusCode === 200) {
-            Message.success({message: resp.data.message})
+            if (resp.data.message) {
+                Message.success({message: resp.data.message})
+            }
             // 返回数据给前端
             return resp.data
         } else {
+            if (resp.data.statusCode === 401 && sessionStorage.getItem('token')) {
+                sessionStorage.removeItem('token')
+                // 跳转到登录页面
+                router.replace('/')
+            }
             Message.warning({message: resp.data.message})
             return false
         }
     }
 }, error => {
+    // 后端接口都访问不了的情况
     console.log('api.js->axios.interceptors.response.use() => error')
     // 响应拦截进来隐藏loading效果，此处采用延时处理是合并loading请求效果，
     // 避免多次请求loading关闭又开启合并loading请求效果 避免重复请求
     setTimeout(() => {
         hideLoading()
     }, 500);
+
+    const code = error.response.code;
+    if (code === 504 || code === 404) {
+        Message.error({message: '服务器宕机，你可敢信？'})
+    } else if (code === 403) {
+        Message.error({message: '权限不足呢！'})
+    } else if (code === 401) {
+        Message.error({message: '请登录先喂！'})
+        router.replace(constants.ROOT)
+    } else {
+        if (error.response.data.message) {
+            Message.error({message: error.response.data.message})
+        } else {
+            Message.error({message: '未知错误！'})
+        }
+    }
     console.log(error)
+    return;
 })
 /**
  * 显示loading的函数 并且记录请求次数 ++
@@ -93,41 +120,10 @@ const hideLoading = () => {
         });
     }
 }
-/*=============================监听 storage===========================*/
-// export const watchStorage = function (type, key, data) {
-//     if (type === 1) {
-//         // 创建一个StorageEvent事件
-//         let newStorageEvent = document.createEvent('StorageEvent');
-//         const storage = {
-//             setItem: function (k, val) {
-//                 localStorage.setItem(k, val);
-//                 // 初始化创建的事件
-//                 newStorageEvent.initStorageEvent('setItem', false, false, k, null, val, null, null);
-//                 // 派发对象
-//                 window.dispatchEvent(newStorageEvent);
-//             }
-//         }
-//         return storage.setItem(key, data);
-//     } else {
-//         // 创建一个StorageEvent事件
-//         let newStorageEvent = document.createEvent('StorageEvent');
-//         const storage = {
-//             setItem: function (k, val) {
-//                 sessionStorage.setItem(k, val);
-//                 // 初始化创建的事件
-//                 newStorageEvent.initStorageEvent('setItem', false, false, k, null, val, null, null);
-//                 // 派发对象
-//                 window.dispatchEvent(newStorageEvent);
-//             }
-//         }
-//         return storage.setItem(key, data);
-//     }
-// }
 /*===============================axios 请求公共方法===========================*/
 /**
  * 前缀 url
  */
-// const baseURL = '/api'
 const baseURL = ''
 /**
  * 发送一个 axios 异步 get 请求
