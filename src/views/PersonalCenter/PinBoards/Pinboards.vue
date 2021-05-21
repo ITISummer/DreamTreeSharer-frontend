@@ -35,24 +35,22 @@ import {EventBus} from "@/apis/eventBus"
 export default {
   components: {Header, WaterfallMain, Dialog},
   mounted() {
-    // 这里的 images 初始化从数据库获取 TODO
-    this.getRequest('get-pinboards').then(res => {
+    this.getRequest('/get-pinboards').then(res => {
       if (res) {
         this.images = res.object
       } else {
-        this.$message('没有查询到您的愿望卡！')
+        this.$message('没有查询到您的愿望卡，您可以进行添加操作来添加您的愿望卡！')
       }
     }).catch(err => {
-      console.log(err)
+      console.log('Pinboards.vue->mounted()',err)
     });
     EventBus.$on('getShowDialog', value => {
       this.showDialog = value
-      console.log(showDialog)
     });
-    EventBus.$on('getADreamForm', value => {
-      console.log(value)
-      // this.images.push(value)
-    });
+    // EventBus.$on('getADreamForm', value => {
+    //   console.log(value)
+    //   // this.images.push(value)
+    // });
   },
   data() {
     return {
@@ -68,22 +66,34 @@ export default {
   methods: {
     initDreamForm() {
       this.showDialog = !this.showDialog
+      const dreamForm = {
+        pinboardTitle: '',
+            pinboardContent: '',
+            pinboardSharable: true,
+            pinboardBgimgUrl: '',
+            pinUsername: '',
+            pinUserAvatarUrl: '',
+      }
+      EventBus.$emit('initDreamForm', dreamForm)
       EventBus.$emit('initImageUrl', '')
-      // EventBus.$emit('initDreamForm', {})
       EventBus.$emit('saveOrUpdate',true)
     },
     handleClick(item) {
       this.$message.warning(item.pinboardBgimgUrl);
     },
-    // * 编辑
+    /**
+     * 编辑
+     */
     handleEdit(item) {
-      // TODO 弹出编辑框 发送请求向数据库更新一个 pinboard
       this.showDialog = true
       EventBus.$emit('initImageUrl', item.pinboardBgimgUrl)
-      EventBus.$emit('initDreamFormFromPinboards', item)
+      EventBus.$emit('initDreamForm', item)
       EventBus.$emit('saveOrUpdate', false)
     },
-    // * 删除
+    /**
+     * 删除
+      * @param item
+     */
     handleDelete(item) {
       this.$confirm('确认删除吗？', '删除一个pin', 'warning').then(res => {
         if (res) {
@@ -100,10 +110,6 @@ export default {
       })
     },
   },
-  // [vue中event bus被触发多次问题](https://segmentfault.com/q/1010000009710635)
-  // beforeDestroy() {
-  //   EventBus.$off('getDreamForm')
-  // }
 }
 
 </script>

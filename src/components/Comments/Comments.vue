@@ -9,7 +9,7 @@
     <div class="comment" v-for="comment in comments">
       <!--      头像、评论者昵称、日期-->
       <div class="info">
-        <img class="avatar" :src="'http://qrne6et6u.hn-bkt.clouddn.com/'+comment.fromAvatar" width="36" height="36"/>
+        <img class="avatar" :src="getBaseUrl+comment.fromAvatar" width="36" height="36"/>
         <div class="right">
           <div class="name">{{ comment.fromName }}</div>
           <div class="date">{{ comment.date }}</div>
@@ -70,8 +70,7 @@ export default {
       pinboardInfo: {},
     }
   },
-  initComment() {
-    // TODO 向后端发送请求，请求评论用到分页查询 - 默认加载两条评论
+  i_mounted() {
     EventBus.$on('getPinboardInfoFromHome', value=>{
       offset = 0
       this.comments = []
@@ -79,17 +78,26 @@ export default {
       this.loadComments();
     })
   },
+  computed: {
+    getBaseUrl() {
+      return this.baseUrl
+    }
+  },
   methods: {
     showCommentInput() {
       this.showInput = !this.showInput
     },
-    // 取消评论
+    /**
+     * 取消评论
+      */
     cancel() {
       this.showItemId = ''
       this.showInput = false
     },
 
-    // 加载更多评论 - 分页查询
+    /**
+     * 加载更多评论 - 分页查询
+      */
     loadComments() {
       // getRequest(`/get-comments/${this.$store.state.pinboardInfo.pinboardId}/${limit}/${offset}`).then(res=>{
             this.getRequest(`/get-comments/${this.pinboardInfo.pinboardId}/${limit}/${offset}`).then(res=>{
@@ -111,7 +119,9 @@ export default {
       })
     },
 
-    // * 点赞
+    /**
+     * 点赞
+     */
     likeClick(item) {
       console.log(item)
       if (item.isLiked === null) {
@@ -132,21 +142,21 @@ export default {
       })
     },
 
-    // 确认提交评论
+    /**
+     * 确认提交评论
+      */
     commitComment() {
       if (this.inputComment !== '') {
         // 每次添加前new一个comment以防止数据覆盖
         const comment = {
           date: this.$moment(Date.now()).format('yyyy-MM-DD HH:mm:ss'),  //评论时间
-          // pinboardId: this.$store.state.pinboardInfo.pinboardId,//图片的id
           pinboardId: this.pinboardInfo.pinboardId,//图片的id
-          fromId: this.$store.state.userInfo.userId, //评论者id
-          fromName: this.$store.state.userInfo.userUsername,  //评论者昵称
-          fromAvatar: this.$store.state.userInfo.userAvatarUrl,//评论者头像
+          fromId: this.$store.state.user.userInfo.userId, //评论者id
+          fromName: this.$store.state.user.userInfo.userUsername,  //评论者昵称
+          fromAvatar: this.$store.state.user.userInfo.userAvatarUrl,//评论者头像
           likeNum: 0, //点赞人数
           content: this.inputComment,  //评论内容
         }
-        console.log(comment)
         //TODO 向后台发送请求添加一个评论，如果后台返回成功，则将 comment push 进 comments，后台需要返回 commentId
         this.postRequest('/add-one-comment',comment).then(res=>{
           if (res && res.statusCode === 200) {

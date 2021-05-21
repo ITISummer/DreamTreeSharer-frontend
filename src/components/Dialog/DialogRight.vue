@@ -11,10 +11,10 @@
       <button class="save_pin" @click="emitDreamForm">Save</button>
     </div>
     <div class="section1" v-else>
-      <div>
-        <el-avatar data-title="卡片发布者头像" :src="getUserAvatarUrl"/>
-        <span class="user-name">{{this.pinboardInfo.userUsername}}</span>
-        <span class="date">{{this.pinboardInfo.pinboardCreateTime}}</span>
+      <div class="publisher">
+        <el-avatar data-title="卡片发布者头像" :src="getUserAvatarUrl" class="user-avatar"/>
+        <span class="user-name">发布者：{{ this.pinboardInfo.userUsername }}</span>
+        <span class="date">{{ formatPinboardCreateTime }}</span>
       </div>
     </div>
     <!-- 右侧中部 -->
@@ -61,23 +61,29 @@ export default {
   },
   computed: {
     getUserAvatarUrl() {
-      return this.baseUrl+this.userInfo.userAvatarUrl
+      if (this.showSaveBtn) {
+        return this.baseUrl + this.userInfo.userAvatarUrl
+      }
+      return this.baseUrl + this.pinboardInfo.userAvatarUrl
+    },
+    formatPinboardCreateTime() {
+      return this.$moment(this.pinboardInfo.pinboardCreateTime).format('yyyy-MM-DD HH:mm:ss')
     }
   },
   mounted() {
-    EventBus.$on('getImageUrlFromUpload',imageUrl=>{
+    EventBus.$on('getImageUrlFromUpload', imageUrl => {
       this.dreamForm.pinboardBgimgUrl = imageUrl
     })
-    EventBus.$on('initDreamFormFromPinboards', value => {
+    EventBus.$on('initDreamForm', value => {
       this.dreamForm = value
     });
-    EventBus.$on('showSaveBtn',value=>{
+    EventBus.$on('showSaveBtn', value => {
       this.showSaveBtn = value
     });
-    EventBus.$on('saveOrUpdate', value=>{
+    EventBus.$on('saveOrUpdate', value => {
       this.saveOrUpdate = value
     })
-    EventBus.$on('getPinboardInfoFromHome',value=>{
+    EventBus.$on('getPinboardInfoFromHome', value => {
       this.pinboardInfo = value
     })
   },
@@ -99,40 +105,44 @@ export default {
     }
   },
   methods: {
-    // * 计算文本剩余字数
+    /**
+     * 计算文本剩余字数
+     */
     descInput() {
       let txtVal = this.dreamForm.pinboardContent.length;
       this.remnant = 249 - txtVal;
     },
-    // 检查字段并分发事件 getDreamForm 给 Pinboards
+    /**
+     * 检查字段并分发事件 getDreamForm 给 Pinboards
+     */
     emitDreamForm() {
-      console.log('DialogRight->emitDreamForm()',this.saveOrUpdate)
+      console.log('DialogRight->emitDreamForm()', this.saveOrUpdate)
       if (this.saveOrUpdate) {
-       // 添加操作
-      const {
-        pinboardTitle: title,
-        pinboardContent: content,
-        pinboardSharable: sharable,
-        pinboardBgimgUrl: imageUrl
-      } = this.dreamForm
-      this.dreamForm.pinUsername = this.userInfo.userUsername
-      this.dreamForm.pinUserAvatarUrl = this.userInfo.userAvatarUrl
-      if (title === '' || content === '' || imageUrl === '') {
-        this.$message({message: '字段不能为空！', type: 'warning'})
-      } else {
-        // 当用户添加一个 pin 时，往数据库中插入一条数据，并根据是否分享来决定是否往 pinboards.vue 传递一条数据
-        this.postRequest('/add-one-pinboard', this.dreamForm).then(res=>{
-          if (res && res.statusCode === 200) {
-            EventBus.$emit('getShowDialog',false)
-            EventBus.$emit('getADreamForm',this.dreamForm)
-          }
+        // 添加操作
+        const {
+          pinboardTitle: title,
+          pinboardContent: content,
+          pinboardSharable: sharable,
+          pinboardBgimgUrl: imageUrl
+        } = this.dreamForm
+        this.dreamForm.pinUsername = this.userInfo.userUsername
+        this.dreamForm.pinUserAvatarUrl = this.userInfo.userAvatarUrl
+        if (title === '' || content === '' || imageUrl === '') {
+          this.$message({message: '字段不能为空！', type: 'warning'})
+        } else {
+          // 当用户添加一个 pin 时，往数据库中插入一条数据，并根据是否分享来决定是否往 pinboards.vue 传递一条数据
+          this.postRequest('/add-one-pinboard', this.dreamForm).then(res => {
+                if (res && res.statusCode === 200) {
+                  EventBus.$emit('getShowDialog', false)
+                  EventBus.$emit('getADreamForm', this.dreamForm)
+                }
+              }
+          ).catch(err => {
+            console.log(err)
+          })
+          // EventBus.$emit('getDreamForm',this.dreamForm)
         }
-        ).catch(err=>{
-          console.log(err)
-        })
-        // EventBus.$emit('getDreamForm',this.dreamForm)
-      }
-    } else {
+      } else {
         // 更新操作
         const {
           pinboardTitle: title,
@@ -143,9 +153,9 @@ export default {
         if (title === '' || content === '' || imageUrl === '') {
           this.$message({message: '字段不能为空！', type: 'warning'})
         } else {
-          this.putRequest('/update-pinboard',this.dreamForm).then(res => {
+          this.putRequest('/update-pinboard', this.dreamForm).then(res => {
             if (res && res.statusCode === 200) {
-              EventBus.$emit('getShowDialog',false)
+              EventBus.$emit('getShowDialog', false)
             }
           }).catch(err => {
             console.log(err)
@@ -166,16 +176,31 @@ export default {
   .section1 {
     display: flex;
     justify-content: flex-end;
-    .user-name {
-      font-size: 16px;
-      color: #8c939d;
-      margin-bottom: 5px;
-      font-weight: 500;
+    .publisher{
+      position: relative;
+      background: #021930;
+      .user-avatar{
+        position: absolute;
+        left: -250px;
+        top: 0;
+      }
+      .user-name {
+        position: absolute;
+        left: -200px;
+        font-size: 14px;
+        color: #8c939d;
+        margin-bottom: 5px;
+        font-weight: 600;
+      }
+      .date {
+        left: -200px;
+        top: 30px;
+        position: absolute;
+        font-size: 12px;
+        color: #8c939d;
+      }
     }
-    .date {
-      font-size: 12px;
-      color: #8c939d;
-    }
+
     .select_size {
       width: 236px;
       height: 40px;

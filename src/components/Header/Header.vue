@@ -2,15 +2,13 @@
   https://dev.to/jakzaizzat/avoid-mutating-a-prop-directly-ab9
   https://stackoverflow.com/questions/40574661/avoid-mutating-a-prop-directly-since-the-value-will-be-overwritten
   [Vuex异步请求数据后,在组件中获取状态的方法](https://blog.csdn.net/panyang01/article/details/71750897)
-  ---------------------
-
 -->
 <template>
   <!--    头部-->
   <el-header>
     <el-row align="middle" justify="center">
       <el-col :span="2">
-        <el-image style="width: 36px; height: 36px" :src="require('@/assets/images/logo.png')"></el-image>
+        <el-image class="image-el" :src="require('@/assets/images/logo3.png')"></el-image>
       </el-col>
       <el-col :span="2">
         <router-link to="/home">
@@ -19,16 +17,17 @@
       </el-col>
       <el-col :span="14" :offset="1">
         <el-input type="text"
+                  @keyup.enter.native="validate"
                   placeholder="Type something..."
                   class="input-with-select"
                   v-model="search"
         >
-          <el-select v-model="flag" slot="prepend" placeholder="Select">
-            <el-option label="用户名" value="1"></el-option>
-            <el-option label="梦卡类型" value="2"></el-option>
-            <el-option label="梦卡标题" value="3"></el-option>
+          <el-select v-model="flag" slot="prepend" placeholder="Select" style="width: 120px">
+            <el-option label="用户名" value="1"/>
+            <el-option label="梦卡类型" value="2"/>
+            <el-option label="梦卡标题" value="3"/>
           </el-select>
-          <el-button slot="append" icon="el-icon-search" @click="validate"></el-button>
+          <el-button slot="append" icon="el-icon-search" @click="validate"/>
         </el-input>
       </el-col>
       <el-col :span="2" :offset="1">
@@ -63,7 +62,7 @@
 import constants from "../../apis/constants"
 import requests from "../../apis/constants"
 import Pagination from "../Pagination/Pagination";
-import { mapGetters } from 'vuex'
+import {mapGetters} from 'vuex'
 
 export default {
   components: {Pagination},
@@ -75,17 +74,17 @@ export default {
     }
   },
   computed: {
-  // 使用对象展开运算符将 getter 混入 computed 对象中
+    // 使用对象展开运算符将 getter 混入 computed 对象中
     ...mapGetters([
       'getUserInfo',
     ]),
     getUserAvatarUrl() {
-      return this.baseUrl+this.userInfo.userAvatarUrl
+      return this.baseUrl + this.userInfo.userAvatarUrl
     }
   },
   methods: {
-    /*
-    [vue.js，如何在父组件调用子组件的方法？](https://segmentfault.com/q/1010000005345202)
+    /**
+     * [vue.js，如何在父组件调用子组件的方法？](https://segmentfault.com/q/1010000005345202)
      */
     validate() {
       this.$refs.pagination.validate()
@@ -108,7 +107,7 @@ export default {
           this.postRequest(requests.LOGOUT)
           // 清空用户信息
           window.sessionStorage.removeItem('token')
-          window.sessionStorage.removeItem('userInfo')
+          this.$store.dispatch('initUserInfo', {})
           // // 清空 vuex 中一些信息！
           // this.$store.commit('mutation-type',[])
           // 跳转到登录页
@@ -128,7 +127,6 @@ export default {
   }
 }
 </script>
-
 <style scoped lang="scss">
 .el-header {
   background: #66677c;
@@ -145,9 +143,49 @@ export default {
     color: #409EFF;
   }
 
+  .card {
+    pointer-events: none;
+    transform: translateZ(0);
+    padding: 30px;
+    background: white;
+    border-radius: 5px;
+    width: 400px;
+    height: 200px;
+    margin: auto;
+    transform-style: preserve-3d;
+    backface-visibility: hidden;
+    display: flex;
+    box-shadow: 0 0 5px rgba(0, 0, 0, .1);
+    position: relative;
+
+    &:after {
+      content: " ";
+      position: absolute;
+      width: 100%;
+      height: 10px;
+      border-radius: 50%;
+      left: 0;
+      bottom: -50px;
+      box-shadow: 0 30px 20px rgba(0, 0, 0, .3);
+
+    }
+
+    .card-content {
+      margin: auto;
+      text-align: center;
+      transform-style: preserve-3d;
+    }
+  }
+
   .el-image {
     cursor: pointer;
     border-radius: 13px;
+    width: 42px;
+    height: 42px;
+    &:hover{
+      width: 200px;
+      height: 200px;
+    }
   }
 
   .router-link-active {
@@ -160,12 +198,8 @@ export default {
     margin-left: 5px;
   }
 }
-
-a { // 去除 router-link 下划线
+// 去除 router-link 下划线
+a {
   text-decoration: none;
 }
-
-//.el-table-column{
-//  cursor: pointer;
-//}
 </style>

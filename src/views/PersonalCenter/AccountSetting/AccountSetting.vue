@@ -291,43 +291,34 @@ export default {
     },
     /**
      * 上传图片成功后的响应
-     * res -> 请求远程图床响应返回的数据
+     * res -> 请求远程图床后响应返回的数据
      * file -> 上传的图片
      * fileList -> 上传的图片集
      */
     handleResponse(res, file, fileList) {
-      // 往数据库发送异步请求，存入用户上传的头像 TODO
       let newAvatarUrl = res.key;
-      console.log(newAvatarUrl)
       this.putRequest(`update-avatar-url/${newAvatarUrl}`).then(res => {
         if (res.statusCode === 200) {
-          // 更新 sessionStorage
-          // let sessionValue = JSON.parse(window.sessionStorage.getItem('userInfo'))
-          // sessionValue.userAvatarUrl = newAvatarUrl
-          // window.sessionStorage.setItem('userInfo', JSON.stringify(sessionValue))
           // 更新 state 中的 userInfo
           this.$store.dispatch('updateUserAvatar', newAvatarUrl)
         }
       }).catch(err => {
-        console.log(err)
+        console.log('AccountSetting.vue->handleResponse',err)
       })
       return file.avatarUrl
     },
+    // async getUserInfo(id) {
+    //   const {res} = await this.getRequest('getUserById/' + id)
+    //   if (res.meta.status !== 200) {
+    //     return this.$message.error('查询用户失败')
+    //   }
+    //   // 把查询到的数据 保存到 updateForm
+    //   this.updateForm = res.data
+    // },
     /**
-     * 展示编辑用户的对话框<br>
-     * 展示时从后台异步获取对应 id 的用户信息
-     * @param id
-     * @returns {Promise<ElMessageComponent>}
+     * 重置表单
+     * @param formName
      */
-    async getUserInfo(id) {
-      const {res} = await this.getRequest('getUserById/' + id)
-      if (res.meta.status !== 200) {
-        return this.$message.error('查询用户失败')
-      }
-      // 把查询到的数据 保存到 updateForm
-      this.updateForm = res.data
-    },
-    // 重置表单
     resetForm(formName) {
       this.$refs[formName].resetFields();
     }

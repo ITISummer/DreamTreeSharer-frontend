@@ -75,7 +75,7 @@ export default {
     showAvatar: {type: Boolean, default: true},
     showSavedFrom: {type: Boolean, default: false},
     showSaveBtnInWaterfall: {type:Boolean, default: true},
-    like: Function,
+    // like: Function,
     savePin: Function,
     handleClick: Function,
     handleEdit: Function,
@@ -83,7 +83,6 @@ export default {
   },
   data() {
     return {
-      // userInfo: {},
       loading: false,
       list: [],
     }
@@ -100,7 +99,40 @@ export default {
     }
   },
   methods: {
-    // * 加载图片
+    /**
+     * 图片点赞
+     */
+    like(item) {
+      console.log(item)
+      if (item.isLiked === undefined) {
+        this.$set(item, "isLiked", true);
+        // item.likeNum++
+        this.list.forEach(el => {
+          if (el.userId === item.userId) {
+            el.likeNum++
+          }
+        })
+      } else {
+        if (item.isLiked) {
+          // item.likeNum--
+          this.list.forEach(el => {
+            if (el.userId === item.userId) {
+              el.likeNum--
+            }
+          })
+        } else {
+          item.likeNum++
+        }
+        item.isLiked = !item.isLiked;
+      }
+      // TODO 发送请求更新点赞数
+      // putRequest(`update-like-num/${item.commentId}/${item.likeNum}`).then(res=>true).catch(err=>{
+      //   console.log(err)
+      // })
+    },
+    /**
+     * 加载图片
+     */
     async load() {
       this.loading = true;
       await this.addNewList();
@@ -111,7 +143,6 @@ export default {
      * [es6 扩展运算符 三个点(...)](https://blog.csdn.net/qq_30100043/article/details/53391308)
      */
     addNewList() {
-      // axios 异步向数据库发送请求 TODO
       // 然后使用 const list = this.images.map()
       return new Promise((resolve) => {
         const list = this.images.map((item, index) => {
