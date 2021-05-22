@@ -30,7 +30,6 @@ export const store = new Vuex.Store({
 store.watch(function (state) {
     return state.chat.sessions
 }, function (val) {
-    console.log('CHANGE: ', val);
     localStorage.setItem('vue-chat-session', JSON.stringify(val));
 }, {
     deep: true/*这个貌似是开启watch监测的判断,官方说明也比较模糊*/

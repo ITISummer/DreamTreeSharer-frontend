@@ -5,7 +5,6 @@
     <WaterfallMain
         :images="images"
         :showSaveBtnInWaterfall="true"
-        :savePin="savePin"
         :handleClick="handleClick"
         :handleDelete="handleDelete"
         :handleEdit="handleEdit"/>
@@ -44,15 +43,6 @@ export default {
   },
 
   methods: {
-    /**
-     * 收藏一个 Pin
-     */
-    savePin(item) {
-      this.postRequest(`favorite-one-pin/${item.pinboardId}`).then(res => true).catch(err => {
-        console.log('Home.vue->savePin()',err)
-      })
-
-    },
     /**
      * 图片点击
      * @param item

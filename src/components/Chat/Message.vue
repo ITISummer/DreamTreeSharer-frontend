@@ -1,13 +1,13 @@
 <template>
   <div id="message" v-scroll-bottom="sessions">
-  	<ul v-if="currentSessionId === item.id" v-for="item in sessions">
-  		<li v-for="entry in item.messages">
+  	<ul v-if="currentSession">
+  		<li v-for="msgEntry in sessions[currentUser.userUsername + '#' + currentSession.userUsername]">
   			<p class="time">
-  				<span>{{entry.date | time}}</span>
+  				<span>{{msgEntry.date | time}}</span>
   			</p>
-  			<div class="main" :class="{self:entry.self}">
-  				<img class="avatar" :src="entry.self ? img : item.user.img" alt="">
-  				<p class="text">{{entry.content}}</p>
+  			<div class="main" :class="{self: msgEntry.self}">
+  				<img class="avatar" :src="msgEntry.self ? (getUserAvatarUrl)+currentUser.userAvatarUrl : (getUserAvatarUrl)+currentSession.userAvatarUrl">
+  				<p class="text">{{msgEntry.content}}</p>
   			</div>
   		</li>
   	</ul>
@@ -20,13 +20,20 @@ import {mapState} from 'vuex'
 export default {
   data () {
     return {
-      img: 'https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png'
+      img: ''
     }
   },
-  computed:mapState([
-  	'sessions',
-  	'currentSessionId'
-  ]),
+  computed: {
+    ...mapState({
+      currentUser: (state) => state.chat.currentUser,
+      sessions: (state) => state.chat.sessions,
+      currentSession: (state) => state.chat.currentSession,
+    }),
+
+    getUserAvatarUrl() {
+      return this.baseUrl
+    }
+  },
   filters:{
   	time (date) {
       if (date) {

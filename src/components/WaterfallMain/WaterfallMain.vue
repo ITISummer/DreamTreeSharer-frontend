@@ -36,21 +36,22 @@
                         :alt="props.data.pinboardBgimgUrl" @load="$refs.waterfall.refresh"/>
             </div>
             <div class="dream">
-              <div class="dream-title">{{props.data.pinboardTitle}}</div>
-              <div class="dream-content">{{props.data.pinboardContent}}</div>
+              <div class="dream-title">{{ props.data.pinboardTitle }}</div>
+              <div class="dream-content">{{ props.data.pinboardContent }}</div>
             </div>
             <div class="menus">
-<!--              Home 页所需-->
+              <!--              Home 页所需-->
               <div v-if="showAvatar" class="avatar-and-like">
                 <el-avatar :title="props.data.userUsername" :src="getBaseUrl+props.data.userAvatarUrl"/>
-                <span class="like-num">👍{{props.data.likeNum}}</span>
+                <span class="like-num">👍{{ props.data.likeNum }}</span>
               </div>
-<!--              Favorites 页所需-->
+              <!--              Favorites 页所需-->
               <div v-else-if="showSavedFrom" class="save-from">
                 <strong>Saved From: </strong>
-                <router-link :to="{path: '/profile',query:{username:props.data.userUsername}}"><span>{{props.data.userUsername}}</span></router-link>
+                <router-link :to="{path: '/profile',query:{username:props.data.userUsername}}">
+                  <span>{{ props.data.userUsername }}</span></router-link>
               </div>
-<!--              Pinboards 页所需-->
+              <!--              Pinboards 页所需-->
               <div v-else class="edit">
                 <p data-title="编辑" @click="handleEdit(props.data)"/>
                 <p data-title="删除" @click="handleDelete(props.data)"/>
@@ -74,9 +75,7 @@ export default {
     images: {type: Array, default: []},
     showAvatar: {type: Boolean, default: true},
     showSavedFrom: {type: Boolean, default: false},
-    showSaveBtnInWaterfall: {type:Boolean, default: true},
-    // like: Function,
-    savePin: Function,
+    showSaveBtnInWaterfall: {type: Boolean, default: true},
     handleClick: Function,
     handleEdit: Function,
     handleDelete: Function,
@@ -103,33 +102,40 @@ export default {
      * 图片点赞
      */
     like(item) {
-      console.log(item)
-      if (item.isLiked === undefined) {
-        this.$set(item, "isLiked", true);
-        // item.likeNum++
-        this.list.forEach(el => {
-          if (el.userId === item.userId) {
+      let el_mock = {}
+      let num_mock = item.likeNum
+      this.list.forEach(el => {
+        if (el.pinboardId === item.pinboardId) {
+          el_mock = el
+          num_mock = el.likeNum
+          if (el.isliked) {
+            el.likeNum--
+          } else {
             el.likeNum++
           }
-        })
-      } else {
-        if (item.isLiked) {
-          // item.likeNum--
-          this.list.forEach(el => {
-            if (el.userId === item.userId) {
-              el.likeNum--
-            }
-          })
-        } else {
-          item.likeNum++
+          el.isliked = !el.isliked
         }
-        item.isLiked = !item.isLiked;
-      }
-      // TODO 发送请求更新点赞数
-      // putRequest(`update-like-num/${item.commentId}/${item.likeNum}`).then(res=>true).catch(err=>{
-      //   console.log(err)
-      // })
+      })
+      console.log(el_mock)
+      this.putRequest(`update-pin-like-num/${item.pinboardId}/${el_mock.likeNum}`).then(res => true).catch(err => {
+        // 如果发生错误则需要还原点赞量
+        el_mock.likeNum = num_mock
+        // 发送还原点赞量请求
+        this.putRequest(`update-pin-like-num/${item.pinboardId}/${el_mock.likeNum}`).then(res => true).catch(err => {
+          console.log('WaterfallMain.vue->like(err_1)', err)
+        })
+      })
     },
+    /**
+     * 收藏一个 Pin
+     */
+    savePin(item) {
+      this.postRequest(`favorite-one-pin/${item.pinboardId}`).then(res => true).catch(err => {
+        console.log('Home.vue->savePin()', err)
+      })
+
+    }
+    ,
     /**
      * 加载图片
      */
@@ -137,7 +143,8 @@ export default {
       this.loading = true;
       await this.addNewList();
       this.loading = false;
-    },
+    }
+    ,
     /**
      * 添加到新 list 中
      * [es6 扩展运算符 三个点(...)](https://blog.csdn.net/qq_30100043/article/details/53391308)
@@ -151,7 +158,8 @@ export default {
         this.list.push(...list);
         setTimeout(() => resolve(), 1000);
       });
-    },
+    }
+    ,
   }
 }
 </script>
@@ -161,9 +169,11 @@ export default {
   background: #6e8efb;
   height: 100vh;
   overflow-y: auto;
+
   .waterfall-container {
     margin-top: 40px;
   }
+
   .card { //每一张卡片样式
     background: #fff;
     border-radius: 5px;
@@ -172,27 +182,33 @@ export default {
     position: relative;
     transition: 0.2s;
     top: 0;
+
     &:hover {
       top: -3px;
       background: rgba(201, 147, 147, 0.1);
-      .save-btn{// 设置按钮显示
+
+      .save-btn { // 设置按钮显示
         display: block;
       }
-      .thumb{
+
+      .thumb {
         display: block;
       }
-      .dream{
+
+      .dream {
         display: block;
       }
     }
-    .save-btn{
+
+    .save-btn {
       display: none;
       position: absolute;
       top: 0px;
       left: 0px;
       z-index: 100;
     }
-    .thumb{
+
+    .thumb {
       display: none;
       position: absolute;
       top: 0px;
@@ -201,14 +217,17 @@ export default {
       background: url("thumb.png") no-repeat;
       border-style: none;
     }
+
     .cover {
       margin: 10px 10px 0 10px;
+
       img {
         display: block;
         width: 100%;
       }
     }
-    .dream{
+
+    .dream {
       display: none;
       position: absolute;
       left: 20%;
@@ -216,14 +235,17 @@ export default {
       color: #f3cf06;
       font-size: xx-small;
       z-index: 101;
-      .dream-title{
+
+      .dream-title {
         color: #3a8ee6;
         text-align: center;
       }
-      .dream-content{
+
+      .dream-content {
         text-align: center;
       }
     }
+
     .name { //卡片底部名字样式
       background: #fff;
       color: #666;
@@ -236,20 +258,25 @@ export default {
       padding: 10px;
       border-top: 1px solid #e7e7e7;
       text-align: right;
-      .avatar-and-like{
+
+      .avatar-and-like {
         display: flex;
         justify-content: space-between;
       }
-      .save-from{
+
+      .save-from {
         text-align: left;
-        strong{
+
+        strong {
           font-size: 14px;
         }
-        a{
+
+        a {
           font-size: 12px;
         }
       }
-      .edit{
+
+      .edit {
         display: flex;
         justify-content: space-between;
       }

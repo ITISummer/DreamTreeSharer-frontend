@@ -9,17 +9,28 @@
 
 <script>
 
+import {mapState} from 'vuex'
+
 export default {
   data () {
     return {
-      content:''
+      content: ''
     }
+  },
+  computed: {
+    ...mapState({
+      currentSession: (state) => state.chat.currentSession,
+    })
   },
   methods: {
     // 默认传入 event(事件对象)
   	addMessage (e) {
   		if (e.ctrlKey && e.keyCode === 13 && this.content.length) {
-  			this.$store.commit('addMessage',this.content);
+        let msgObj = {}
+        msgObj.to = this.currentSession.userUsername
+        msgObj.content = this.content
+        this.$store.state.chat.stomp.send('/ws/chat',{},JSON.stringify(msgObj))
+  			this.$store.commit('ADD_MESSAGE',msgObj);
   			this.content='';
   		}
   	}

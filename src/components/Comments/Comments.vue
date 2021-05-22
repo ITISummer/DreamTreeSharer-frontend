@@ -123,22 +123,19 @@ export default {
      * 点赞
      */
     likeClick(item) {
-      console.log(item)
       if (item.isLiked === null) {
         this.$set(item, "isLiked", true);
         item.likeNum++
       } else {
         if (item.isLiked) {
-          // TODO 发送请求更新点赞数
           item.likeNum--
         } else {
-          // TODO 发送请求更新点赞数
           item.likeNum++
         }
         item.isLiked = !item.isLiked;
       }
       this.putRequest(`update-like-num/${item.commentId}/${item.likeNum}`).then(res=>true).catch(err=>{
-        console.log(err)
+        console.log('Comments.vue->likeClick()',err)
       })
     },
 

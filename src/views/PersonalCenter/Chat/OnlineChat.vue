@@ -25,10 +25,9 @@ export default {
   components:{Card, List, Message, UserText},
   mounted() {
     // 连接后台 websocket - 初始化 websocket 链接
-    console.log('OnlineChat.vue->mounted()-before')
-    // this.$store.dispatch('chatConnect');
-    // this.$store.dispatch('initUsers')
-    console.log('OnlineChat.vue->mounted()-after')
+    this.$store.dispatch('chatConnect');
+    this.$store.dispatch('initUsers')
+    this.$store.dispatch('initData')
   },
 }
 </script>

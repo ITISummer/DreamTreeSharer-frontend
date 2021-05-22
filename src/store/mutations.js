@@ -18,12 +18,4 @@ export default {
         state.BMsg = payload.BMsg
     },
     //----------vue-component-communication 测试使用----------
-    /** 在线聊天系统 */
-    // initData(state) {
-    // let data = localStorage.getItem('vue-chat-session');
-    // //console.log(data)
-    // if (data) {
-    //     state.sessions = JSON.parse(data);
-    // }
-    // },
 }
