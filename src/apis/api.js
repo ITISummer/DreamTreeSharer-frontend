@@ -18,12 +18,14 @@ let loadingRequestCount = 0;
  * 请求拦截器
  */
 axios.interceptors.request.use(config => {
-    config.cancelToken = source.token // 取消请求
+    // 取消请求
+    config.cancelToken = source.token
     if (config.cancelToken && config.cancelObj && config.cancelObj.cancel) {
         config.cancelObj.cancel('中断请求');
         delete config.cancelObj;
     }
-    if (!navigator.onLine) { // 断网提示
+    // 断网提示
+    if (!navigator.onLine) {
         source.cancel('网络故障，请检查!')
     }
     // 配置了store持久化的就不需要取 sessionStorage 的了
@@ -35,17 +37,17 @@ axios.interceptors.request.use(config => {
     }
     // 请求拦截进来调用显示loading效果
     showLoading(config)
-    console.log('api.js->axios.interceptors.request.use()')
+    console.log('api.js->axios.interceptors.request.use()->config')
     return config
-}, error => {
-    console.log(error)
+}, err => {
+    console.log('api.js->axios.interceptors.request.use()->err',err)
 })
 
 /**
  * 响应拦截器-拦截后台返回的数据
  */
 axios.interceptors.response.use(resp => {
-    console.log('api.js->axios.interceptors.response.use() => success')
+    console.log('api.js->axios.interceptors.response.use() -> resp')
     // 响应拦截进来隐藏loading效果，此处采用延时处理是合并loading请求效果，
     // 避免多次请求loading关闭又开启
     // 合并loading请求效果 避免重复请求
@@ -53,7 +55,7 @@ axios.interceptors.response.use(resp => {
         hideLoading()
     }, 500);
 
-    if (resp.status === 200) {
+    if (resp.status === 200 && resp.data) {
         if (resp.data.statusCode === 200) {
             if (resp.data.message) {
                 Message.success({message: resp.data.message})
@@ -61,26 +63,26 @@ axios.interceptors.response.use(resp => {
             // 返回数据给前端
             return resp.data
         } else {
+            // 后台返回 401-用户尚未登录，并且当前 sessionStorage 中存在失效的 token，则跳转到登录页面
             if (resp.data.statusCode === 401 && sessionStorage.getItem('token')) {
                 sessionStorage.removeItem('token')
                 // 跳转到登录页面
-                router.replace('/')
+                router.replace(constants.ROOT)
             }
             Message.warning({message: resp.data.message})
             return false
         }
     }
-}, error => {
+}, err => {
     // 后端接口都访问不了的情况
-    console.log('api.js->axios.interceptors.response.use() => error')
     // 响应拦截进来隐藏loading效果，此处采用延时处理是合并loading请求效果，
     // 避免多次请求loading关闭又开启合并loading请求效果 避免重复请求
     setTimeout(() => {
         hideLoading()
     }, 500);
 
-    const code = error.response.code;
-    if (code === 504 || code === 404) {
+    const code = err.response.code;
+    if (code === 504 || code === 500) {
         Message.error({message: '服务器宕机，你可敢信？'})
     } else if (code === 403) {
         Message.error({message: '权限不足呢！'})
@@ -88,13 +90,13 @@ axios.interceptors.response.use(resp => {
         Message.error({message: '请登录先喂！'})
         router.replace(constants.ROOT)
     } else {
-        if (error.response.data.message) {
-            Message.error({message: error.response.data.message})
+        if (err.response.data.message) {
+            Message.error({message: err.response.data.message})
         } else {
             Message.error({message: '未知错误！'})
         }
     }
-    console.log(error)
+    console.log('api.js->axios.interceptors.response.use() => err',err)
     return;
 })
 /**
@@ -107,6 +109,7 @@ const showLoading = () => {
         loadingInstance = Loading.service({target: '.el-form'});
     }
     loadingRequestCount++
+    console.log(loadingRequestCount)
 }
 /**
  * 隐藏loading的函数，并且记录请求次数

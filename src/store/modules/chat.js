@@ -6,15 +6,18 @@ import {INIT_USERINFO} from "../mutation-types";
 import {Notification} from "element-ui";
 
 const state = {
-    /** 在线聊天系统会话存储 */
+    // 在线聊天系统会话存储 - localStorage
     sessions: {},
     // 用户聊天朋友列表
     users: [],
+    // 当前登录用户
     currentUser: {},
+    // 当前聊天对象
     currentSession: null,
+    // 新消息红色小点提示
+    isDot: {},
     filterKey: '',
     stomp: null,
-    isDot: {}
 }
 
 /*
@@ -25,11 +28,11 @@ const state = {
  */
 const mutations = {
     /** 初始化用户聊天列表 */
-    INIT_USER_LIST(state, data) {
+    INIT_CHAT_LIST(state, data) {
         state.users = data
     },
 
-    CHANGE_CURRENT_SESSION_ID(state, currentSession) {
+    CHANGE_CURRENT_SESSION(state, currentSession) {
         state.currentSession = currentSession;
         Vue.set(state.isDot, state.currentUser.userUsername + '#' + state.currentSession.userUsername, false);
     },
@@ -39,8 +42,8 @@ const mutations = {
      * [ES6 新增数据结构](https://www.bilibili.com/video/BV1Pz4y1S7Uv?p=33)
      */
     ADD_MESSAGE(state, msg) {
-        let message = state.sessions[state.currentUser.userUsername + '#' + msg.to];
-        if (!message) {
+        let session = state.sessions[state.currentUser.userUsername + '#' + msg.to];
+        if (!session) {
             // 使 vue 能够监听 sessions
             Vue.set(state.sessions, state.currentUser.userUsername + '#' + msg.to, []);
         }
@@ -77,11 +80,11 @@ const actions = {
      * */
     chatConnect(context) {
         context.state.stomp = Stomp.over(new SockJS('/ws'))
-        console.log('action.js->after stomp.over()')
         let token = window.sessionStorage.getItem('token')
         context.state.stomp.connect({'Auth-Token': token}, success => {
             context.state.stomp.subscribe('/user/queue/chat', msg => {
                 let receiveMsg = JSON.parse(msg.body);
+                // 消息提示
                 if (!context.state.currentSession || receiveMsg.from !== context.state.currentSession.userUsername) {
                     Notification.info({
                         title: '【' + receiveMsg.fromNickName + '】发来一条消息',
@@ -99,15 +102,11 @@ const actions = {
         })
     },
     /** 初始化用户聊天列表 */
-    initUsers(context) {
-        getRequest('/get-user-list').then(resp => {
-            if (resp) {
-                context.commit('INIT_USER_LIST', resp.object)
-            }
-        })
+    initChatList(context, chatList) {
+        context.commit('INIT_CHAT_LIST', chatList)
     },
     changeCurrentSession(context, currentSession) {
-        context.commit('CHANGE_CURRENT_SESSION_ID', currentSession)
+        context.commit('CHANGE_CURRENT_SESSION', currentSession)
     },
     /**浏览器本地聊天记录*/
     initData(context) {

@@ -6,12 +6,12 @@
   <div>
     <el-dialog title="模糊查询结果" :visible.sync="dialogTableVisible">
       <el-table :data="gridData" v-if="flag === '1'">
-        <el-table-column label="用户头像" width="150" prop="userAvatarUrl">
+        <el-table-column label="用户头像"  prop="userAvatarUrl">
           <template slot-scope="scope" property="userAvatarUrl">
             <el-avatar size="large" :src="getBaseUrl+scope.row.userAvatarUrl"></el-avatar>
           </template>
         </el-table-column>
-        <el-table-column label="用户名" width="200" prop="userUsername">
+        <el-table-column label="用户名"  prop="userUsername">
           <template slot-scope="scope" property="userUsername">
             <router-link :to="{path: '/profile',query:{username:scope.row.userUsername}}">
               <span>{{ scope.row.userUsername }}</span></router-link>
@@ -21,13 +21,13 @@
       <!-- 模糊分页查询 pin-title 或者 pin-type 后的展示 table -->
 <!--          <el-table :data="gridData" v-else @row-click="rowClick">-->
       <el-table :data="gridData" v-else>
-        <el-table-column label="梦卡背景图" width="150" prop="pinboardBgimgUrl">
+        <el-table-column label="梦卡背景图" prop="pinboardBgimgUrl">
           <template slot-scope="scope">
             <el-image fit="cover" style="width: 100px; height: 100px" :src="scope.row.pinboardBgimgUrl"></el-image>
           </template>
         </el-table-column>
-        <el-table-column :label="flag === '2'? '梦卡类型':'梦卡标题'" width="200"
-                         :prop="flag === '2'? 'pinboardType':'pinboardTitle'">
+        <el-table-column :label="flag === '2'? '梦卡类型':'梦卡标题'"
+                         :prop="flag === '2'?'pinboardType':'pinboardTitle'">
         </el-table-column>
       </el-table>
       <el-pagination
@@ -48,6 +48,8 @@
 
 <script>
 import {EventBus} from "../../apis/eventBus";
+import constants from "../../apis/constants";
+import {getBaseUrl} from "../../apis/commonMethods";
 
 export default {
   props: {
@@ -56,7 +58,7 @@ export default {
   },
   computed: {
     getBaseUrl() {
-      return this.baseUrl;
+      return getBaseUrl();
     }
   },
   data() {
@@ -109,7 +111,7 @@ export default {
      */
     fuzzySearch() {
       // 判断 flag，根据 flag 向后端发送数据，对相关表进行字段模糊查询
-      this.getRequest(`/fuzzy-search/${this.flag}/${this.search}/${this.size}/${this.currentPage}`).then(res => {
+      this.getRequest(`${constants.FUZZY_SEARCH}/${this.flag}/${this.search}/${this.size}/${this.currentPage}`).then(res => {
         if (res) {
           this.total = res.object.total
           this.gridData = res.object.records
@@ -117,9 +119,17 @@ export default {
           this.$message.warning('已无更多数据！')
         }
       }).catch(err => {
-        console.log('Pagination.vue->fuzzySearch()',err)
+        console.log('Pagination.vue->fuzzySearch()->err',err)
       })
     },
   }
 }
 </script>
+
+<style lang="scss" scoped>
+.el-dialog .el-table{
+      //display: flex;
+      //justify-content: center;
+      //align-items: center;
+}
+</style>

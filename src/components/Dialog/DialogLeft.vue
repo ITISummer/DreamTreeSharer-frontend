@@ -1,5 +1,5 @@
 <template>
-  <div class="side" id="left_side">
+  <div id="left_side" class="side">
     <!-- 左侧头部 -->
     <div class="section1">
       <div class="pint_mock_icon_container">
@@ -19,12 +19,13 @@
 
 <script>
 import Upload from "../Upload/Upload";
-import {EventBus} from "../../apis/eventBus";
+import {EventBus,EventName} from "../../apis/eventBus";
 
 export default {
   components: {Upload},
   mounted() {
-    EventBus.$on('showSaveFromSiteBtn',value=>{
+    // 接收来自 Home.vue
+    EventBus.$on(EventName.SHOW_SAVE_FROM_SITE_BTN,value=>{
       this.showSaveFromSiteBtn = value
     });
   },

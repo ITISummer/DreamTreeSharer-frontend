@@ -1,15 +1,6 @@
 /* 路由器模块 - 用于匹配请求 */
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-// import LoginAndRegister from "../views/LoginAndRegister/LoginAndRegister";
-// import Home from "../views/Home/Home";
-// import PersonalCenter from "../views/PersonalCenter/PersonalCenter";
-// import PinBoards from "../views/PersonalCenter/PinBoards/Pinboards";
-// import AccountSetting from "../views/PersonalCenter/AccountSetting/AccountSetting";
-// import OnlineChat from "../views/PersonalCenter/Chat/OnlineChat";
-// import Parent from "../../vue-componet-communication/8- $attrs & $listeners/Parent";
-// import Favorites from "../views/Favorites/Favorites";
-// import Profile from "../views/Profile/Profile";
 /* 懒加载：[Vue路由和组件的懒加载](https://www.jianshu.com/p/6fb92ea1790d)*/
 const LoginAndRegister = () => import( "../views/LoginAndRegister/LoginAndRegister");
 const Home = () => import("../views/Home/Home");
@@ -22,8 +13,6 @@ const Favorites = () => import("../views/Favorites/Favorites")
 const Profile = () => import("../views/Profile/Profile")
 // 相当于 controller 层，起转发请求的作用
 Vue.use(VueRouter)
-// 定义 routes 对象数组
-// const baseURL = '/api'
 const baseURL = ''
 const routes = [
     //----------vue-component-communication 测试使用----------

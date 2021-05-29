@@ -31,6 +31,8 @@
 
 <script>
 import Header from "../../components/Header/Header";
+import constants from "../../apis/constants";
+import {getUserAvatarUrl} from "../../apis/commonMethods";
 
 export default {
   components: {Header},
@@ -42,20 +44,20 @@ export default {
   },
   computed: {
     getUserAvatarUrl() {
-      return this.baseUrl+this.userInfo.userAvatarUrl
+      return getUserAvatarUrl(this.userInfo)
     }
   },
   mounted() {
     this.username = this.$route.query.username
     // 向后台发送根据用户名查询用户信息
-    this.getRequest(`get-user-info/${this.username}`).then(res=>{
+    this.getRequest(`${constants.GET_USER_INFO}/${this.username}`).then(res=>{
       if (res) {
         this.userInfo = res.object
       } else {
         this.$message.warning('未查询到该用户，可能账户已注销！┭┮﹏┭┮')
       }
     }).catch(err=>{
-      console.log(err)
+      console.log('Profile.vue->mounted()->err',err)
     })
   }
 }

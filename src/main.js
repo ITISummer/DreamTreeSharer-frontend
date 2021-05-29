@@ -4,7 +4,6 @@ import router from './router'
 import ElementUI from 'element-ui'
 import 'element-ui/lib/theme-chalk/index.css'
 import {store} from './store'
-import requests from './apis/constants'
 import moment from 'moment'
 import 'moment/locale/zh-cn'
 import {postRequest, deleteRequest, putRequest, getRequest} from "./apis/api";
@@ -20,7 +19,6 @@ Vue.prototype.postRequest = postRequest;
 Vue.prototype.deleteRequest = deleteRequest;
 Vue.prototype.putRequest = putRequest;
 Vue.prototype.getRequest = getRequest;
-Vue.prototype.baseUrl = constants.qiniu.uploadQiniuAddr
 
 /*==============================路由导航守卫==================================*/
 /**
@@ -33,19 +31,16 @@ router.beforeEach((to, from, next) => {
     if (window.sessionStorage.getItem('token')) {
         // 判断用户信息是否存在
         // [js 判断一个 object 对象是否为空](https://blog.csdn.net/FungLeo/article/details/78113661)
-        // if (!window.sessionStorage.getItem('userInfo')) {
         if (Object.keys(store.getters.getUserInfo).length === 0) {
-            return getRequest(requests.GET_CURRENT_USER_INFO).then(resp => {
+            return getRequest(constants.GET_CURRENT_USER_INFO).then(resp => {
                 if (resp) {
-                    // 存入用户信息
-                    // window.sessionStorage.setItem('userInfo', JSON.stringify(resp.object))
                     // // store.dispatch() 触发 store 的 action 方法
-                    store.dispatch('initUserInfo', resp.object).then(r => true)
+                    store.dispatch('initUserInfo', resp.object).then(res => true)
                     next()
                 }
             })
         }
-        if (to.path === requests.ROOT) {
+        if (to.path === constants.ROOT) {
             alert('main.js->router.beforeEach')
         } else {
             // next()：放行请求，必须加
@@ -53,7 +48,7 @@ router.beforeEach((to, from, next) => {
         }
     } else {
         // 判断用户点击要去的页面是否是登录页请求
-        if (to.path === requests.ROOT) {
+        if (to.path === constants.ROOT) {
             next()
         } else {
             next('/?redirect=' + to.path)
@@ -64,12 +59,14 @@ router.beforeEach((to, from, next) => {
 new Vue({
     // 路由组件 - 对应 src/router/index.js
     router,
-    // 状态组件 - 对应 src/store/index.js - 全局
     /*
+    状态组件 - 对应 src/store/index.js
     为了在 Vue 组件中访问 this.$store property，
     你需要为 Vue 实例提供创建好的 store。
     Vuex 提供了一个从根组件向所有子组件， 以 store 选项的方式“注入”该 store 的机制
      */
     store,
-    render: h => h(App) // 渲染到 App.vue 组件里的内容 (template 标签里的内容)
-}).$mount('#app') // 手动挂载，相当于 el: '#app' index.html 中的 app
+    // 渲染到 App.vue 组件里的内容 (template 标签里的内容)
+    render: h => h(App)
+    // 手动挂载，相当于 el: '#app' index.html 中的 app
+}).$mount('#app')

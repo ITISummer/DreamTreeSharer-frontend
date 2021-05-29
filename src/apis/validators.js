@@ -1,22 +1,18 @@
 import constants from "./constants";
 import * as requestApi from "./api";
-import { MessageBox } from 'element-ui';
+import {MessageBox} from 'element-ui';
 
 let globalFlag = false;
 /**
  * 验证邮箱格式
- * @param rule
- * @param value
- * @param callback
- * @returns {*}
  */
-const checkEmail = function (rule, value, callback){
+const checkEmail = function (rule, value, callback) {
     if (!value) {
         callback(new Error('请输入邮箱！'));
     } else if (!constants.REG_OF_EMAIL.test(value)) {
         callback(new Error('邮箱格式不匹配！'));
     } else {
-        globalFlag =  true
+        globalFlag = true
     }
     // callback() 一定要调用！
     callback();
@@ -25,30 +21,32 @@ const checkEmail = function (rule, value, callback){
 /**
  * 验证手机格式
  */
-const checkMobile = function (rule, value, callback){
+const checkMobile = function (rule, value, callback) {
     if (!value) {
         callback(new Error('请输入手机号！'));
     } else if (!constants.REG_OF_MOBILE.test(value)) {
         callback(new Error('手机号格式不匹配！'));
     } else {
-        globalFlag =  true
+        globalFlag = true
     }
     callback();
 
 };
 
-/** 更改用户邮箱或者手机号 */
+/**
+ * 更改用户邮箱或者手机号
+ */
 const checkEmailOrMobile = function (rule, value, callback) {
     if (this.hasOwnProperty('updateForm')) {
         if (!this.updateForm.flag) {
             callback(new Error('请选择修改的字段！'))
         }
         if (this.updateForm.flag === 'email') {
-            checkEmail(rule,value,callback)
+            checkEmail(rule, value, callback)
         } else if (this.updateForm.flag === 'mobile') {
-            checkMobile(rule,value,callback)
+            checkMobile(rule, value, callback)
         }
-        this.enableButton = globalFlag
+        this.getCodeBtn = globalFlag
         globalFlag = false
     }
 }
@@ -70,13 +68,13 @@ const checkPassword = function (rule, value, callback) {
  * [javascript，检测对象中是否存在某个属性](https://www.cnblogs.com/kongxianghai/archive/2013/04/12/3015803.html)
  */
 const reCheckPassword = function (rule, value, callback) {
-    if (this.hasOwnProperty("regForm") ) {
-        if (value !== this.regForm.password ) {
+    if (this.hasOwnProperty("regForm")) {
+        if (value !== this.regForm.password) {
             callback(new Error('输入的密码与以上密码不相同！'));
         }
     }
-    if (this.hasOwnProperty("updateForm") ) {
-        if (value !== this.updateForm.password ) {
+    if (this.hasOwnProperty("updateForm")) {
+        if (value !== this.updateForm.password) {
             callback(new Error('输入的密码与以上密码不相同！'));
         }
     }
@@ -86,18 +84,18 @@ const reCheckPassword = function (rule, value, callback) {
  * 验证输入的用户名格式
  * [axios使用及配置明细小记](https://blog.csdn.net/u014225733/article/details/98722635)
  */
-const checkUsername = function (rule, value, callback){
+const checkUsername = function (rule, value, callback) {
     // 移除前后所有空格
     value = value.trim()
     if (!value) {
         callback(new Error('请输入用户名！'));
     } else if (!constants.REG_OF_USERNAME.test(value)) {
         callback(new Error('用户名必须是6-10位之间的字母、下划线、@、. 并且不能以数字开头！'))
-    } else if (!this.showLoginOrReg){ // 如果是注册表单用户名验证，才往后台发送用户名是否重复验证请求
-    // 发送请求到后端验证是否用户名已存在！
-    requestApi.getRequest(`${constants.USERNAME_EXISTED}/${value}`).then(res => {
-    }).catch(error => {
-        console.log("validator->checkUsername->error",error)
+    } else if (!this.showLoginOrReg) { // 如果是注册表单用户名验证，才往后台发送用户名是否重复验证请求
+        // 发送请求到后端验证是否用户名已存在！
+        requestApi.getRequest(`${constants.USERNAME_EXISTED}/${value}`).then(res => {
+        }).catch(err => {
+            console.log("validator->checkUsername->err", err)
         })
     }
     callback()

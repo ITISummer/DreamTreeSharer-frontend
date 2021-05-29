@@ -4,7 +4,7 @@
     <!-- 滚动加载 下面 v-infinite-scroll 的放置位置与瀑布流是否能够加载有关 -->
     <div v-infinite-scroll="load" infinite-scroll-disabled="disabled" class="waterfall-container">
       <!--      waterfall 组件 -->
-      <Waterfall ref="waterfall" :list="list" :gutter="10" :width="250"
+      <Waterfall ref="waterfall" :list="list" :gutter="8" :width="235"
                  :breakpoints="{
                   //当屏幕宽度小于等于1200
                   1200: { rowPerView: 5},
@@ -31,27 +31,30 @@
             <div v-show="showSaveBtnInWaterfall">
               <el-button type="danger" round class="thumb" @click="like(props.data)">👍</el-button>
             </div>
-            <div class="cover">
-              <el-image :src="props.data.pinboardBgimgUrl" @click="handleClick(props.data)"
+            <div class="cover" @click="handleClick(props.data)">
+              <el-image :src="props.data.pinboardBgimgUrl"
                         :alt="props.data.pinboardBgimgUrl" @load="$refs.waterfall.refresh"/>
-            </div>
-            <div class="dream">
-              <div class="dream-title">{{ props.data.pinboardTitle }}</div>
-              <div class="dream-content">{{ props.data.pinboardContent }}</div>
+              <div class="dream">
+                <div class="dream-font">
+                  <div class="dream-title">{{ props.data.pinboardTitle }}</div>
+                  <hr>
+                  <div class="dream-content">{{ props.data.pinboardContent }}</div>
+                </div>
+              </div>
             </div>
             <div class="menus">
-              <!--              Home 页所需-->
+              <!--Home 页所需-->
               <div v-if="showAvatar" class="avatar-and-like">
                 <el-avatar :title="props.data.userUsername" :src="getBaseUrl+props.data.userAvatarUrl"/>
                 <span class="like-num">👍{{ props.data.likeNum }}</span>
               </div>
-              <!--              Favorites 页所需-->
+              <!--Favorites 页所需-->
               <div v-else-if="showSavedFrom" class="save-from">
                 <strong>Saved From: </strong>
                 <router-link :to="{path: '/profile',query:{username:props.data.userUsername}}">
                   <span>{{ props.data.userUsername }}</span></router-link>
               </div>
-              <!--              Pinboards 页所需-->
+              <!--Pinboards 页所需-->
               <div v-else class="edit">
                 <p data-title="编辑" @click="handleEdit(props.data)"/>
                 <p data-title="删除" @click="handleDelete(props.data)"/>
@@ -68,6 +71,8 @@
 
 <script>
 import Waterfall from 'vue-waterfall-plugin';
+import constants from "../../apis/constants";
+import {getBaseUrl} from "../../apis/commonMethods";
 
 export default {
   components: {Waterfall},
@@ -94,7 +99,7 @@ export default {
       return this.loading || this.noMore;
     },
     getBaseUrl() {
-      return this.baseUrl
+      return getBaseUrl()
     }
   },
   methods: {
@@ -116,12 +121,12 @@ export default {
           el.isliked = !el.isliked
         }
       })
-      console.log(el_mock)
-      this.putRequest(`update-pin-like-num/${item.pinboardId}/${el_mock.likeNum}`).then(res => true).catch(err => {
+      // console.log(el_mock)
+      this.putRequest(`${constants.UPDATE_PIN_LIKE_NUM}/${item.pinboardId}/${el_mock.likeNum}`).then(res => true).catch(err => {
         // 如果发生错误则需要还原点赞量
         el_mock.likeNum = num_mock
         // 发送还原点赞量请求
-        this.putRequest(`update-pin-like-num/${item.pinboardId}/${el_mock.likeNum}`).then(res => true).catch(err => {
+        this.putRequest(`${constants.UPDATE_PIN_LIKE_NUM}/${item.pinboardId}/${el_mock.likeNum}`).then(res => true).catch(err => {
           console.log('WaterfallMain.vue->like(err_1)', err)
         })
       })
@@ -130,8 +135,8 @@ export default {
      * 收藏一个 Pin
      */
     savePin(item) {
-      this.postRequest(`favorite-one-pin/${item.pinboardId}`).then(res => true).catch(err => {
-        console.log('Home.vue->savePin()', err)
+      this.postRequest(`${constants.FAVORITE_ONE_PIN}/${item.pinboardId}`).then(res => true).catch(err => {
+        console.log('Home.vue->savePin()->err', err)
       })
 
     }
@@ -150,7 +155,6 @@ export default {
      * [es6 扩展运算符 三个点(...)](https://blog.csdn.net/qq_30100043/article/details/53391308)
      */
     addNewList() {
-      // 然后使用 const list = this.images.map()
       return new Promise((resolve) => {
         const list = this.images.map((item, index) => {
           return {...item}
@@ -186,15 +190,12 @@ export default {
     &:hover {
       top: -3px;
       background: rgba(201, 147, 147, 0.1);
-
       .save-btn { // 设置按钮显示
         display: block;
       }
-
       .thumb {
         display: block;
       }
-
       .dream {
         display: block;
       }
@@ -203,46 +204,52 @@ export default {
     .save-btn {
       display: none;
       position: absolute;
-      top: 0px;
-      left: 0px;
-      z-index: 100;
+      top: 0;
+      left: 0;
+      z-index: 102;
     }
 
     .thumb {
       display: none;
       position: absolute;
-      top: 0px;
-      right: 10px;
-      z-index: 100;
+      top: 0;
+      right: 0;
+      z-index: 102;
       background: url("thumb.png") no-repeat;
       border-style: none;
     }
 
     .cover {
-      margin: 10px 10px 0 10px;
-
-      img {
-        display: block;
-        width: 100%;
-      }
+      position: relative;
     }
 
     .dream {
-      display: none;
       position: absolute;
-      left: 20%;
-      top: 30%;
-      color: #f3cf06;
-      font-size: xx-small;
+      background: rgba(66, 65, 65, 0.6);
+      top: 0;
+      right: 0;
+      width: 100%;
+      height: 100%;
+      border-radius: 10px;
+      //----------------
+      display: none;
       z-index: 101;
-
-      .dream-title {
-        color: #3a8ee6;
-        text-align: center;
-      }
-
-      .dream-content {
-        text-align: center;
+      .dream-font{
+        position: absolute;
+        top: 45px;
+        width: 100%;
+        height: 100%;
+        .dream-title {
+          width: 100%;
+          color: #3a8ee6;
+          font-size: 18px;
+          font-weight: bold;
+        }
+        .dream-content {
+          width: 100%;
+          color: #f3cf06;
+          font-size: 15px;
+        }
       }
     }
 

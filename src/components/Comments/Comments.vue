@@ -7,7 +7,7 @@
 <template>
   <div id="comments-container">
     <div class="comment" v-for="comment in comments">
-      <!--      头像、评论者昵称、日期-->
+      <!--头像、评论者昵称、日期-->
       <div class="info">
         <img class="avatar" :src="getBaseUrl+comment.fromAvatar" width="36" height="36"/>
         <div class="right">
@@ -16,7 +16,7 @@
         </div>
       </div>
       <div class="content">{{ comment.content }}</div>
-      <!--      点赞选项 -->
+      <!--点赞选项-->
       <div class="control">
         <span class="like" :class="{active: comment.isLiked}" @click="likeClick(comment)">
           <span class="like-num">👍{{ comment.likeNum > 0 ? comment.likeNum + '人赞' : '赞' }}</span>
@@ -27,12 +27,12 @@
     <div v-else>没有更多评论~</div>
     <div class="comment">
       <div class="reply">
-        <!--        添加母评论-->
+        <!-- 添加母评论-->
         <div class="write-reply" @click="showCommentInput">
           <i class="el-icon-edit"></i>
           <span class="add-comment">添加新评论</span>
         </div>
-        <!--      评论输入框  -->
+        <!--评论输入框-->
         <transition name="fade">
           <div class="input-wrapper" v-show="showInput">
             <el-input class="gray-bg-input"
@@ -55,8 +55,12 @@
 
 <script>
 import constants from "../../apis/constants";
-import {EventBus} from "../../apis/eventBus";
-// 分页查询评论
+import {EventBus,EventName} from "../../apis/eventBus";
+import {getBaseUrl} from "../../apis/commonMethods";
+
+/**
+ * 分页查询评论
+ */
 let limit = 2
 let offset = 0
 export default {
@@ -71,7 +75,8 @@ export default {
     }
   },
   i_mounted() {
-    EventBus.$on('getPinboardInfoFromHome', value=>{
+    // 接收来自 Home.vue
+    EventBus.$on(EventName.INIT_PIN_INFO, value => {
       offset = 0
       this.comments = []
       this.pinboardInfo = value
@@ -80,7 +85,7 @@ export default {
   },
   computed: {
     getBaseUrl() {
-      return this.baseUrl
+      return getBaseUrl()
     }
   },
   methods: {
@@ -89,7 +94,7 @@ export default {
     },
     /**
      * 取消评论
-      */
+     */
     cancel() {
       this.showItemId = ''
       this.showInput = false
@@ -97,25 +102,25 @@ export default {
 
     /**
      * 加载更多评论 - 分页查询
-      */
+     */
     loadComments() {
-      // getRequest(`/get-comments/${this.$store.state.pinboardInfo.pinboardId}/${limit}/${offset}`).then(res=>{
-            this.getRequest(`/get-comments/${this.pinboardInfo.pinboardId}/${limit}/${offset}`).then(res=>{
+      this.getRequest(`${constants.GET_COMMENTS}/${this.pinboardInfo.pinboardId}/${limit}/${offset}`).then(res => {
         if (res) {
-        Array.from(res.object,value=>{
-          this.comments.push(value)
-        })
+          // 将对象中的值传递到数组中
+          Array.from(res.object, value => {
+            this.comments.push(value)
+          })
           if (res.object.length < limit) {
             this.showLoadBtn = false
-          }else {
+          } else {
             offset += 2
             this.showLoadBtn = true
           }
         } else {
           this.showLoadBtn = false
         }
-      }).catch(err=>{
-        console.log(err)
+      }).catch(err => {
+        console.log('Comments.vue->loadComments()->err',err)
       })
     },
 
@@ -134,19 +139,19 @@ export default {
         }
         item.isLiked = !item.isLiked;
       }
-      this.putRequest(`update-like-num/${item.commentId}/${item.likeNum}`).then(res=>true).catch(err=>{
-        console.log('Comments.vue->likeClick()',err)
+      this.putRequest(`${constants.UPDATE_LIKE_NUM}/${item.commentId}/${item.likeNum}`).then(res => true).catch(err => {
+        console.log('Comments.vue->likeClick()->err', err)
       })
     },
 
     /**
      * 确认提交评论
-      */
+     */
     commitComment() {
       if (this.inputComment !== '') {
         // 每次添加前new一个comment以防止数据覆盖
         const comment = {
-          date: this.$moment(Date.now()).format('yyyy-MM-DD HH:mm:ss'),  //评论时间
+          date: this.$moment(Date.now()).format(constants.TIME_FORMATTER),  //评论时间
           pinboardId: this.pinboardInfo.pinboardId,//图片的id
           fromId: this.$store.state.user.userInfo.userId, //评论者id
           fromName: this.$store.state.user.userInfo.userUsername,  //评论者昵称
@@ -154,15 +159,15 @@ export default {
           likeNum: 0, //点赞人数
           content: this.inputComment,  //评论内容
         }
-        //TODO 向后台发送请求添加一个评论，如果后台返回成功，则将 comment push 进 comments，后台需要返回 commentId
-        this.postRequest('/add-one-comment',comment).then(res=>{
-          if (res && res.statusCode === 200) {
+        // 向后台发送请求添加一个评论，如果后台返回成功，则将 comment push 进 comments，后台需要返回 commentId
+        this.postRequest(constants.ADD_ONE_COMMENT, comment).then(res => {
+          if (res) {
             comment.commentId = res.object
             this.showInput = false
             this.showLoadBtn = true
             this.inputComment = ''
           }
-        }).catch(err=>{
+        }).catch(err => {
           console.log(err)
         })
       }

@@ -5,13 +5,10 @@
     <WaterfallMain
         :images="images"
         :showSaveBtnInWaterfall="true"
-        :handleClick="handleClick"
-        :handleDelete="handleDelete"
-        :handleEdit="handleEdit"/>
+        :handleClick="handleClick"/>
     <Dialog
         :showDialog.sync="showDialog"
-        :showCommentsOrDreamForm="false"
-        :showSelect="false"/>
+        :showCommentsOrDreamForm="false"/>
   </el-container>
 </template>
 
@@ -19,13 +16,15 @@
 import Header from "../../components/Header/Header";
 import WaterfallMain from "../../components/WaterfallMain/WaterfallMain";
 import Dialog from "../../components/Dialog/Dialog";
-import {EventBus} from "../../apis/eventBus";
-
+import {EventBus,EventName} from "../../apis/eventBus";
+import constants from "../../apis/constants";
 export default {
   components: {Dialog, Header, WaterfallMain},
   mounted() {
-    // 获取用户分享的 pinboard
-    this.getRequest('/get-sharable-pin').then(res => {
+    /**
+     * 获取用户分享的 pinboard
+     */
+    this.getRequest(constants.GET_SHARABLE_PIN).then(res => {
       if (res) {
         this.images = res.object
       }
@@ -45,26 +44,17 @@ export default {
   methods: {
     /**
      * 图片点击
-     * @param item
      */
     handleClick(item) {
       this.showDialog = true
-      EventBus.$emit('getPinboardInfoFromHome', item)
-      EventBus.$emit('initImageUrl', item.pinboardBgimgUrl)
-      EventBus.$emit('showSaveBtn', false)
-      EventBus.$emit('showSaveFromSiteBtn', false)
-    },
-    /**
-     * 编辑
-     */
-    handleEdit() {
-      this.$message.success('编辑');
-    },
-    /**
-     * 删除
-     */
-    handleDelete() {
-      this.$message.error('删除');
+      // 传入到 DialogRight.vue 和 Comments.vue 中
+      EventBus.$emit(EventName.INIT_PIN_INFO, item)
+      // 传入到 Upload.vue 中
+      EventBus.$emit(EventName.INIT_IMAGE_URL, item.pinboardBgimgUrl,'home')
+      // 传入到 DialogRight.vue 中
+      EventBus.$emit(EventName.SHOW_SAVE_BTN, false)
+      // 传入到 DialogLeft.vue 中
+      EventBus.$emit(EventName.SHOW_SAVE_FROM_SITE_BTN, false)
     },
   }
 }

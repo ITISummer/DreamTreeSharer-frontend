@@ -10,12 +10,11 @@
 <script>
 
 import {mapState} from 'vuex'
+import constants from "../../apis/constants";
 
 export default {
   data () {
-    return {
-      content: ''
-    }
+    return {content: ''}
   },
   computed: {
     ...mapState({
@@ -23,14 +22,17 @@ export default {
     })
   },
   methods: {
-    // 默认传入 event(事件对象)
+    /**默认传入 event(事件对象)*/
   	addMessage (e) {
   		if (e.ctrlKey && e.keyCode === 13 && this.content.length) {
-        let msgObj = {}
-        msgObj.to = this.currentSession.userUsername
-        msgObj.content = this.content
-        this.$store.state.chat.stomp.send('/ws/chat',{},JSON.stringify(msgObj))
-  			this.$store.commit('ADD_MESSAGE',msgObj);
+        let msg = {}
+        msg.to = this.currentSession.userUsername
+        msg.content = this.content
+        // 发送消息
+        this.$store.state.chat.stomp.send(constants.WS_CHAT,{},JSON.stringify(msg))
+        // 显示消息
+  			this.$store.commit('ADD_MESSAGE',msg);
+        // 清空当前 content
   			this.content='';
   		}
   	}

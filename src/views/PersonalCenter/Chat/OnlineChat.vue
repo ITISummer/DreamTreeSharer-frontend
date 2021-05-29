@@ -17,16 +17,16 @@
 </template>
 
 <script>
-import Card from '../../../components/Chat/Card.vue'
-import List from '../../../components/Chat/List.vue'
-import Message from '../../../components/Chat/Message.vue'
-import UserText from '../../../components/Chat/UserText.vue'
+const Card = () => import('../../../components/Chat/Card.vue');
+const List = () => import('../../../components/Chat/List.vue');
+const Message = () => import('../../../components/Chat/Message.vue');
+const UserText = () => import('../../../components/Chat/UserText.vue');
 export default {
   components:{Card, List, Message, UserText},
   mounted() {
     // 连接后台 websocket - 初始化 websocket 链接
-    this.$store.dispatch('chatConnect');
-    this.$store.dispatch('initUsers')
+    this.$store.dispatch('chatConnect')
+    // TODO 初始化本地聊天数据 - 有 bug
     this.$store.dispatch('initData')
   },
 }
@@ -36,7 +36,6 @@ export default {
 #chat {
   margin: 20px auto;
   width: 800px;
-  //height: 600px;
   overflow: hidden;
   border-radius: 10px;
   .sidebar, .main {

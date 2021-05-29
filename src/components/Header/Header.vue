@@ -32,7 +32,7 @@
       </el-col>
       <el-col :span="2" :offset="1">
         <span class="user-name">{{ userInfo.userUsername }}</span>
-        <i class="el-icon-chat-dot-round" @click="goChat"></i>
+        <i class="el-icon-chat-dot-round chat-icon" style="width: 40px;height: 40px;line-height: inherit;" @click="goChat"></i>
       </el-col>
       <el-col :span="1" :offset="1">
         <el-dropdown @command="handleCommand">
@@ -59,10 +59,10 @@
 </template>
 
 <script>
-import constants from "../../apis/constants"
-import requests from "../../apis/constants"
+import constants from "../../apis/constants";
 import Pagination from "../Pagination/Pagination";
 import {mapGetters} from 'vuex'
+import {getUserAvatarUrl} from "../../apis/commonMethods";
 
 export default {
   components: {Pagination},
@@ -79,7 +79,7 @@ export default {
       'getUserInfo',
     ]),
     getUserAvatarUrl() {
-      return this.baseUrl + this.userInfo.userAvatarUrl
+      return getUserAvatarUrl(this.userInfo)
     }
   },
   methods: {
@@ -89,13 +89,17 @@ export default {
     validate() {
       this.$refs.pagination.validate()
     },
-    // * 跳转到在线聊天页面
+    /**
+     * 跳转到在线聊天页面
+     */
     goChat() {
       this.$router.push(constants.CHAT).catch(() => {
         console.log('catch redundant path ' + constants.CHAT + ' in Header.vue->goChat')
       })
     },
-    // * 处理 logout 功能
+    /**
+     * 处理 logout 功能
+     */
     handleCommand(command) {
       if (command === 'logout') {
         this.$confirm('此操作将注销登录！是否继续？', 'Warning', {
@@ -104,14 +108,12 @@ export default {
           type: 'warning'
         }).then(() => {
           // 注销登录
-          this.postRequest(requests.LOGOUT)
+          this.postRequest(constants.LOGOUT)
           // 清空用户信息
           window.sessionStorage.removeItem('token')
           this.$store.dispatch('initUserInfo', {})
-          // // 清空 vuex 中一些信息！
-          // this.$store.commit('mutation-type',[])
           // 跳转到登录页
-          this.$router.replace(requests.ROOT)
+          this.$router.replace(constants.ROOT)
           this.$message({
             type: 'success',
             message: '注销成功！'
@@ -196,6 +198,7 @@ export default {
     cursor: pointer;
     color: black;
     margin-left: 5px;
+    font-size: 30px;
   }
 }
 // 去除 router-link 下划线

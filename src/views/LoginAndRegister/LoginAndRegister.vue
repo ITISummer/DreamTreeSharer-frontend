@@ -8,7 +8,8 @@
         <el-input type="text" v-model="loginForm.username" placeholder="请输入用户名"></el-input>
       </el-form-item>
       <el-form-item prop="password">
-        <el-input type="password" v-model="loginForm.password" placeholder="请输入密码" auto-complete="false"></el-input>
+        <el-input type="password" v-model="loginForm.password" show-password placeholder="请输入密码"
+                  auto-complete="false"></el-input>
       </el-form-item>
       <el-form-item prop="captcha">
         <el-input type="text" @keyup.enter.native="login" v-model="loginForm.captcha" placeholder="点击图片更换验证码"
@@ -28,10 +29,12 @@
         <el-input type="text" v-model="regForm.username" placeholder="请输入用户名"></el-input>
       </el-form-item>
       <el-form-item prop="password">
-        <el-input type="password" v-model="regForm.password" auto-complete="false" placeholder="请输入密码"></el-input>
+        <el-input type="password" v-model="regForm.password" auto-complete="false" show-password
+                  placeholder="请输入密码"></el-input>
       </el-form-item>
       <el-form-item prop="rePassword">
-        <el-input type="password" v-model="regForm.rePassword" auto-complete="false" placeholder="请确认密码"></el-input>
+        <el-input type="password" v-model="regForm.rePassword" auto-complete="false" show-password
+                  placeholder="请确认密码"></el-input>
       </el-form-item>
       <el-form-item prop="phone">
         <el-input type="tel" v-model="regForm.phone" maxLength="11" placeholder="请输入注册手机号"></el-input>
@@ -51,8 +54,8 @@
   </div>
 </template>
 <script>
-import constants from "../../apis/constants";
-import validators from "../../apis/validators";
+import constants from "@/apis/constants";
+import validators from "@/apis/validators";
 
 export default {
   /**
@@ -73,25 +76,25 @@ export default {
       // 登录参数-对应后端 UsersModel
       loginForm: {
         username: 'summer',
-        password: 'WWW_dts123',
+        password: 'WWWdts123',
         captcha: '',
         checked: true
       },
       // 注册参数 - 对应后端 UsresModel
       regForm: {
         username: 'summerlv',
-        password: 'WWW_dts123',
-        rePassword: 'WWW_dts123',
+        password: 'WWWdts123',
+        rePassword: 'WWWdts123',
         phone: '15244812873',
         smsCode: ''
       },
-      // 校验规则
+      /*
+       校验规则
+       [ElementUI 的校验函数 validator 的传参与复用](https://blog.csdn.net/qq_42941302/article/details/112799014)
+       [vue+elementUI项目实现自定义校验规则的传参复用性](https://blog.csdn.net/u012443286/article/details/105258443)
+       这里的 username, password, code 是和表单标签里面对应的，prop 应该和 form 中相关属性同名
+       */
       rules: {
-        /*
-         [ElementUI 的校验函数 validator 的传参与复用](https://blog.csdn.net/qq_42941302/article/details/112799014)
-         [vue+elementUI项目实现自定义校验规则的传参复用性](https://blog.csdn.net/u012443286/article/details/105258443)
-         这里的 username, password, code 是和表单标签里面对应的，prop 应该和 form 中相关属性同名
-         */
         username: [{validator: validators.checkUsername.bind(this), trigger: 'blur'}],
         password: [{validator: validators.checkPassword, trigger: 'blur'}],
         captcha: [{len: 4, message: "图形验证码长度应该为4", trigger: 'blur'}],
@@ -105,7 +108,6 @@ export default {
   methods: {
     /**
      * 更新验证码
-     * @returns {string}
      */
     updateCaptcha() {
       return this.captchaUrl = `${constants.CAPTCHA}?time=` + new Date()
@@ -127,12 +129,13 @@ export default {
               // 登录成功后获取并存入用户信息到 state - main.js 中
               // 登录成功后跳转到 home 页面 - 使用 replace 表示不能回退，而使用 push 则可以回退
               查看此逻辑的话，结合 main.js 中路由导航守卫配置
-              页面跳转 - 查询用户输入的路劲，
+              页面跳转 - 查询用户输入的路径，
               如果没有登录则跳转到登录页面让用户登录，
               如果登录成功，则跳转到用户登录前指定的页面
               如果登录失败，则重新跳转到登录页面！
               */
               let path = this.$route.query.redirect
+              // replace 表示不能回退
               this.$router.replace((path === constants.ROOT || path == undefined) ? constants.HOME : path)
             }
           })
@@ -165,7 +168,7 @@ export default {
      */
     getSmsCode() {
       this.getRequest(`${constants.GET_SMS_CODE}/${this.regForm.phone}`).then((res) => {
-        if (resp.statusCode === 200) {
+        if (resp && resp.statusCode === 200) {
           this.$message.success(resp.message + '您的验证码为：' + resp.object)
         }
         if (res) {
@@ -176,12 +179,11 @@ export default {
           this.cutDownTime(smsCodeEndTime)
         }
       }).catch(error => {
-        console.log(error)
+        console.log('LoginAndReg.vue->getSmsCode()->err', error)
       })
     },
     /**
      * 倒计时
-     * @param smsCodeEndTime
      */
     cutDownTime(smsCodeEndTime) {
       this.BtnStatus = false;
@@ -190,7 +192,7 @@ export default {
         this.countDownTime--
         if (this.countDownTime < 1) {
           this.BtnStatus = true
-          this.countDownTime = 60
+          this.countDownTime = 30
           // 将当前时间戳从 localSotrage 移除
           window.localStorage.removeItem('smsCodeEndTime')
           clearTimeout(time)

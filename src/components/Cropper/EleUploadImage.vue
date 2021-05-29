@@ -98,7 +98,6 @@ import Cropper from "vue-image-crop-upload";
 import EleGallery from "vue-ele-gallery";
 
 export default {
-  name: "EleUploadImage",
   components: {
     Cropper,
     EleGallery

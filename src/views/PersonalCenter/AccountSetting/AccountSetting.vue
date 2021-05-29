@@ -29,8 +29,9 @@ rules	validation rules of form
 <!--    </el-form-item>-->
 <template>
   <el-main style="margin-top: 60px; background-color: #6e8efb">
+    <!-- 显示基本信息 -->
     <el-form ref="updateForm" :model="updateForm" :rules="updateFormRules" label-width="70px">
-      <!-- 头像上传(crop) -->
+      <!--头像上传(crop)-->
       <el-form-item prop="avatarUrl">
         <ele-upload-image
             crop
@@ -44,7 +45,7 @@ rules	validation rules of form
             @commitCropDataToInvoker="getCropDataFromComponets"
         ></ele-upload-image>
       </el-form-item>
-      <!--      用户名-->
+      <!--用户名-->
       <el-form-item label="用户名" prop="username">
         <el-input v-model="updateForm.username" disabled></el-input>
       </el-form-item>
@@ -53,38 +54,38 @@ rules	validation rules of form
         <el-input clearable type="email" v-model="updateForm.email" disabled></el-input>
         <el-button type="primary" @click="updateEmailOrMobileF">修改邮箱</el-button>
       </el-form-item>
-      <!-- 手机号-->
+      <!--手机号-->
       <el-form-item label="手机号" prop="mobile">
         <el-input clearable type="tel" maxlength="11" v-model="updateForm.mobile" disabled></el-input>
         <el-button type="primary" @click="updateEmailOrMobileF">修改手机号</el-button>
       </el-form-item>
-      <!--      重置密码-->
+      <!--重置密码-->
       <el-form-item label="密码" prop="password">
         <el-input type="password" v-model="updateForm.password" autocomplete="off" disabled></el-input>
-        <el-button type="primary" @click="updatePwdDialog = true">修改密码</el-button>
+        <el-button type="primary" @click="updatePwdDialogF">修改密码</el-button>
       </el-form-item>
     </el-form>
 
-    <!--    update password -->
+    <!--更新密码的弹出框-->
     <el-dialog title="密码修改" :visible.sync="updatePwdDialog">
       <el-form :model="updateForm" :rules="updateFormRules" ref="updatePwdDialog">
         <el-form-item label="密码" prop="password">
-          <el-input type="password" v-model="updateForm.password" autocomplete="off"></el-input>
+          <el-input type="password" v-model="updateForm.password" autocomplete="off" clearable show-password></el-input>
         </el-form-item>
-        <!--      确认密码-->
-        <el-form-item label="确认密码" prop="checkPassword">
-          <el-input type="password" v-model="updateForm.checkPassword" autocomplete="off"></el-input>
+        <!--确认密码-->
+        <el-form-item label="确认密码" prop="rePassword">
+          <el-input type="password" v-model="updateForm.rePassword" autocomplete="off" clearable show-password></el-input>
         </el-form-item>
       </el-form>
       <!--点击此元素会自动激活验证码-->
       <button @click="varify">验证</button>
       <span slot="footer" class="dialog-footer">
-      <el-button @click="updatePwdDialog = false">Cancel</el-button>
-      <el-button type="primary" @click="commitUpdatePwd">Confirm</el-button>
+      <el-button @click="cancleUpdatePwd">取消</el-button>
+      <el-button type="primary" @click="commitUpdatePwd">确认</el-button>
     </span>
     </el-dialog>
 
-    <!-- update email or mobile form -->
+    <!-- 更新邮箱和手机号弹出框 -->
     <el-dialog title="手机号或者邮箱修改" :visible.sync="updateEmailOrMobileDialog">
       <el-form :model="updateForm" :rules="updateFormRules" ref="updateEmailOrMobile">
         <el-form-item prop="flag">
@@ -99,11 +100,11 @@ rules	validation rules of form
         <el-form-item label="请输入验证码：" prop="code">
           <el-input autocomplete="off" v-model="updateForm.code"></el-input>
         </el-form-item>
-        <el-button type="primary" @click="getCode" :disabled="!enableButton">点击获取验证码</el-button>
+        <el-button type="primary" @click="getCode" :disabled="!getCodeBtn">点击获取验证码</el-button>
       </el-form>
       <span slot="footer" class="dialog-footer">
-    <el-button @click="updateEmailOrMobileDialog = false">Cancel</el-button>
-    <el-button type="primary" @click="commitUpdateEmailOrMobile">Confirm</el-button>
+    <el-button @click="updateEmailOrMobileDialog = false">取消</el-button>
+    <el-button type="primary" @click="commitUpdateEmailOrMobile">确认</el-button>
   </span>
     </el-dialog>
 
@@ -114,56 +115,89 @@ rules	validation rules of form
 import EleUploadImage from "../../../components/Cropper/EleUploadImage";
 import constants from "../../../apis/constants";
 import validators from "../../../apis/validators";
+import {mapGetters} from "vuex";
 
+/**
+ * [Getter](https://vuex.vuejs.org/zh/guide/getters.html)
+ * [vuex 如何在 obj 属性变化时 watch 到 obj 的变化？](https://segmentfault.com/q/1010000010315629)
+ */
 export default {
   components: {EleUploadImage},
   mounted() {
+    this.updateForm.email = this.userInfo.userEmail
     this.updateForm.username = this.userInfo.userUsername
     this.updateForm.password = this.userInfo.userPassword
-    this.updateForm.email = this.userInfo.userEmail
     this.updateForm.mobile = this.userInfo.userPhone
     this.updateForm.birthday = this.userInfo.userBirthday
     this.updateForm.sex = this.userInfo.userSex
   },
+  computed: {
+    ...mapGetters({
+      userInfo: 'getUserInfo'
+    })
+    // userInfo() {
+    //   return this.$store.state.user.userInfo
+    // }
+  },
+  watch: {
+    userInfo: {
+        deep: true,
+        handler() {
+          console.log(this.userInfo)
+          this.updateForm.email = this.userInfo.userEmail
+          this.updateForm.username = this.userInfo.userUsername
+          this.updateForm.password = this.userInfo.userPassword
+          this.updateForm.mobile = this.userInfo.userPhone
+          this.updateForm.birthday = this.userInfo.userBirthday
+          this.updateForm.sex = this.userInfo.userSex
+        }
+    },
+  },
+
   data() {
     return {
       updateEmailOrMobileDialog: false,
       updatePwdDialog: false,
-      enableButton: false,
+      getCodeBtn: false,
       cropData: {},
-      userInfo: this.$store.state.user.userInfo,
       slideCode: false,
-      // 查询到的用户信息对象
+      qiniu: constants.qiniu,
+      // userInfo: this.$store.state.user.userInfo,
+      // 用户更新表单信息对象
       updateForm: {
         username: '',
         password: '',
+        rePassword: '',
         email: '',
         mobile: '',
-        birthday: Date.now(),
         // email or mobile
         emailOrMobile: '',
         flag: '',
         code: '',
       },
-      qiniu: constants.qiniu,
       // 修改表单的验证规则 blur: 文本失去焦点 - 默认 trigger: 'change'
       updateFormRules: {
         email: [{validator: validators.checkEmail, trigger: 'blur'}],
         mobile: [{validator: validators.checkMobile, trigger: 'blur'}],
         password: [{validator: validators.checkPassword, trigger: 'blur'}],
-        checkPassword: [{validator: validators.reCheckPassword.bind(this), trigger: 'blur'}],
+        rePassword: [{validator: validators.reCheckPassword.bind(this), trigger: 'blur'}],
         code: [{required: true, len: 6, message: "验证码长度应该为6", trigger: 'blur'}],
         emailOrMobile: [{validator: validators.checkEmailOrMobile.bind(this), trigger: 'blur'}],
       },
     }
   },
   methods: {
+    cancleUpdatePwd() {
+      this.updatePwdDialog = false
+      this.updateForm.password = ''
+    },
     /**
      * [腾讯防水墙](https://007.qq.com)
      * [如何在项目中调用腾讯云的滑动验证码](https://segmentfault.com/a/1190000023225263)
      */
     varify() {
-      let appid = '1258827934'; // 腾讯云控制台中对应这个项目的 appid
+      // 腾讯云控制台中对应这个项目的 appid
+      let appid = '1258827934';
       //生成一个滑块验证码对象
       let captcha = new TencentCaptcha(appid, res => {
         // 用户滑动结束或者关闭弹窗，腾讯返回的内容
@@ -182,84 +216,107 @@ export default {
     /**
      * 每次点击前先清空上次误操作输入的字段
      * [element-ui清除表单验证提示语](https://blog.csdn.net/qq_41378597/article/details/104761987)
+     * [element-ui 表单报错 Cannot read property ‘clearValidate‘ of undefined“](https://blog.csdn.net/qq_36437172/article/details/107348939)
      */
     updateEmailOrMobileF() {
       this.updateEmailOrMobileDialog = true
-      this.$refs['updateEmailOrMobile'].clearValidate(['emailOrMobile', 'code'])
+      this.$nextTick(() => {
+        this.$refs['updateEmailOrMobile'].clearValidate()
+      })
       this.updateForm.emailOrMobile = ''
       this.updateForm.flag = ''
       this.updateForm.code = ''
     },
-    // 向后台提交密码更新请求
+    /**
+     * 每次点击前先清空上次误操作输入的字段
+     */
+    updatePwdDialogF() {
+      this.updatePwdDialog = true
+      this.$nextTick(() => {
+        this.$refs['updatePwdDialog'].clearValidate()
+      })
+      this.updateForm.password = ''
+      this.updateForm.rePassword = ''
+
+    },
+    /**
+     * 向后台提交密码更新请求
+     */
     commitUpdatePwd() {
       if (!this.slideCode) {
         this.$message.warning('请进行滑动验证')
         return false
       }
-        this.$confirm(`确认修改密码吗？`, "", {type: 'warning'}).then(res => {
-          this.$refs.updatePwdDialog.validate(valid => {
-            if (valid) {
-              // 验证通过
-              this.putRequest(`update-pwd`, this.updateForm).then(res => {
-                // 更新密码成功
-                if (res.statusCode === 200) {
-                  this.updatePwdDialog = false
-                  this.slideCode = false
-                }
-              }).catch(err => {
-                // 更新密码失败
-                console.log(err)
-              })
-            }
-          })
-        }).catch(err => {
-          this.$message.info('取消密码修改！')
+      this.$confirm(`确认修改密码吗？`, "", {type: 'warning'}).then(res => {
+        this.$refs.updatePwdDialog.validate(valid => {
+          if (valid) {
+            // 验证通过
+            this.putRequest(constants.UPDATE_PWD, this.updateForm).then(res => {
+              // 更新密码成功
+              if (res) {
+                this.updatePwdDialog = false
+                this.slideCode = false
+              }
+            }).catch(err => {
+              // 更新密码失败
+              console.log('AccountSetting.vue->commitUpdatePwd->err',err)
+            })
+          }
         })
+      }).catch(err => {
+        this.$message.info('取消密码修改！')
+      })
     },
-    // 向后台提交邮箱或者手机号更新请求
+    /**
+     * 向后台提交邮箱或者手机号更新请求
+     */
     commitUpdateEmailOrMobile() {
       this.$refs.updateEmailOrMobile.validate((valid) => {
         // 没通过验证
         if (!valid) return
         // 收集数据（验证码与邮箱或者手机号），向后台发送更新请求
-        this.putRequest(`update-email-or-mobile/${this.updateForm.flag}/${this.updateForm.emailOrMobile}/${this.updateForm.code}`).then(res => {
+        this.putRequest(`${constants.UPDATE_EMAIL_OR_MOBILE}/${this.updateForm.flag}/${this.updateForm.emailOrMobile}/${this.updateForm.code}`).then(res => {
           // 通过验证，发起修改用户信息的数据请求
-          if (res.statusCode === 200) {
+          if (res) {
             this.updateEmailOrMobileDialog = false
-            let sessionValue = JSON.parse(window.sessionStorage.getItem('userInfo'))
             if (this.updateForm.flag === 'email') {
               this.updateForm.email = this.updateForm.emailOrMobile
             } else {
               this.updateForm.mobile = this.updateForm.emailOrMobile
             }
+            // 更新 store.user.userInfo
             this.$store.dispatch('updateEmailOrMobile', {
               flag: this.updateForm.flag,
               value: this.updateForm.emailOrMobile
             })
           }
-          console.log(res)
         }).catch(err => {
-          console.log(err)
+          console.log('AccountSetting.vue->commitUpdateEmailOrMobile->err', err)
         })
       })
 
     },
-    // 根据内容不同获取验证码
+    /**
+     * 根据内容不同获取验证码
+     */
     getCode() {
       this.$confirm(`确认修改${this.updateForm.flag}吗？`, "", {type: 'warning'}).then(res => {
-        // TODO 获取邮箱或手机验证码
-        this.getRequest(`/get-code/${this.updateForm.flag}/${this.updateForm.emailOrMobile}`).then(res => {
-          // 成功！更新 updateForm
-          console.log(res)
+        // 获取邮箱或手机验证码
+        this.getRequest(`${constants.GET_CODE}/${this.updateForm.flag}/${this.updateForm.emailOrMobile}`).then(res => {
+          if (res) {
+            alert(res.object)
+          }
         }).catch(err => {
-          console.log(err)
+          console.log('AccountSetting.vue->getCode->err', err)
         })
       }).catch(err => {
-        console.log(err)
+        console.log('AccountSetting.vue->getCode->err', err)
       })
     },
 
-    //  获取子组件 $emit() 分发的事件(commitCropDataToInvoker)的值
+    /**
+     * 获取子组件 $emit() 分发的事件(commitCropDataToInvoker)的值
+     */
     getCropDataFromComponets(cropData) {
       this.cropData = cropData
     },
@@ -275,9 +332,12 @@ export default {
       this.cropData.avatarUrl = fileBase64Url
       this.qiniu.qiniuData.key = this.cropData.name;
       await this.getQiniuToken(this.qiniu.qiniuData.key)
+      // callback() 防止上传两次，修改了原项目中的源代码
       callback()
     },
-    // 创建前从后台获取访问七牛云的 token - (key(文件名) bucket, AccessKey, SecretKey)
+    /**
+     * 创建前从后台获取访问七牛云的 token - (key(文件名) bucket, AccessKey, SecretKey)
+     */
     getQiniuToken: async function (key) {
       const _this = this;
       await this.getRequest(`${constants.GET_QINIU_TOKEN_URL}/${key}`)
@@ -297,35 +357,22 @@ export default {
      */
     handleResponse(res, file, fileList) {
       let newAvatarUrl = res.key;
-      this.putRequest(`update-avatar-url/${newAvatarUrl}`).then(res => {
-        if (res.statusCode === 200) {
+      this.putRequest(`${constants.UPDATE_AVATAR_URL}/${newAvatarUrl}`).then(res => {
+        if (res) {
           // 更新 state 中的 userInfo
           this.$store.dispatch('updateUserAvatar', newAvatarUrl)
         }
       }).catch(err => {
-        console.log('AccountSetting.vue->handleResponse',err)
+        console.log('AccountSetting.vue->handleResponse->err', err)
       })
       return file.avatarUrl
     },
-    // async getUserInfo(id) {
-    //   const {res} = await this.getRequest('getUserById/' + id)
-    //   if (res.meta.status !== 200) {
-    //     return this.$message.error('查询用户失败')
-    //   }
-    //   // 把查询到的数据 保存到 updateForm
-    //   this.updateForm = res.data
-    // },
     /**
      * 重置表单
-     * @param formName
      */
     resetForm(formName) {
       this.$refs[formName].resetFields();
     }
-  },
+  }
 }
 </script>
-
-<style scoped>
-
-</style>

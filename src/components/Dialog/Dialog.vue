@@ -4,6 +4,7 @@
   [vue中直接修改props中的值并未给出警告，为啥](https://segmentfault.com/q/1010000015952520)
   [Vue2在子组件改变父组件传入props值三种方法（利用Vue的设计漏洞实现双向同步）](https://blog.csdn.net/qq_21567385/article/details/109213813)
   [vue中实现点击空白区域关闭弹窗](https://juejin.cn/post/6911863086487961607)
+  [用一个div画出关闭图标](https://segmentfault.com/a/1190000008955548)
   -->
   <div class="add_pin_modal" v-show="showDialog">
     <i class="el-icon-close close-btn" @click="closeDialog"></i>
