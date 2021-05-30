@@ -75,7 +75,7 @@ export default {
      * 图片点击
      */
     handleClick(item) {
-      this.$message.warning(item.pinboardBgimgUrl);
+      this.$message.info(item.pinboardBgimgUrl);
     },
     /**
      * 编辑

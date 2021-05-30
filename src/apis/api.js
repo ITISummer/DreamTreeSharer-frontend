@@ -47,7 +47,7 @@ axios.interceptors.request.use(config => {
  * 响应拦截器-拦截后台返回的数据
  */
 axios.interceptors.response.use(resp => {
-    console.log('api.js->axios.interceptors.response.use() -> resp')
+    console.log('api.js->axios.interceptors.response.use()->resp')
     // 响应拦截进来隐藏loading效果，此处采用延时处理是合并loading请求效果，
     // 避免多次请求loading关闭又开启
     // 合并loading请求效果 避免重复请求

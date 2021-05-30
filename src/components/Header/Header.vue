@@ -5,57 +5,58 @@
 -->
 <template>
   <!--    头部-->
-  <el-header>
-    <el-row align="middle" justify="center">
-      <el-col :span="2">
-        <el-image class="image-el" :src="require('@/assets/images/logo3.png')"></el-image>
-      </el-col>
-      <el-col :span="2">
-        <router-link to="/home">
-          <el-button round>Home</el-button>
-        </router-link>
-      </el-col>
-      <el-col :span="14" :offset="1">
-        <el-input type="text"
-                  @keyup.enter.native="validate"
-                  placeholder="Type something..."
-                  class="input-with-select"
-                  v-model="search"
-        >
-          <el-select v-model="flag" slot="prepend" placeholder="Select" style="width: 120px">
-            <el-option label="用户名" value="1"/>
-            <el-option label="梦卡类型" value="2"/>
-            <el-option label="梦卡标题" value="3"/>
-          </el-select>
-          <el-button slot="append" icon="el-icon-search" @click="validate"/>
-        </el-input>
-      </el-col>
-      <el-col :span="2" :offset="1">
-        <span class="user-name">{{ userInfo.userUsername }}</span>
-        <i class="el-icon-chat-dot-round chat-icon" style="width: 40px;height: 40px;line-height: inherit;" @click="goChat"></i>
-      </el-col>
-      <el-col :span="1" :offset="1">
-        <el-dropdown @command="handleCommand">
-          <div class="el-dropdown-link">
-            <el-avatar size="large"
-                       :src="getUserAvatarUrl"></el-avatar>
-          </div>
-          <el-dropdown-menu slot="dropdown">
-            <el-dropdown-item command="personal-center">
-              <router-link to="/account-setting">个人中心</router-link>
-            </el-dropdown-item>
-            <el-dropdown-item command="logout">登出</el-dropdown-item>
-          </el-dropdown-menu>
-        </el-dropdown>
-      </el-col>
-    </el-row>
-    <!--    分页模糊查询(用户名，梦卡类型，梦卡标题)-->
-    <Pagination
-        ref="pagination"
-        :search="search"
-        :flag="flag"
-    />
-  </el-header>
+    <el-header>
+      <el-row align="middle" justify="center">
+        <el-col :span="2">
+          <el-image class="image-el" :src="require('@/assets/images/logo3.png')"></el-image>
+        </el-col>
+        <el-col :span="2">
+          <router-link to="/home">
+            <el-button round>Home</el-button>
+          </router-link>
+        </el-col>
+        <el-col :span="14" :offset="1">
+          <el-input type="text"
+                    @keyup.enter.native="validate"
+                    placeholder="Type something..."
+                    class="input-with-select"
+                    v-model="search"
+          >
+            <el-select v-model="flag" slot="prepend" placeholder="Select" style="width: 120px">
+              <el-option label="用户名" value="1"/>
+              <el-option label="梦卡类型" value="2"/>
+              <el-option label="梦卡标题" value="3"/>
+            </el-select>
+            <el-button slot="append" icon="el-icon-search" @click="validate"/>
+          </el-input>
+        </el-col>
+        <el-col :span="2" :offset="1">
+          <span class="user-name">{{ userInfo.userUsername }}</span>
+          <i class="el-icon-chat-dot-round chat-icon" style="width: 40px;height: 40px;line-height: inherit;"
+             @click="goChat"></i>
+        </el-col>
+        <el-col :span="1" :offset="1">
+          <el-dropdown @command="handleCommand">
+            <div class="el-dropdown-link">
+              <el-avatar size="large"
+                         :src="getUserAvatarUrl"></el-avatar>
+            </div>
+            <el-dropdown-menu slot="dropdown">
+              <el-dropdown-item command="personal-center">
+                <router-link to="/account-setting">个人中心</router-link>
+              </el-dropdown-item>
+              <el-dropdown-item command="logout">登出</el-dropdown-item>
+            </el-dropdown-menu>
+          </el-dropdown>
+        </el-col>
+      </el-row>
+      <!--    分页模糊查询(用户名，梦卡类型，梦卡标题)-->
+      <Pagination
+          ref="pagination"
+          :search="search"
+          :flag="flag"
+      />
+    </el-header>
 </template>
 
 <script>
@@ -114,10 +115,10 @@ export default {
           this.$store.dispatch('initUserInfo', {})
           // 跳转到登录页
           this.$router.replace(constants.ROOT)
-          this.$message({
-            type: 'success',
-            message: '注销成功！'
-          });
+          // this.$message({
+          //   type: 'success',
+          //   message: '注销成功！'
+          // });
         }).catch(() => {
           this.$message({
             type: 'info',
@@ -184,7 +185,8 @@ export default {
     border-radius: 13px;
     width: 42px;
     height: 42px;
-    &:hover{
+
+    &:hover {
       width: 200px;
       height: 200px;
     }
@@ -201,6 +203,7 @@ export default {
     font-size: 30px;
   }
 }
+
 // 去除 router-link 下划线
 a {
   text-decoration: none;

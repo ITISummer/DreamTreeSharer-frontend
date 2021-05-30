@@ -3,55 +3,56 @@
 [element UI 的row-click事件如何使用参数？](https://blog.csdn.net/Gochan_Tao/article/details/79606066)
 -->
 <template>
-  <div>
-    <el-dialog title="模糊查询结果" :visible.sync="dialogTableVisible">
-      <el-table :data="gridData" v-if="flag === '1'">
-        <el-table-column label="用户头像"  prop="userAvatarUrl">
-          <template slot-scope="scope" property="userAvatarUrl">
-            <el-avatar size="large" :src="getBaseUrl+scope.row.userAvatarUrl"></el-avatar>
-          </template>
-        </el-table-column>
-        <el-table-column label="用户名"  prop="userUsername">
-          <template slot-scope="scope" property="userUsername">
-            <router-link :to="{path: '/profile',query:{username:scope.row.userUsername}}">
-              <span>{{ scope.row.userUsername }}</span></router-link>
-          </template>
-        </el-table-column>
-      </el-table>
-      <!-- 模糊分页查询 pin-title 或者 pin-type 后的展示 table -->
-<!--          <el-table :data="gridData" v-else @row-click="rowClick">-->
-      <el-table :data="gridData" v-else>
-        <el-table-column label="梦卡背景图" prop="pinboardBgimgUrl">
-          <template slot-scope="scope">
-            <el-image fit="cover" style="width: 100px; height: 100px" :src="scope.row.pinboardBgimgUrl"></el-image>
-          </template>
-        </el-table-column>
-        <el-table-column :label="flag === '2'? '梦卡类型':'梦卡标题'"
-                         :prop="flag === '2'?'pinboardType':'pinboardTitle'">
-        </el-table-column>
-      </el-table>
-      <el-pagination
-          background
-          layout="prev, pager, next"
-          @current-change="currentChange"
-          :total="this.total"
-          :page-size="size">
-      </el-pagination>
-    </el-dialog>
-
+  <el-container>
+      <el-dialog title="模糊查询结果" :visible.sync="dialogTableVisible" :modal='false'>
+        <el-table :data="gridData" v-if="flag === '1'">
+          <el-table-column label="用户头像" prop="userAvatarUrl">
+            <template slot-scope="scope" property="userAvatarUrl">
+              <el-avatar size="large" :src="getBaseUrl+scope.row.userAvatarUrl"></el-avatar>
+            </template>
+          </el-table-column>
+          <el-table-column label="用户名" prop="userUsername">
+            <template slot-scope="scope" property="userUsername">
+              <router-link :to="{path: '/profile',query:{username:scope.row.userUsername}}">
+                <span>{{ scope.row.userUsername }}</span></router-link>
+            </template>
+          </el-table-column>
+        </el-table>
+        <!-- 模糊分页查询 pin-title 或者 pin-type 后的展示 table -->
+<!--                <el-table :data="gridData" v-else @row-click="rowClick">-->
+        <el-table :data="gridData" v-else>
+          <el-table-column label="梦卡背景图" prop="pinboardBgimgUrl">
+            <template slot-scope="scope">
+              <el-image fit="cover" style="width: 100px; height: 100px" :src="scope.row.pinboardBgimgUrl"></el-image>
+            </template>
+          </el-table-column>
+          <el-table-column :label="flag === '2'? '梦卡类型':'梦卡标题'"
+                           :prop="flag === '2'?'pinboardType':'pinboardTitle'">
+          </el-table-column>
+        </el-table>
+        <el-pagination
+            background
+            layout="prev, pager, next"
+            @current-change="currentChange"
+            :total="this.total"
+            :page-size="size">
+        </el-pagination>
+      </el-dialog>
+    <!--点击查询结果的图片后显示评论等信息-->
     <Dialog
         :showDialog.sync="showDialog"
-        :showCommentsOrDreamForm="false"
-        :showSelect="false"/>
-  </div>
+        :showCommentsOrDreamForm="false"/>
+  </el-container>
 </template>
 
 <script>
-import {EventBus} from "../../apis/eventBus";
+import {EventBus, EventName} from "../../apis/eventBus";
 import constants from "../../apis/constants";
+import Dialog from "../Dialog/Dialog";
 import {getBaseUrl} from "../../apis/commonMethods";
 
 export default {
+  components: {Dialog},
   props: {
     search: '',
     flag: '',
@@ -74,13 +75,13 @@ export default {
   },
   methods: {
     // rowClick(item) {
-    //   console.log(item)
+    //   // console.log(item)
     //   // 获取图片元数据后，设置 dialog 显示为 true，通过 $emit()
     //   this.showDialog = true
-    //   EventBus.$emit('getPinboardInfoFromHome', item)
-    //   EventBus.$emit('initImageUrl', item.pinboardBgimgUrl)
-    //   EventBus.$emit('showSaveBtn', false)
-    //   EventBus.$emit('showSaveFromSiteBtn', false)
+    //   // EventBus.$emit(EventName.INIT_PIN_INFO, item)
+    //   // EventBus.$emit('initImageUrl', item.pinboardBgimgUrl)
+    //   // EventBus.$emit('showSaveBtn', false)
+    //   // EventBus.$emit('showSaveFromSiteBtn', false)
     // },
     /**
      * 当前页
@@ -102,6 +103,7 @@ export default {
       } else {
         // 每次调用之前 offset 记得清零
         this.offset = 0
+        this.currentPage = 1
         this.fuzzySearch()
         this.dialogTableVisible = true
       }
@@ -119,17 +121,9 @@ export default {
           this.$message.warning('已无更多数据！')
         }
       }).catch(err => {
-        console.log('Pagination.vue->fuzzySearch()->err',err)
+        console.log('Pagination.vue->fuzzySearch()->err', err)
       })
     },
   }
 }
 </script>
-
-<style lang="scss" scoped>
-.el-dialog .el-table{
-      //display: flex;
-      //justify-content: center;
-      //align-items: center;
-}
-</style>

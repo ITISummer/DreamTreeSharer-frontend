@@ -93,6 +93,7 @@ export default {
      */
     handleSuccess(res) {
       this.imageUrl = this.qiniu.uploadQiniuAddr + res.key;
+      this.showFlag = 'edit'
       // 向上暴露 imageUrl
       EventBus.$emit(EventName.GET_IMAGE_URL_FROM_UPLOAD, this.imageUrl)
       this.$message({message: `上传成功！图片地址为：${this.imageUrl}`, type: "success"})

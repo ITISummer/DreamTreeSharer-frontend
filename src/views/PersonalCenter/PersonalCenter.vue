@@ -1,7 +1,7 @@
 <template>
   <el-container>
-    <Header></Header>
-    <Aside></Aside>
+    <Header/>
+    <Aside/>
     <router-view/>
   </el-container>
 </template>
@@ -13,5 +13,3 @@ export default {
   components: {Header,Aside},
 }
 </script>
-<style scoped lang="scss">
-</style>

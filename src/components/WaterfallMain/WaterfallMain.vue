@@ -219,13 +219,14 @@ export default {
       border-style: none;
     }
 
-    .cover {
-      position: relative;
-    }
+    //.cover {
+    //  position: relative;
+    //}
 
     .dream {
       position: absolute;
       background: rgba(66, 65, 65, 0.6);
+      //background: white;
       top: 0;
       right: 0;
       width: 100%;
@@ -244,6 +245,7 @@ export default {
           color: #3a8ee6;
           font-size: 18px;
           font-weight: bold;
+          font-style: italic;
         }
         .dream-content {
           width: 100%;
@@ -253,15 +255,18 @@ export default {
       }
     }
 
-    .name { //卡片底部名字样式
-      background: #fff;
-      color: #666;
-      font-weight: 600;
-      padding: 10px 20px;
-      font-size: 14px;
-    }
+    //.name { //卡片底部名字样式
+    //  background: #fff;
+    //  color: #666;
+    //  font-weight: 600;
+    //  padding: 10px 20px;
+    //  font-size: 14px;
+    //}
 
     .menus { // 卡片操作菜单栏
+      background-image: linear-gradient(45deg, #F73D3D 25%, #4F1948 50%, #D12378 75%, #24A4E9 100%);
+      position: relative;
+      z-index: 102;
       padding: 10px;
       border-top: 1px solid #e7e7e7;
       text-align: right;

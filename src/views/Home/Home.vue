@@ -1,6 +1,6 @@
 <!--[瀑布流学习地址](https://www.jianshu.com/p/97b89597ab5c)-->
 <template>
-  <el-container id="main-container">
+  <el-container>
     <Header/>
     <WaterfallMain
         :images="images"

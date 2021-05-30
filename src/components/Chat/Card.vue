@@ -49,21 +49,21 @@ export default {
       value: [],
       loading: false,
       list: [
-        {
-          userId: '1',
-          userUsername: 'summer',
-          userAvatarUrl: 'user1.jpg'
-        },
-        {
-          userId: '2',
-          userUsername: 'summerlv',
-          userAvatarUrl: 'user2.jpg'
-        },
-        {
-          userId: '3',
-          userUsername: 'sulv',
-          userAvatarUrl: 'user3.jpg'
-        }
+        // {
+        //   userId: '1',
+        //   userUsername: 'summer',
+        //   userAvatarUrl: 'user1.jpg'
+        // },
+        // {
+        //   userId: '2',
+        //   userUsername: 'summerlv',
+        //   userAvatarUrl: 'user2.jpg'
+        // },
+        // {
+        //   userId: '3',
+        //   userUsername: 'sulv',
+        //   userAvatarUrl: 'user3.jpg'
+        // }
       ],
     }
   },

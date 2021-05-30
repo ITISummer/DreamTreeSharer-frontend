@@ -40,14 +40,19 @@ export default {
 <style scoped lang="scss">
 .add_pin_modal {
   width: 100%;
-  height: 100%;
+  height: 754px;
+  //width: 1900px;
+  //height: 850px;
   position: absolute;
+  //position: relative;
   top: 50%;
   left: 50%;
+  //top: 330px;
+  //left: 700px;
   transform: translate(-50%, -50%);
   z-index: 999;
   background-color: rgba(0, 0, 0, 0.5);
-
+  overflow: hidden;
 }
 .close-btn{
   width:60px;
@@ -55,6 +60,9 @@ export default {
   border:2px solid white;
   border-radius: 50%;
   position: relative;
+  //position: absolute;
+  //top: 9%;
+  //left: 50%;
   &:hover{
     cursor: pointer;
     background: #3a8ee6;

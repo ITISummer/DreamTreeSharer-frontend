@@ -300,7 +300,7 @@ export default {
      * 根据内容不同获取验证码
      */
     getCode() {
-      this.$confirm(`确认修改${this.updateForm.flag}吗？`, "", {type: 'warning'}).then(res => {
+      this.$confirm(`确认修改${this.updateForm.flag === 'mobile'?"手机号":"邮箱"}吗？`, "", {type: 'warning'}).then(res => {
         // 获取邮箱或手机验证码
         this.getRequest(`${constants.GET_CODE}/${this.updateForm.flag}/${this.updateForm.emailOrMobile}`).then(res => {
           if (res) {
